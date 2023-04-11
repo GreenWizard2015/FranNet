@@ -1,0 +1,12 @@
+{
+  "inherit": "configs/basic.json",
+  "experiment": {
+    "title": "Basic DDPM restorator",
+    "description": "Baseline for DDPM restorators"
+  },
+  "model": {
+    "restorator": {
+      "inherit": "configs/models/restorator/ddpm.json"
+    }
+  }
+}

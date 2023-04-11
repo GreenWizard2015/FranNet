@@ -1,0 +1,24 @@
+{
+  "name": "basic",
+  "latent dimension": 64,
+  "head": {
+    "downsample steps": [32, 32, 32],
+    "global context": {
+      "channels": 8,
+      "kernel size": 3,
+      "mlp": [256],
+      "final activation": "relu"
+    },
+    "local context": {
+      "kernel size": 5,
+      "conv before": 1,
+      "final activation": "relu"
+    }
+  },
+  "contexts mixer": {
+    "extract method": "interpolate",
+    "combine method": "concat",
+    "mlp": [256],
+    "final activation": "relu"
+  }
+}

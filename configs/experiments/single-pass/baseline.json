@@ -1,0 +1,12 @@
+{
+  "inherit": "configs/basic.json",
+  "experiment": {
+    "title": "Basic single pass restorator",
+    "description": "Baseline for restorators"
+  },
+  "model": {
+    "restorator": {
+      "inherit": "configs/models/restorator/single-pass.json"
+    }
+  }
+}

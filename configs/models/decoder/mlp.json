@@ -1,0 +1,11 @@
+{
+  "name": "mlp",
+  "residual": true,
+  "mlp blocks": 3,
+  "mlp": {
+    "shared": false,
+    "sizes": [64, 64, 64],
+    "activation": "relu",
+    "final activation": "linear"
+  }
+}

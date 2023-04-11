@@ -1,0 +1,9 @@
+{
+  "name": "celeba",
+  "image_size": 64,
+  "batch_size": 32,
+  "train": {
+    "repeat": 1,
+    "shuffle": 3
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "diffusion",
+  "kind": "DDPM",
+  "beta_schedule": "cosine",
+  "noise_steps": 100,
+  "loss_scaling": null,
+  "t_sheduler": null
+}

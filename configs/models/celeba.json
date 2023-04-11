@@ -1,0 +1,20 @@
+{
+  "encoder": {
+    "inherit": "encoder/basic.json",
+    "image size": 64,
+    "channels": 1
+  },
+  "decoder": {
+    "inherit": "decoder/mlp.json",
+    "channels": 3
+  },
+  "restorator": {
+    "inherit": "restorator/single-pass.json",
+    "channels": 3
+  },
+  "renderer": "from:renderer.json",
+  "nerf": {
+    "name": "basic",
+    "samplesN": 256
+  }
+}

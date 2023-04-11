@@ -1,0 +1,16 @@
+{
+  "name": "autoregressive",
+  "extra train steps": 0,
+  "source distribution": "normal",
+  "sampling": {
+    "threshold": 0.003,
+    "steps limit": 100,
+    "step size decay": 0.9,
+    "dynamic adjustment": false
+  },
+  "encoding": {
+    "scale by time": false,
+    "scale by coefficient": false,
+    "levels": [0.0]
+  }
+}

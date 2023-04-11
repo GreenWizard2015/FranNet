@@ -1,0 +1,22 @@
+{
+  "dataset": {
+    "inherit": "configs/dataset/celeba.json",
+    "test": {
+      "limit": 512,
+      "batch_size": 8
+    }
+  },
+  "model": {
+    "inherit": "configs/models/celeba.json",
+    "optimizer": {
+      "name": "adam",
+      "learning_rate": 1e-4
+    },
+    "decoder": {
+      "channels": 3
+    }
+  },
+  "fit_params": {
+    "epochs": 15
+  }
+}

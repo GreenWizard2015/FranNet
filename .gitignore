@@ -1,0 +1,7 @@
+__pycache__
+/.settings
+/.pydevproject
+/.project
+/dataset/*.csv
+/dataset/*.npy
+/final_config.json

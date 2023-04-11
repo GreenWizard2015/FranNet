@@ -1,0 +1,19 @@
+{
+  "inherit": "configs/basic.json",
+  "model": {
+    "restorator": {
+      "inherit": "configs/models/restorator/autoregressive.json",
+      "channels": 3,
+      "encoding": {
+        "levels": [0]
+      }
+    },
+    "decoder": {
+      "channels": 3
+    }
+  },
+  "experiment": {
+    "title": "Basic autoregressive restorator",
+    "description": "Baseline for autoregressive restorators."
+  }
+}
