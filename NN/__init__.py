@@ -52,8 +52,7 @@ def model_from_config(config, compile=True):
   nerf = _nerf_from_config(config['nerf'])(
     encoder, renderer, restorator
   )
-  inputShape = encoder.get_input_shape()
-  nerf.build((None, *inputShape))
+  nerf.build(nerf.get_input_shape())
 
   if compile:
     nerf.compile(optimizer=_optimizer_from_config(config['optimizer']))

@@ -44,7 +44,21 @@ def showDiffusion(diff, img, N=14, process=lambda x: x, stepBy=25):
     continue
   return
 
-def load_config(path, folder=None):
+# function to recursively merge two configs
+def merge_configs(old, new):
+  if isinstance(old, dict) and isinstance(new, dict):
+    keys = set(list(old.keys()) + list(new.keys()))
+    for key in keys:
+      value = new.get(key, old.get(key))
+      if key in old:
+        value = merge_configs(old[key], value)
+
+      old[key] = value
+      continue
+    return old
+  return new
+
+def _load_single_config(path, folder=None):
   if folder is None: folder = []
   if not isinstance(folder, list): folder = [folder]
   curFolder = os.path.dirname(path)
@@ -61,40 +75,35 @@ def load_config(path, folder=None):
       pass
     return path
 
-  # function to recursively merge two values
-  def merge(old, new):
-    if isinstance(old, dict) and isinstance(new, dict):
-      keys = set(list(old.keys()) + list(new.keys()))
-      for key in keys:
-        value = new.get(key, old.get(key))
-        if key in old:
-          value = merge(old[key], value)
-
-        old[key] = value
-        continue
-      return old
-    return new
   # iterate over the config and fetch the values if 'inherit' is specified
   def iterate(config):
     for key, value in config.items():
       if isinstance(value, dict): iterate(value)
       if isinstance(value, str) and value.startswith('from:'):
         filepath = resolve_path(value[5:])
-        config[key] = load_config(filepath, folder)
+        config[key] = _load_single_config(filepath, folder)
         iterate(config[key])
       continue
     # if 'inherit' is specified, fetch the values from the inherited config
     # should be done after the iteration to avoid overriding the values
     if 'inherit' in config:
       filepath = resolve_path(config['inherit'])
-      inhConfig = load_config(filepath, folder)
+      inhConfig = _load_single_config(filepath, folder)
       config.pop('inherit')
       # update the config with the inherited values
       for key, value in inhConfig.items():
-        config[key] = merge(value, config.get(key)) if key in config else value
+        config[key] = merge_configs(value, config.get(key)) if key in config else value
         continue
       return iterate(config)
     return
   
   iterate(config)
+  return config
+
+def load_config(pathOrList, folder):
+  if isinstance(pathOrList, str): return _load_single_config(pathOrList, folder)
+  config = {}
+  for path in pathOrList:
+    config = merge_configs(config, _load_single_config(path, folder))
+    continue
   return config

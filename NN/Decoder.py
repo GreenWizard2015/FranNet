@@ -13,6 +13,7 @@ class MLPDecoder(tf.keras.Model):
     self._blocks = blocks(self.name)
     return
   
+  @tf.function
   def _value2initstate(self, x):
     B, C = tf.shape(x)[0], tf.shape(x)[1]
     tf.assert_equal(tf.shape(x), (B, C))

@@ -130,7 +130,7 @@ class CEncoder(tf.keras.Model):
     raise ValueError(f'Unknown combine method: {method}')
   
   def get_input_shape(self):
-    return (self._imgWidth, self._imgWidth, self._channels)
+    return (None, self._imgWidth, self._imgWidth, self._channels)
   
 def encoder_from_config(config):
   if 'basic' == config['name']:

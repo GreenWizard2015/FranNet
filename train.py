@@ -89,7 +89,11 @@ def main(args):
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='Process arguments.')
-  parser.add_argument('--config', type=str, help='Path to JSON config file', required=True)
+  parser.add_argument(
+    '--config', type=str, required=True,
+    help='Path to a single config file or a multiple config files (they will be merged in order of appearance)',
+    default=[], action='append', 
+  )
   parser.add_argument('--model', type=str, help='Path to model weights file (optional)')
   parser.add_argument('--folder', type=str, help='Path to folder to save model (optional)')
   parser.add_argument('--train-limit', type=int, help='Limit number of training samples (optional)')

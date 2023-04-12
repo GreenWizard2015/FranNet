@@ -69,6 +69,7 @@ class CNerf2D(tf.keras.Model):
     return {x.name: x.result() for x in self.metrics}
   
   #####################################################
+  @tf.function
   def call(self, 
     src,
     size=32, scale=1.0, shift=0.0, batchSize=None,
@@ -109,3 +110,6 @@ class CNerf2D(tf.keras.Model):
     )
     C = tf.shape(probes)[-1]
     return tf.reshape(probes, (B, size, size, C))
+  
+  def get_input_shape(self):
+    return self._encoder.get_input_shape()
