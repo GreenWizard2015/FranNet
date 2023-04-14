@@ -25,7 +25,7 @@ class CSingleStepRestoration(IRestorationProcess):
       T = modelT(T)[0]
     #######################
     shp = tf.shape(value)[:-1]
-    T = tf.reshape(T, (1, ) * len(shp) + (-1, ))
+    T = tf.reshape(T, tf.concat([tf.ones_like(shp), [-1]], axis=0))
     T = tf.tile(T, tf.concat([shp, [1]], axis=0))
     return denoiser(value, T)
   

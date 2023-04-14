@@ -28,7 +28,12 @@ class CNerf2D(tf.keras.Model):
     with tf.GradientTape() as tape:
       pos = tf.random.uniform((B, N, 2), dtype=tf.float32)
       x0 = extractInterpolated(dest, pos)
-      latents = self._encoder(src=src, pos=pos, training=True) # obtain latent vector for each sampled position
+      # obtain latent vector for each sampled position
+      latents = self._encoder.latentAt(
+        encoded=self._encoder(src=src, training=True),
+        pos=pos,
+        training=True
+      )
       tf.assert_equal(tf.shape(latents)[:1], (B * N,))
       tf.assert_equal(tf.shape(pos), (B, N, 2))
       tf.assert_equal(tf.shape(x0), (B, N, C))
@@ -69,7 +74,6 @@ class CNerf2D(tf.keras.Model):
     return {x.name: x.result() for x in self.metrics}
   
   #####################################################
-  @tf.function
   def call(self, 
     src,
     size=32, scale=1.0, shift=0.0, batchSize=None,
@@ -85,18 +89,17 @@ class CNerf2D(tf.keras.Model):
     tf.assert_equal(tf.shape(pos), (N, 2))
 
     def getChunk(ind, sz):
+      B = tf.shape(src)[0]
       posC = pos[ind:ind+sz]
       sz = tf.shape(posC)[0]
-      tf.assert_equal(tf.shape(posC), (sz, 2))
 
       # same coordinates for all images in the batch
       posC = tf.tile(posC, [B, 1])
       tf.assert_equal(tf.shape(posC), (B * sz, 2))
 
-      latents = self._encoder(
-        None, # src is not used, just to prevent error that first argument is not provided
+      latents = self._encoder.latentAt(
         encoded=encoded,
-        pos=tf.reshape(posC, (B, sz, 2)),
+        pos=tf.reshape(posC, (-1, sz, 2)),
         training=False
       )
       tf.assert_equal(tf.shape(latents)[:1], (B * sz,))

@@ -13,17 +13,12 @@ class MLPDecoder(tf.keras.Model):
     self._blocks = blocks(self.name)
     return
   
-  @tf.function
   def _value2initstate(self, x):
     B, C = tf.shape(x)[0], tf.shape(x)[1]
     tf.assert_equal(tf.shape(x), (B, C))
-    # due to unknown reasons, always false
-    if C == self._channels: return x
 
     shp = [1, (C + self._channels) // C]
     x = tf.tile(x, shp)[..., :self._channels]
-    tf.assert_equal(tf.shape(x), (B, self._channels))
-    # due to unknown reasons, tf.shape(x) is (B, None), but assert_equal doesn't raise
     return tf.reshape(x, (B, self._channels))
 
   def call(self, condition, coords, timestep, V):

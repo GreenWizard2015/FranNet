@@ -33,13 +33,13 @@ class Renderer(tf.keras.Model):
 
     def denoiser(x, t, mask=None):
       args = (latents, EPos, t, x)
-      if mask is not None:
-        args = (
-          tf.boolean_mask(latents, mask),
-          tf.boolean_mask(EPos, mask),
-          tf.boolean_mask(t, mask),
-          tf.boolean_mask(x, mask)
-        )
+    #   if mask is not None:
+    #     args = (
+        #   tf.boolean_mask(latents, mask),
+    #       tf.boolean_mask(EPos, mask),
+    #       tf.boolean_mask(t, mask),
+    #       tf.boolean_mask(x, mask)
+    #     )
       return self._decoder(*args, training=training)
     
     reverseArgs = {} if reverseArgs is None else reverseArgs
@@ -54,29 +54,26 @@ class Renderer(tf.keras.Model):
   def batched(self, ittr, B, N, batchSize=None, training=False):
     batchSize = self._batchSize if batchSize is None else batchSize
     # B * stepBy <= batchSize... stepBy <= batchSize / B
-    stepBy = tf.cast(
-      tf.math.floor(tf.cast(batchSize, tf.float32) / tf.cast(B, tf.float32)),
-      tf.int32
-    )
-    batchSize = stepBy * B
-    NBatches = tf.cast(tf.math.floor(tf.cast(N, tf.float32) / tf.cast(stepBy, tf.float32)), tf.int32)
+    stepBy = batchSize #// B
+    batchSize = stepBy #* B
+    NBatches = N // stepBy
     res = tf.TensorArray(tf.float32, 1 + NBatches, dynamic_size=False, clear_after_read=True)
     for i in tf.range(NBatches):
       index = i * stepBy
       data = ittr(index, stepBy)
       V = self._invD(*data, training=training)
       C = tf.shape(V)[-1]
-      res = res.write(i, tf.reshape(V, (B, stepBy, C)))
+      res = res.write(i, tf.reshape(V, (-1, stepBy, C)))
       continue
     #################
     index = NBatches * stepBy
 
-    data = ittr(index, stepBy)
+    data = ittr(index, N - index)
     V = self._invD(*data)
     C = tf.shape(V)[-1]
 
     w = N - index
-    V = tf.reshape(V, (B, w, C))
+    V = tf.reshape(V, (-1, w, C))
     V = tf.pad(V, [[0, 0], [0, stepBy - w], [0, 0]])
     tf.assert_equal(tf.shape(V), (B, stepBy, C))
     res = res.write(NBatches, V)
@@ -85,7 +82,7 @@ class Renderer(tf.keras.Model):
     tf.assert_equal(tf.shape(res)[1:], (B, stepBy, C))
 
     res = tf.transpose(res, (1, 0, 2, 3))
-    res = tf.reshape(res, (B, (NBatches + 1) * stepBy, C))[:, :N]
+    res = tf.reshape(res, (-1, (NBatches + 1) * stepBy, C))[:, :N]
     tf.assert_equal(tf.shape(res), (B, N, C))
     return res
   

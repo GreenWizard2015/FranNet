@@ -1,0 +1,20 @@
+{
+  "visualization": {
+    "output": {
+      "mode": "separate",
+      "format": "png",
+      "input": false,
+      "original": false
+    },
+    "model args": {
+      "size": 1024,
+      "scale": 1.0,
+      "shift": 0.0
+    }
+  },
+  "dataset": {
+    "test": {
+      "limit": 64
+    }
+  }
+}

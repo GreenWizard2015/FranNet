@@ -71,12 +71,10 @@ class CCoordsEncodingLayer(tf.keras.layers.Layer):
     )
     return
 
-  @tf.function
   def _fussion(self, x):
     res = tf.reduce_sum(x * self._fussionW, axis=-1) + self._fussionB
     return res
   
-  @tf.function
   def _transform(self, x):
     B, M, P, N = tf.shape(x)[0], x.shape[1], x.shape[2], self._N
     data = []
@@ -95,7 +93,6 @@ class CCoordsEncodingLayer(tf.keras.layers.Layer):
     tf.assert_equal(tf.shape(res)[:-1], (B, M, N, P))
     return tf.reshape(res, (B, M, N, res.shape[-1] * P))
   
-  @tf.function
   def call(self, x, training=None):
     # x is (B, M, P)
     # output is (B, M, N)
@@ -133,10 +130,8 @@ class CCoordsEncodingLayer(tf.keras.layers.Layer):
       mask = tf.cast(normed < noise, x.dtype) / (1.0 - normed)
       return x * tf.stop_gradient(mask)
     
-    @tf.function
     def F(x, training):
-      if training is None:
-        training = tf.keras.backend.learning_phase()
+      training = tf.keras.backend.learning_phase()
       training = tf.cast(training, tf.bool)
       return tf.cond(training, lambda: apply(x), lambda: tf.identity(x))
     return F

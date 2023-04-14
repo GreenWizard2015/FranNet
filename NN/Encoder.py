@@ -70,10 +70,9 @@ class CEncoder(tf.keras.Model):
     self._encoderHead = head(self.name + '/EncoderHead')
     self._localMixer = localMixer(self.name + '/LocalMixer')
     return
-  
-  def _encode(self, src, training=None):
-    encoded = self._encoderHead(src, training=training)
-    return encoded
+
+  def call(self, src, training=None):
+    return self._encoderHead(src, training=training)
   
   def _localContext(self, encoded, pos, training=None):
     B = tf.shape(pos)[0]
@@ -86,9 +85,9 @@ class CEncoder(tf.keras.Model):
     # concatenate all latent vectors and mix them
     latent = tf.concat(latent, axis=-1)
     localCtx = self._localMixer(latent, training=training)
-    if training:
-      dropoutMask = tf.random.uniform((B * N, 1)) < 0.2
-      localCtx = tf.where(dropoutMask, 0.0, localCtx)
+    # if training:
+    #   dropoutMask = tf.random.uniform((B * N, 1)) < 0.2
+    #   localCtx = tf.where(dropoutMask, 0.0, localCtx)
     return localCtx
 
   def latentAt(self, encoded, pos, training=None):
@@ -105,14 +104,6 @@ class CEncoder(tf.keras.Model):
       context=context, localCtx=localCtx,
       B=B, N=N, M=M
     )
-  
-  def call(self, src, encoded=None, pos=None, training=None):
-    if encoded is None:
-      assert src is not None, 'Src should be provided if encoded is not provided'
-      encoded = self._encode(src, training=training)
-      
-    if pos is None: return encoded
-    return self.latentAt(encoded, pos, training=training)
   
   def _getCombineMethod(self, method):
     def _combine_method_add(context, localCtx, B, N, M):
@@ -164,3 +155,4 @@ def encoder_from_config(config):
     )
   
   raise ValueError(f"Unknown encoder name: {config['name']}")
+ 
