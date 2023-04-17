@@ -69,6 +69,7 @@ class CEncoder(tf.keras.Model):
 
     self._encoderHead = head(self.name + '/EncoderHead')
     self._localMixer = localMixer(self.name + '/LocalMixer')
+    self._contextDropout = L.SpatialDropout1D(0.2)
     return
 
   def call(self, src, training=None):
@@ -85,9 +86,6 @@ class CEncoder(tf.keras.Model):
     # concatenate all latent vectors and mix them
     latent = tf.concat(latent, axis=-1)
     localCtx = self._localMixer(latent, training=training)
-    # if training:
-    #   dropoutMask = tf.random.uniform((B * N, 1)) < 0.2
-    #   localCtx = tf.where(dropoutMask, 0.0, localCtx)
     return localCtx
 
   def latentAt(self, encoded, pos, training=None):
@@ -100,6 +98,10 @@ class CEncoder(tf.keras.Model):
     context = encoded['context']
     tf.assert_equal(tf.shape(context), (B, M))
     tf.assert_equal(tf.shape(localCtx), (B * N, M))
+    
+    # apply spatial dropout to each context separately
+    context = self._contextDropout(context[None], training=training)[0]
+    localCtx = self._contextDropout(localCtx[None], training=training)[0]
     return self._combine(
       context=context, localCtx=localCtx,
       B=B, N=N, M=M

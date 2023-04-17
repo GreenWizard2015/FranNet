@@ -33,13 +33,13 @@ class Renderer(tf.keras.Model):
 
     def denoiser(x, t, mask=None):
       args = (latents, EPos, t, x)
-    #   if mask is not None:
-    #     args = (
-        #   tf.boolean_mask(latents, mask),
-    #       tf.boolean_mask(EPos, mask),
-    #       tf.boolean_mask(t, mask),
-    #       tf.boolean_mask(x, mask)
-    #     )
+      if mask is not None:
+        args = (
+          tf.boolean_mask(latents, mask),
+          tf.boolean_mask(EPos, mask),
+          tf.boolean_mask(t, mask),
+          tf.boolean_mask(x, mask)
+        )
       return self._decoder(*args, training=training)
     
     reverseArgs = {} if reverseArgs is None else reverseArgs
@@ -50,12 +50,11 @@ class Renderer(tf.keras.Model):
       **reverseArgs
     )
 
-  @tf.function
   def batched(self, ittr, B, N, batchSize=None, training=False):
     batchSize = self._batchSize if batchSize is None else batchSize
     # B * stepBy <= batchSize... stepBy <= batchSize / B
-    stepBy = batchSize #// B
-    batchSize = stepBy #* B
+    stepBy = batchSize // B
+    batchSize = stepBy * B
     NBatches = N // stepBy
     res = tf.TensorArray(tf.float32, 1 + NBatches, dynamic_size=False, clear_after_read=True)
     for i in tf.range(NBatches):
@@ -63,7 +62,7 @@ class Renderer(tf.keras.Model):
       data = ittr(index, stepBy)
       V = self._invD(*data, training=training)
       C = tf.shape(V)[-1]
-      res = res.write(i, tf.reshape(V, (-1, stepBy, C)))
+      res = res.write(i, tf.reshape(V, (B, stepBy, C)))
       continue
     #################
     index = NBatches * stepBy
@@ -73,7 +72,7 @@ class Renderer(tf.keras.Model):
     C = tf.shape(V)[-1]
 
     w = N - index
-    V = tf.reshape(V, (-1, w, C))
+    V = tf.reshape(V, (B, w, C))
     V = tf.pad(V, [[0, 0], [0, stepBy - w], [0, 0]])
     tf.assert_equal(tf.shape(V), (B, stepBy, C))
     res = res.write(NBatches, V)

@@ -74,6 +74,7 @@ class CNerf2D(tf.keras.Model):
     return {x.name: x.result() for x in self.metrics}
   
   #####################################################
+  @tf.function
   def call(self, 
     src,
     size=32, scale=1.0, shift=0.0, batchSize=None,
@@ -89,7 +90,6 @@ class CNerf2D(tf.keras.Model):
     tf.assert_equal(tf.shape(pos), (N, 2))
 
     def getChunk(ind, sz):
-      B = tf.shape(src)[0]
       posC = pos[ind:ind+sz]
       sz = tf.shape(posC)[0]
 
@@ -99,7 +99,7 @@ class CNerf2D(tf.keras.Model):
 
       latents = self._encoder.latentAt(
         encoded=encoded,
-        pos=tf.reshape(posC, (-1, sz, 2)),
+        pos=tf.reshape(posC, (B, sz, 2)),
         training=False
       )
       tf.assert_equal(tf.shape(latents)[:1], (B * sz,))
