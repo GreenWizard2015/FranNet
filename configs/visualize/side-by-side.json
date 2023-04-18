@@ -1,0 +1,9 @@
+{
+  "inherit": "configs/visualize/basic.json",
+  "visualization": {
+    "output": {
+      "mode": "side by side",
+      "resize": "centered"
+    }
+  }
+}

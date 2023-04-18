@@ -5,3 +5,4 @@ __pycache__
 /dataset/*.csv
 /dataset/*.npy
 /final_config.json
+/visualized

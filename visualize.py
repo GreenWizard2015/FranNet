@@ -7,6 +7,7 @@ import cv2, os, argparse, shutil
 from NN import model_from_config
 from Utils import dataset_from_config
 from Utils.visualize import generateImage
+from Utils.CFilesDataLoader import CFilesDataLoader
    
 def makeImageProcessor(unnormalizeImg):
   def _processImage(img):
@@ -52,7 +53,18 @@ def _data_from_dataset(config):
   return data.prefetch(buffer_size=tf.data.experimental.AUTOTUNE), dataset
 
 def _data_from_input(input, inputShape):
-  raise NotImplementedError('Input image not implemented yet')
+  files = []
+  if os.path.isdir(input):
+    # load all files from folder, filter by extension, only png and jpg... mind reading by copilot :)
+    files = [os.path.join(input, f) for f in os.listdir(input) if f.endswith('.png') or f.endswith('.jpg')]
+  if os.path.isfile(input):
+    files = [input]
+
+  if len(files) == 0:
+    raise ValueError(f'No files found in {input}')
+  
+  dataloader = CFilesDataLoader(files, targetSize=inputShape[:2], srcSize=(256, 256))
+  return dataloader.iterator(), dataloader
   
 def main(args):
   folder = os.path.dirname(__file__)
@@ -66,6 +78,7 @@ def main(args):
 
   model = model_from_config(config['model'])
   model.load_weights(args.model)
+  print('Model loaded successfully.')
   
   data, dataset = _data_from_dataset(config) if args.input is None else _data_from_input(args.input, model.get_input_shape()[1:])
   ##############################
