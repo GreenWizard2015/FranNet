@@ -3,13 +3,16 @@ import numpy as np
 
 # schedulers
 def cosine_beta_schedule(timesteps, s=0.008):
-  """
-  cosine schedule as proposed in https://arxiv.org/abs/2102.09672
-  """
-  x = tf.linspace(0.0, timesteps, timesteps + 1)
-  alphas_cumprod = tf.cos(((x / timesteps) + s) / (1 + s) * np.pi * 0.5) ** 2
-  alphas_cumprod = alphas_cumprod / alphas_cumprod[0]
-  betas = 1 - (alphas_cumprod[1:] / alphas_cumprod[:-1])
+  # cosine schedule as proposed in https://arxiv.org/abs/2102.09672
+  def f(t):
+    t = t / tf.cast(timesteps, tf.float32)
+    fraction = (t + s) / (1 + s)
+    alphas = tf.cos(fraction * np.pi / 2) ** 2
+    alpha0 = tf.cos((s / (1 + s)) * np.pi / 2) ** 2
+    return alphas / alpha0
+
+  f_t = f( tf.linspace(0.0, timesteps, timesteps + 1) )
+  betas = 1.0 - (f_t[1:] / f_t[:-1])
   return tf.clip_by_value(betas, 0.0001, 0.9999)
 
 def linear_beta_schedule(timesteps, beta_start=0.0001, beta_end=0.02):
