@@ -32,7 +32,8 @@ class CGaussianDiffusion(IRestorationProcess):
 
     (alphaHatT, SNR, ) = self._schedule.parametersForT(t, [CDiffusionParameters.PARAM_ALPHA_HAT, CDiffusionParameters.PARAM_SNR, ])
     noise = self._noise(s)
-    xT = (tf.sqrt(alphaHatT) * x0) + (tf.sqrt(1.0 - alphaHatT) * noise)
+    signal_rate, noise_rate = tf.sqrt(alphaHatT), tf.sqrt(1.0 - alphaHatT)
+    xT = (signal_rate * x0) + (noise_rate * noise)
     tf.assert_equal(tf.shape(xT), tf.shape(x0))
     return {
       'xT': xT,
