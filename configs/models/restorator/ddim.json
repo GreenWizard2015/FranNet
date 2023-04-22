@@ -1,7 +1,11 @@
 {
   "name": "diffusion",
   "kind": "DDPM",
-  "sampler": "DDPM",
+  "sampler": {
+    "kind": "DDIM",
+    "stochasticity": 0.0,
+    "K": 5
+  },
   "beta_schedule": "cosine",
   "noise_steps": 100,
   "loss_scaling": null,
