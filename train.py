@@ -32,6 +32,7 @@ def main(args):
 
   # Create model
   model = model_from_config(config["model"], compile=True)
+  model.summary(expand_nested=True)
   # save to config model architecture and number of parameters
   config['architecture'] = model_to_architecture(model)
   
@@ -47,7 +48,6 @@ def main(args):
       pass
     pass
 
-  model.summary(expand_nested=True)
   if args.no_train: return
 
   latestModel = os.path.join(folder, 'model-latest.h5')
