@@ -39,7 +39,7 @@ class CGaussianDiffusion(IRestorationProcess):
       'SNR': SNR,
     }
   
-  def reverse(self, value, denoiser, modelT=None, startStep=None, endStep=0):
+  def reverse(self, value, denoiser, modelT=None, startStep=None, endStep=0, **kwargs):
     # NOTE: don't use 'early stopping' here, like in the autoregressive case
     if isinstance(value, tuple):
       value = tf.random.normal(value + (self._channels, ), dtype=tf.float32)
@@ -63,11 +63,13 @@ class CGaussianDiffusion(IRestorationProcess):
       tf.assert_equal(tf.shape(x), initShape)
       return denoiser(x=x, t=T)
     #######################
-    value = self._sampler.sample(
+    sampler = kwargs.get('sampler', self._sampler)
+    value = sampler.sample(
       value,
       model=predictNoise,
       schedule=self._schedule,
       startStep=startStep, endStep=endStep,
+      **kwargs
     )
     tf.assert_equal(tf.shape(value), initShape)
     return value
