@@ -1,5 +1,5 @@
 import tensorflow as tf
-from NN.diffusion_schedulers import CDiffusionParameters
+from .diffusion_schedulers import CDiffusionParameters
 
 # diffusion works better with squared/zero variance, but it is incorrect implementation, so I added this configurable option
 class CNoiseProvider:

@@ -1,8 +1,8 @@
 import tensorflow as tf
 import numpy as np
-from NN.IRestorationProcess import IRestorationProcess
-from NN.diffusion_schedulers import CDiffusionParameters, CDPDiscrete, get_beta_schedule
-from NN.diffusion_samplers import sampler_from_config
+from ..IRestorationProcess import IRestorationProcess
+from .diffusion_schedulers import CDiffusionParameters, CDPDiscrete, get_beta_schedule
+from .diffusion_samplers import sampler_from_config
 
 # simple gaussian diffusion process
 class CGaussianDiffusion(IRestorationProcess):

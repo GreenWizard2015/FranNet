@@ -1,0 +1,1 @@
+from .diffusion import diffusion_from_config

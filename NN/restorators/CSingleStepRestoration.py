@@ -1,5 +1,5 @@
 import tensorflow as tf
-from NN.IRestorationProcess import IRestorationProcess
+from .IRestorationProcess import IRestorationProcess
 
 class CSingleStepRestoration(IRestorationProcess):
   def __init__(self, channels):

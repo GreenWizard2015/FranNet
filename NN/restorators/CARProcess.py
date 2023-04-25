@@ -1,5 +1,5 @@
 import tensorflow as tf
-from NN.IRestorationProcess import IRestorationProcess
+from .IRestorationProcess import IRestorationProcess
 import numpy as np
 import tensorflow_probability as tfp
 tfd = tfp.distributions

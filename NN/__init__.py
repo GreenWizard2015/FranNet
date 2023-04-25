@@ -1,24 +1,9 @@
-from NN.Encoder import encoder_from_config
-from NN.Decoder import decoder_from_config
-from NN.Renderer import renderer_from_config
-from NN.Nerf2D import CNerf2D
-from NN.CARProcess import autoregressive_restoration_from_config
-import NN.diffusion as D
-from NN.CSingleStepRestoration import CSingleStepRestoration
+from .Encoder import encoder_from_config
+from .Decoder import decoder_from_config
+from .Renderer import renderer_from_config
+from .restorators import restorator_from_config
+from .Nerf2D import CNerf2D
 import tensorflow as tf
-
-def _restorator_from_config(config):
-  name = config['name']
-  if 'autoregressive' == name:
-    return autoregressive_restoration_from_config(config)
-  
-  if 'diffusion' == name:
-    return D.diffusion_from_config(config)
-  
-  if 'single pass' == name:
-    return CSingleStepRestoration(channels=config['channels'])
-  
-  raise ValueError(f"Unknown restorator name: {name}")
 
 def _optimizer_from_config(config):
   if isinstance(config, str):
@@ -46,7 +31,7 @@ def _nerf_from_config(config):
 def model_from_config(config, compile=True):
   encoder = encoder_from_config(config['encoder'])
   decoder = decoder_from_config(config['decoder'])
-  restorator = _restorator_from_config(config['restorator'])
+  restorator = restorator_from_config(config['restorator'])
   renderer = renderer_from_config(config['renderer'], decoder, restorator)
   
   nerf = _nerf_from_config(config['nerf'])(
