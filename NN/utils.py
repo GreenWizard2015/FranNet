@@ -4,6 +4,11 @@ import numpy as np
 import tensorflow.keras.layers as L
 from NN.CCoordsEncodingLayer import CCoordsEncodingLayer
 
+def normVec(x):
+  V, L = tf.linalg.normalize(x, axis=-1)
+  V = tf.where(tf.math.is_nan(V), 0.0, V)
+  return(V, L)
+
 def ensure4d(src):
   return tf.reshape(src, tf.concat([tf.shape(src)[:3], (-1,)], axis=-1)) # 3d/4d => 4d
 

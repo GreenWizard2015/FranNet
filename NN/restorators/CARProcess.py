@@ -1,13 +1,9 @@
 import tensorflow as tf
 from .IRestorationProcess import IRestorationProcess
 import numpy as np
+from NN.utils import normVec
 import tensorflow_probability as tfp
 tfd = tfp.distributions
-
-def normVec(x):
-  V, L = tf.linalg.normalize(x, axis=-1)
-  V = tf.where(tf.math.is_nan(V), 0.0, V)
-  return(V, L)
 
 def normal_source_distribution(N):
   return tf.random.normal((N, 3), dtype=tf.float32)
