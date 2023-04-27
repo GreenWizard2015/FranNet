@@ -96,6 +96,9 @@ def main(args):
   # override config value by command line arg
   if args.target_size:
     modelArgs['size'] = args.target_size
+
+  if args.renderer_batch_size:
+    modelArgs['batchSize'] = args.renderer_batch_size
   
   dataIttr = _processData(
     data,
@@ -126,6 +129,7 @@ if __name__ == "__main__":
   # misc
   parser.add_argument('--folder', type=str, help='Path to output folder (optional)', default=None)
   parser.add_argument('--gpu-memory-mb', type=int, help='GPU memory limit in Mb (optional)')
+  parser.add_argument('--renderer-batch-size', type=int, help='Renderer batch size (optional)')
   ########################### 
   args = parser.parse_args()
   if args.gpu_memory_mb: setGPUMemoryLimit(args.gpu_memory_mb)
