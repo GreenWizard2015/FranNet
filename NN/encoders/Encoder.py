@@ -52,7 +52,7 @@ def createEncoderHead(
   )
 
 class CEncoder(tf.keras.Model):
-  def __init__(self, imgWidth, channels, head, extractor, combiner, **kwargs):
+  def __init__(self, imgWidth, channels, head, extractor, combiner, contextDropout, **kwargs):
     super().__init__(**kwargs)
     self._imgWidth = imgWidth
     self._channels = channels
@@ -60,7 +60,10 @@ class CEncoder(tf.keras.Model):
     self._encoderHead = head(self.name + '/EncoderHead')
     self._extractor = extractor(self.name + '/Extractor')
     self._combine = combiner
-    self._contextDropout = L.SpatialDropout1D(0.2)
+
+    self._contextDropout = None
+    if 0.0 < contextDropout:
+      self._contextDropout = L.SpatialDropout1D(contextDropout, name=self.name + '/ContextDropout')
     return
 
   def call(self, src, training=None):
@@ -78,8 +81,9 @@ class CEncoder(tf.keras.Model):
     tf.assert_equal(tf.shape(localCtx), (B * N, M))
     
     # apply spatial dropout to each context separately
-    context = self._contextDropout(context[None], training=training)[0]
-    localCtx = self._contextDropout(localCtx[None], training=training)[0]
+    if not(self._contextDropout is None):
+      context = self._contextDropout(context[None], training=training)[0]
+      localCtx = self._contextDropout(localCtx[None], training=training)[0]
     return self._combine(
       context=context, localCtx=localCtx,
       B=B, N=N, M=M
