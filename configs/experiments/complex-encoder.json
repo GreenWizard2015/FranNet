@@ -1,0 +1,22 @@
+{
+  "model": {
+    "encoder": {
+      "contexts mixer": {
+        "extractor": {
+          "kind": "combined",
+          "weights activation": "squared tanh",
+          "extractors": [
+            {
+              "kind": "interpolate",
+              "mlp": [256],
+              "final activation": "relu"
+            },
+            {
+              "kind": "conv"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

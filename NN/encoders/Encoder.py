@@ -1,6 +1,6 @@
 import tensorflow as tf
 import tensorflow.keras.layers as L
-from NN.utils import sMLP, extractInterpolated
+from NN.utils import sMLP
 
 '''
 Simple encoder that takes image as input and returns corresponding latent vector with intermediate representations
@@ -51,30 +51,6 @@ def createEncoderHead(
     name=name
   )
 
-class CInterpolateExtractor(tf.keras.Model):
-  def __init__(self, localMixer, **kwargs):
-    super().__init__(**kwargs)
-    self._localMixer = localMixer(self.name + '/LocalMixer')
-    return
-  
-  def call(self, features, pos, training=None):
-    B = tf.shape(pos)[0]
-    N = tf.shape(pos)[1]
-    # extract latent vectors from each 2D feature map
-    latent = []
-    for data in features:
-      # assert 2D feature map
-      tf.assert_rank(data, 4)
-      vectors = extractInterpolated(data, pos)
-      D = vectors.shape[-1]
-      # reshape to (B * N, D) and append to latent
-      latent.append(tf.reshape(vectors, (B * N, D)))
-      continue
-    # concatenate all latent vectors and mix them
-    latent = tf.concat(latent, axis=-1)
-    return self._localMixer(latent, training=training)
-# End of CInterpolateExtractor
-
 class CEncoder(tf.keras.Model):
   def __init__(self, imgWidth, channels, head, extractor, combiner, **kwargs):
     super().__init__(**kwargs)
@@ -112,61 +88,3 @@ class CEncoder(tf.keras.Model):
   def get_input_shape(self):
     return (None, self._imgWidth, self._imgWidth, self._channels)
 # End of CEncoder
-
-def _local_mixer_from_config(mixer, latentDim):
-  def localMixer(name):
-    return tf.keras.Sequential([
-      sMLP(sizes=mixer['mlp'], activation='relu', name=name + '/mlp'),
-      L.Dense(latentDim, activation=mixer['final activation'], name=name + '/final')
-    ], name=name)
-  return localMixer
-
-def _extractor_from_config(mixer, latentDim):
-  localMixer = _local_mixer_from_config(mixer, latentDim)
-  extractMethod = mixer['extract method']
-  if 'interpolate' == extractMethod:
-    return lambda name: CInterpolateExtractor(localMixer, name=name)
-  
-  raise ValueError(f'Unknown extractor method: {extractMethod}')
-
-def _getCombineMethod(method):
-  def _combine_method_add(context, localCtx, B, N, M):
-    localCtx = tf.reshape(localCtx, (B, N, M))
-    res = context[:, None] + localCtx
-    return tf.reshape(res, (B * N, M))
-  
-  def _combine_method_concat(context, localCtx, B, N, M):
-    context = tf.repeat(context, N, axis=0)
-    res = tf.concat([context, localCtx], axis=-1)
-    return tf.reshape(res, (B * N, 2 * M))
-  
-  if method == 'add': return _combine_method_add
-  if method == 'concat': return _combine_method_concat
-  raise ValueError(f'Unknown combine method: {method}')
-
-def encoder_from_config(config):
-  if 'basic' == config['name']:
-    imgWidth = config['image size']
-    latentDim = config['latent dimension']
-    headConfig = config['head']
-    head = lambda name: createEncoderHead(
-      imgWidth=imgWidth,
-      channels=config['channels'],
-      downsampleSteps=headConfig['downsample steps'],
-      latentDim=latentDim,
-      localContext=headConfig['local context'],
-      globalContext=headConfig['global context'],
-      name=name
-    )
-
-    mixer = config['contexts mixer']
-    return CEncoder(
-      imgWidth=imgWidth,
-      channels=config['channels'],
-      head=head,
-      extractor=_extractor_from_config(mixer, latentDim),
-      combiner=_getCombineMethod(mixer['combine method']),
-    )
-  
-  raise ValueError(f"Unknown encoder name: {config['name']}")
- 

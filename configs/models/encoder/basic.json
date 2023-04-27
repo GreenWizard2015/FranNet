@@ -16,9 +16,11 @@
     }
   },
   "contexts mixer": {
-    "extract method": "interpolate",
-    "combine method": "concat",
-    "mlp": [256],
-    "final activation": "relu"
+    "extractor": {
+      "kind": "interpolate",
+      "mlp": [256],
+      "final activation": "relu"
+    },
+    "combine method": "concat"
   }
 }

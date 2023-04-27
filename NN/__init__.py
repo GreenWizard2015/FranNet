@@ -1,4 +1,4 @@
-from .Encoder import encoder_from_config
+from .encoders import encoder_from_config
 from .Decoder import decoder_from_config
 from .Renderer import renderer_from_config
 from .restorators import restorator_from_config
