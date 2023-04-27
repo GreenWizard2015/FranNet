@@ -1,5 +1,6 @@
 import tensorflow as tf
 import tensorflow_datasets as tfds
+from Utils.utils import masking_from_config
 
 class CCelebADataset:
   def __init__(self, image_size=64, batch_size=32):
@@ -34,7 +35,7 @@ class CCelebADataset:
     src = tf.image.resize(src, [self._imageSize, self._imageSize])
     return(self.normalizeImg(src), self.normalizeImg(img))
 
-  def as_dataset(self, split, batch_size=None, limit=None):
+  def _dataset(self, split, batch_size=None, limit=None):
     batch_size = batch_size or self._batchSize
     res = self._celeb_a_builder.as_dataset(split=split)
     if limit: res = res.take(limit)
@@ -42,11 +43,12 @@ class CCelebADataset:
     return res.map(self._process)
   
   def make_dataset(self, config, split):
-    res = self.as_dataset(
+    res = self._dataset(
       split,
       batch_size=config.get('batch_size', self._batchSize),
       limit=config.get('limit', None),
     )
+    if 'masking' in config: res = res.map( masking_from_config(config['masking']) )
     if 'repeat' in config: res = res.repeat(config['repeat'])
     if 'shuffle' in config: res = res.shuffle(config['shuffle'])
     return res
@@ -54,3 +56,28 @@ class CCelebADataset:
   @property
   def input_shape(self):
     return (self._imageSize, self._imageSize, 1)
+  
+if __name__ == "__main__": # test masking
+  import cv2
+  train = CCelebADataset(image_size=64, batch_size=1).make_dataset(
+    {
+      'batch_size': 1, 'limit': 16,
+      'masking': {
+        'kind': 'grid',
+        'size': 8, # 8x8 grid
+        'min': 0, 'max': -1, # min and max number of masked squares
+        'mask value': -1.0, # normalized value of masked squares
+      }
+    }, 'train'
+  )
+  for src, img in train.take(12):
+    src = src[0].numpy()
+    img = img[0].numpy()
+    src = (1.0 + src) / 2.0
+    # upscale src by 4x
+    src = cv2.resize(src, (256, 256), interpolation=cv2.INTER_NEAREST)
+    cv2.imshow('src', src)
+    cv2.imshow('img', img)
+    cv2.waitKey(0)
+    pass
+  pass

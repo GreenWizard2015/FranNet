@@ -107,3 +107,41 @@ def load_config(pathOrList, folder):
     config = merge_configs(config, _load_single_config(path, folder))
     continue
   return config
+
+# helper function to create a masking function from config for the dataset
+def masking_from_config(config):
+  kind = config['kind'].lower()
+  if 'grid' == kind:
+    size = config['size']
+    total = size * size
+    minC = config['min']
+    maxC = config['max']
+    if maxC < 0: maxC = total + maxC
+    if total <= maxC: maxC = total - 1
+    maskValue = config.get('mask value', 0.0)
+
+    def _applyMasking_(src, img):
+      B = tf.shape(src)[0]
+      # number of masked cells per image
+      maskedCellsN = tf.random.uniform((B, 1), minC, maxC + 1, dtype=tf.int32)
+      # generate probability mask for each image
+      mask = tf.random.uniform((B, total), 0.0, 1.0)
+      # get sorted indices of the mask
+      cellsOrdered = tf.argsort(mask, axis=-1, direction='DESCENDING')
+      # get value of maskedCellsN-th element in each row
+      indices = tf.gather(cellsOrdered, maskedCellsN, batch_dims=1)
+      threshold = tf.gather(mask, indices, batch_dims=1)
+      tf.assert_equal(tf.shape(threshold), (B, 1))
+      # make binary mask, where 1 means NOT masked
+      mask = tf.cast(mask <= threshold, tf.float32)
+      # reshape mask to (B, size, size, 1)
+      mask = tf.reshape(mask, (B, size, size, 1))
+      # scale mask to image size
+      imageSize = tf.shape(src)[1:3]
+      mask = tf.image.resize(mask, imageSize, method='nearest')
+      # apply mask to source image
+      src = src * mask + (1.0 - mask) * maskValue
+      return (src, img)
+    return _applyMasking_
+  
+  raise ValueError('Unknown masking kind: %s' % kind)
