@@ -39,7 +39,7 @@ def encoder_from_config(config):
       head=head,
       extractor=extractor_from_config(mixer['extractor'], latentDim),
       combiner=_getCombineMethod(mixer['combine method']),
-      contextDropout=config['context dropout'],
+      contextDropout=mixer['context dropout'],
     )
   
   raise ValueError(f"Unknown encoder name: {config['name']}")
