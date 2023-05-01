@@ -18,16 +18,8 @@ class CGaussianDiffusion(IRestorationProcess):
     self._sampler = sampler
     return
   
-  def forward(self, x0, t=None):
-    '''
-    This function implements the forward diffusion process. It takes an initial value and applies the T steps of the diffusion process.
-    '''
-    s = tf.shape(x0)
-    if t is None:
-      t = self._schedule.sampleT(s[:-1])
-
+  def _forwardStep(self, x0, noise, t):
     (alphaHatT, SNR, ) = self._schedule.parametersForT(t, [CDiffusionParameters.PARAM_ALPHA_HAT, CDiffusionParameters.PARAM_SNR, ])
-    noise = tf.random.normal(s)
     signal_rate, noise_rate = tf.sqrt(alphaHatT), tf.sqrt(1.0 - alphaHatT)
     xT = (signal_rate * x0) + (noise_rate * noise)
     tf.assert_equal(tf.shape(xT), tf.shape(x0))
@@ -38,6 +30,16 @@ class CGaussianDiffusion(IRestorationProcess):
       'target': noise,
       'SNR': SNR,
     }
+  
+  def forward(self, x0, t=None):
+    '''
+    This function implements the forward diffusion process. It takes an initial value and applies the T steps of the diffusion process.
+    '''
+    s = tf.shape(x0)
+    if t is None:
+      t = self._schedule.sampleT(s[:-1])
+    noise = tf.random.normal(s)
+    return self._forwardStep(x0, noise, t)
   
   def reverse(self, value, denoiser, modelT=None, startStep=None, endStep=0, **kwargs):
     # NOTE: don't use 'early stopping' here, like in the autoregressive case
