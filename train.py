@@ -37,9 +37,10 @@ def main(args):
   config['architecture'] = model_to_architecture(model)
   
   # Load weights if specified and evaluate
+  modelLoss = None
   if args.model:
     model.load_weights(args.model)
-    model.evaluate(test_data)
+    modelLoss = model.evaluate(test_data, return_dict=True)['loss']
     pass
 
   if args.dump_config:
@@ -54,10 +55,12 @@ def main(args):
   callbacks = [
     tf.keras.callbacks.ModelCheckpoint(
       filepath=os.path.join(folder, 'model-{epoch:02d}.h5'),
+      initial_value_threshold=modelLoss,
       save_weights_only=True, save_best_only=True, monitor='val_loss', verbose=1
     ),
     tf.keras.callbacks.ModelCheckpoint(
       filepath=latestModel,
+      initial_value_threshold=modelLoss,
       save_weights_only=True, save_best_only=True, monitor='val_loss', verbose=1
     ),
     tf.keras.callbacks.TerminateOnNaN(),
