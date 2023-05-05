@@ -17,7 +17,7 @@
   },
   "contexts mixer": {
     "extractor": {
-      "kind": "interpolate",
+      "name": "interpolate",
       "mlp": [256],
       "final activation": "relu"
     },

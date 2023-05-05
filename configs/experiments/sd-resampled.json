@@ -1,0 +1,20 @@
+{
+  "model": {
+    "restorator": {
+      "source distribution": {
+        "name": "switch",
+        "inference": {
+          "name": "normal",
+          "mean": 0.0,
+          "stddev": 1.0
+        },
+        "training": {
+          "name": "normal resampled",
+          "mean": 0.0,
+          "stddev": 1.0,
+          "fraction": 0.1
+        }
+      }
+    }
+  }
+}

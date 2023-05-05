@@ -1,0 +1,20 @@
+{
+  "model": {
+    "restorator": {
+      "source distribution": {
+        "name": "switch",
+        "inference": {
+          "name": "normal",
+          "mean": 0.0,
+          "stddev": 1.0
+        },
+        "training": {
+          "comment": "Covers 4sigma of the N(0, 1), but more uniformly than the normal distribution.",
+          "name": "halton",
+          "min": -4.0,
+          "max": 4.0
+        }
+      }
+    }
+  }
+}

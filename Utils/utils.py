@@ -29,21 +29,6 @@ def setupGPU():
     pass
   return
 
-def showDiffusion(diff, img, N=14, process=lambda x: x, stepBy=25):
-  steps = [img]
-  for t in range(0, diff.noise_steps, stepBy):
-    T = np.full(img.shape[:2], t)
-    (xT, _, _) = diff.forward(img, T)
-    steps.append(xT.numpy())
-    continue
-
-  for i in range(0, len(steps), N):
-    items = steps[i:i+N]
-    items = [cv2.resize(process(x)*255, (128, 128)) for x in items]
-    cv2_imshow(np.concatenate(items, axis=1))
-    continue
-  return
-
 # function to recursively merge two configs
 def merge_configs(old, new):
   if isinstance(old, dict) and isinstance(new, dict):
@@ -110,8 +95,8 @@ def load_config(pathOrList, folder):
 
 # helper function to create a masking function from config for the dataset
 def masking_from_config(config):
-  kind = config['kind'].lower()
-  if 'grid' == kind:
+  name = config['name'].lower()
+  if 'grid' == name:
     size = config['size']
     total = size * size
     minC = config['min']
@@ -144,4 +129,4 @@ def masking_from_config(config):
       return (src, img)
     return _applyMasking_
   
-  raise ValueError('Unknown masking kind: %s' % kind)
+  raise ValueError('Unknown masking name: %s' % name)

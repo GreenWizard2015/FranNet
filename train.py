@@ -10,6 +10,9 @@ def main(args):
   folder = os.path.dirname(__file__)
   config = load_config(args.config, folder=folder)
   assert "experiment" in config, "Config must contain 'experiment' key"
+  # store args as part of config
+  config['experiment']['command line arguments'] = vars(args)
+  print(json.dumps(config, indent=2))
   
   if args.folder:
     folder = os.path.abspath(args.folder)

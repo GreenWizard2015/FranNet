@@ -58,6 +58,7 @@ class CDDPMSampler(IDiffusionSampler):
     return steps - 1
   
   def sample(self, value, model, schedule, startStep, endStep, **kwargs):
+    assert schedule.is_discrete, 'CDDPMSampler supports only discrete schedules (for now)'
     initShape = tf.shape(value)
     steps = self._stepsSequence(startStep, endStep, schedule.noise_steps)
     reverseStep = self._reverseStep(model, schedule) # returns closure
@@ -86,19 +87,19 @@ class CDDIMSampler(IDiffusionSampler):
     self._noise_provider = noise_provider
     return
 
-  def _stepsSequence(self, startStep, endStep, totalSteps, **kwargs):
+  def _stepsSequence(self, startStep, endStep, totalSteps, kwargs={}):
     startStep = totalSteps - 1 if startStep is None else startStep
 
     config = kwargs.get('steps skip type', self._stepsConfig)
-    kind = config['kind'].lower() if isinstance(config, dict) else config.lower()
-    if 'uniform' == kind:
+    name = config['name'].lower() if isinstance(config, dict) else config.lower()
+    if 'uniform' == name:
       K = config['K']
       steps = tf.range(endStep + 1, startStep - 1, K, dtype=tf.int32)[::-1]
       steps = tf.concat([[startStep - 1], steps], axis=0)
       prevSteps = tf.concat([steps[1:], [endStep]], axis=0)
       return steps, prevSteps
     
-    if 'quadratic' == kind:
+    if 'quadratic' == name:
       N = tf.cast(tf.abs(startStep - endStep), tf.float32)
       logN = tf.math.ceil(tf.math.log(N) / tf.math.log(2.0))
       logN = tf.cast(logN, tf.int32)
@@ -111,7 +112,7 @@ class CDDIMSampler(IDiffusionSampler):
       prevSteps = tf.concat([steps[1:], [endStep]], axis=0)
       return steps, prevSteps
     
-    raise NotImplementedError('Unknown steps sequence kind: {}'.format(kind))
+    raise NotImplementedError('Unknown steps sequence name: {}'.format(name))
   
   def _get_variance(self, alpha_prod_t, alpha_prod_t_prev):
     beta_prod_t = 1.0 - alpha_prod_t
@@ -145,6 +146,7 @@ class CDDIMSampler(IDiffusionSampler):
     return f
   
   def sample(self, value, model, schedule, startStep, endStep, **kwargs):
+    assert schedule.is_discrete, 'CDIMSampler supports only discrete schedules (for now)'
     reverseStep = self._reverseStep(
       model,
       schedule=kwargs.get('schedule', schedule),
@@ -172,12 +174,12 @@ def noise_provider_from_config(config):
   raise ValueError('Unknown noise provider: %s' % config)
 
 def sampler_from_config(config):
-  if isinstance(config, dict) and ('ddpm' == config['kind'].lower()):
+  if isinstance(config, dict) and ('ddpm' == config['name'].lower()):
     return CDDPMSampler(
       noise_provider=noise_provider_from_config(config['noise stddev']),
     )
   
-  if isinstance(config, dict) and ('ddim' == config['kind'].lower()):
+  if isinstance(config, dict) and ('ddim' == config['name'].lower()):
     return CDDIMSampler(
       stochasticity=config['stochasticity'],
       directionCoef=config['direction scale'],
@@ -190,7 +192,7 @@ def sampler_from_config(config):
 if __name__ == '__main__': # very dumb tests
   def DDIMTests():
     DDIM_CONFIG = {
-      'kind': 'ddim',
+      'name': 'ddim',
       'stochasticity': 0.1,
       'direction scale': 1.0,
       'noise stddev': 'zero',
@@ -219,7 +221,7 @@ if __name__ == '__main__': # very dumb tests
       return
     
     def test_uniform_steps():
-      sampler = make_sampler({ 'steps skip type': { 'kind': 'uniform', 'K': 3 } })
+      sampler = make_sampler({ 'steps skip type': { 'name': 'uniform', 'K': 3 } })
       steps, prevSteps = sampler._stepsSequence(10, 0, 10)
       tf.assert_equal(steps, [9, 7, 4, 1])
       tf.assert_equal(prevSteps, [7, 4, 1, 0])
@@ -240,7 +242,7 @@ if __name__ == '__main__': # very dumb tests
       return
     
     for K in range(1, 10):
-      test_common({ 'steps skip type': { 'kind': 'uniform', 'K': K } })
+      test_common({ 'steps skip type': { 'name': 'uniform', 'K': K } })
     test_common({ 'steps skip type': 'quadratic' })
 
     test_uniform_steps()
@@ -250,7 +252,7 @@ if __name__ == '__main__': # very dumb tests
   
   def DDPMTests():
     DDPM_CONFIG = {
-      'kind': 'ddpm',
+      'name': 'ddpm',
       'noise stddev': 'zero',
     }
     def make_sampler(config):

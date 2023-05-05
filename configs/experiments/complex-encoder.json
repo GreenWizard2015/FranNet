@@ -3,16 +3,16 @@
     "encoder": {
       "contexts mixer": {
         "extractor": {
-          "kind": "combined",
+          "name": "combined",
           "weights activation": "squared tanh",
           "extractors": [
             {
-              "kind": "interpolate",
+              "name": "interpolate",
               "mlp": [256],
               "final activation": "relu"
             },
             {
-              "kind": "conv"
+              "name": "conv"
             }
           ]
         }

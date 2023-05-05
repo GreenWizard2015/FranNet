@@ -46,14 +46,15 @@ class CDiffusionParameters:
   def parametersForT(self, T):
     raise NotImplementedError("parametersForT not implemented")
   
-  def sampleT(self, TShape):
-    raise NotImplementedError("sampleT not implemented")
+
+  @property
+  def is_discrete(self):
+    raise NotImplementedError("is_discrete not implemented")
   pass
   
 class CDPDiscrete(CDiffusionParameters):
-  def __init__(self, beta_schedule, noise_steps, t_schedule=None):
+  def __init__(self, beta_schedule, noise_steps):
     super().__init__()
-    self._tschedule = t_schedule
     self._noise_steps = noise_steps
     beta = beta_schedule
     if callable(beta_schedule):
@@ -74,14 +75,7 @@ class CDPDiscrete(CDiffusionParameters):
 
     self._steps = tf.stack([beta, 1.0 - beta, alpha_hat, posterior_variance, SNR], axis=-1)
     return
- 
-  def sampleT(self, TShape):
-    TShape = (TShape[0], 1)
-    if self._tschedule is not None:
-      return self._tschedule(self.noise_steps, TShape)
-    
-    return tf.random.uniform(minval=0, maxval=self.noise_steps, shape=TShape, dtype=tf.int32)
-     
+
   def parametersForT(self, T, index):
     p = tf.gather(self._steps, T)
     return[tf.reshape(p[..., i], (-1, 1)) for i in index]
@@ -95,3 +89,7 @@ class CDPDiscrete(CDiffusionParameters):
   @property
   def noise_steps(self):
     return self._noise_steps
+  
+  @property
+  def is_discrete(self): return True
+# End of CDPDiscrete 

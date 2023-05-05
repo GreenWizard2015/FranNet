@@ -1,12 +1,16 @@
 {
   "name": "diffusion",
-  "kind": "DDPM",
+  "name": "DDPM",
   "sampler": {
-    "kind": "DDPM",
+    "name": "DDPM",
     "noise stddev": "correct"
   },
   "beta_schedule": "cosine",
   "noise_steps": 100,
   "loss_scaling": null,
-  "t_sheduler": null
+  "source distribution": {
+    "name": "normal",
+    "stddev": 1.0,
+    "mean": 0.0
+  }
 }

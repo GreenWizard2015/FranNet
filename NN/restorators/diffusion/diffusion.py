@@ -3,6 +3,7 @@ import numpy as np
 from ..IRestorationProcess import IRestorationProcess
 from .diffusion_schedulers import CDiffusionParameters, CDPDiscrete, get_beta_schedule
 from .diffusion_samplers import sampler_from_config
+from ..source_distributions import source_distribution_from_config
 
 # simple gaussian diffusion process
 class CGaussianDiffusion(IRestorationProcess):
@@ -10,12 +11,14 @@ class CGaussianDiffusion(IRestorationProcess):
     channels,
     schedule,
     sampler,
+    sourceDistribution,
     lossScaling=None,
   ):
     super().__init__(channels)
     self._lossScaling = self._get_loss_scaling(lossScaling)
     self._schedule = schedule
     self._sampler = sampler
+    self._sourceDistribution = sourceDistribution
     return
   
   def _forwardStep(self, x0, noise, t):
@@ -31,45 +34,59 @@ class CGaussianDiffusion(IRestorationProcess):
       'SNR': SNR,
     }
   
-  def forward(self, x0, t=None):
+  def forward(self, x0):
     '''
     This function implements the forward diffusion process. It takes an initial value and applies the T steps of the diffusion process.
     '''
-    s = tf.shape(x0)
-    if t is None:
-      t = self._schedule.sampleT(s[:-1])
-    noise = tf.random.normal(s)
-    return self._forwardStep(x0, noise, t)
+    # source distribution need to know the shape of the input, so we need to ensure it explicitly
+    x0 = tf.ensure_shape(x0, (None, self._channels))
+    sampled = self._sourceDistribution.sampleFor(x0)
+    x1 = sampled['xT']
+    T = sampled['T']
+    # convert to discrete time, with floor rounding
+    t = tf.cast(tf.floor(T * self._schedule.noise_steps), tf.int32)
+
+    tf.assert_equal(tf.shape(x0), tf.shape(x1))
+    tf.assert_equal(tf.shape(x0)[:1], tf.shape(t)[:1])
+    return self._forwardStep(x0, x1, t)
+  
+  def _makeDenoiser(self, denoiser, modelT, valueShape):
+    if self._schedule.is_discrete: # discrete time diffusion
+      noise_steps = self._schedule.noise_steps
+      encodedT = tf.cast(tf.range(noise_steps), tf.float32) / noise_steps
+      encodedT = tf.reshape(encodedT, (noise_steps, 1))
+      if not(modelT is None):
+        encodedT = modelT(encodedT) # (noise_steps, M)
+      M = tf.shape(encodedT)[-1]
+      tf.assert_equal(tf.shape(encodedT), (noise_steps, M))
+
+      def predictNoise(x, t):
+        B = valueShape[0]
+        # populate encoded T
+        T = tf.gather(encodedT, t)
+        T = tf.reshape(T, (1, M))
+        T = tf.tile(T, (B, 1))
+        tf.assert_equal(tf.shape(T), (B, M))
+        tf.assert_equal(tf.shape(x), valueShape)
+        return denoiser(x=x, t=T)
+      
+      return predictNoise
+    
+    raise NotImplementedError('Continuous time diffusion is not implemented yet')
   
   def reverse(self, value, denoiser, modelT=None, startStep=None, endStep=0, **kwargs):
     # NOTE: don't use 'early stopping' here, like in the autoregressive case
-    if isinstance(value, tuple):
-      value = tf.random.normal(value + (self._channels, ), dtype=tf.float32)
-  
-    noise_steps = self._schedule.noise_steps
-    encodedT = tf.cast(tf.range(noise_steps), value.dtype) / noise_steps
-    encodedT = tf.reshape(encodedT, (noise_steps, 1))
-    if not(modelT is None):
-      encodedT = modelT(encodedT) # (noise_steps, M)
-    M = tf.shape(encodedT)[-1]
-    tf.assert_equal(tf.shape(encodedT), (noise_steps, M))
-    initShape = tf.shape(value)
-    B = initShape[0]
-
-    def predictNoise(x, t):
-      # populate encoded T
-      T = tf.gather(encodedT, t)
-      T = tf.reshape(T, (1, M))
-      T = tf.tile(T, (B, 1))
-      tf.assert_equal(tf.shape(T), (B, M))
-      tf.assert_equal(tf.shape(x), initShape)
-      return denoiser(x=x, t=T)
-    #######################
     sampler = kwargs.get('sampler', self._sampler)
+    if isinstance(value, tuple):
+      value = self._sourceDistribution.initialValueFor(value + (self._channels, ))
+  
+    initShape = tf.shape(value)
+    denoiser = self._makeDenoiser(denoiser, modelT, initShape)
     value = sampler.sample(
       value,
-      model=predictNoise,
+      model=denoiser,
       schedule=self._schedule,
+      # TODO: get startStep/endStep from the schedule
       startStep=startStep, endStep=endStep,
       **kwargs
     )
@@ -121,24 +138,25 @@ def adjustedTSampling(noise_steps, TShape):
   return tf.reshape(res, )
 
 def diffusion_from_config(config):
-  t_schedule = None
-  TShedule = config.get('T_schedule', None)
-  assert TShedule in [None, 'adjusted'], 'Unknown T_schedule'
-  if 'adjusted' == TShedule:
-    t_schedule = adjustedTSampling
+  name = config['name'].lower()
+  # TODO: add support for time schedule via source distribution
+  # t_schedule = None
+  # TShedule = config.get('T_schedule', None)
+  # assert TShedule in [None, 'adjusted'], 'Unknown T_schedule'
+  # if 'adjusted' == TShedule:
+  #   t_schedule = adjustedTSampling
 
-  kind = config['kind'].lower()
-  assert kind in ['ddpm'], 'Unknown diffusion kind'
-  if 'ddpm' == kind:
+  if 'ddpm' == name:
+    sourceDistributionConfigs = config['source distribution']
     return CGaussianDiffusion(
       channels=config['channels'],
       schedule=CDPDiscrete(
         beta_schedule=get_beta_schedule(config['beta_schedule']),
-        noise_steps=config['noise_steps'],
-        t_schedule=t_schedule
+        noise_steps=config['noise_steps']
       ),
       sampler=sampler_from_config(config['sampler']),
-      lossScaling=config['loss_scaling']
+      lossScaling=config['loss_scaling'],
+      sourceDistribution=source_distribution_from_config(sourceDistributionConfigs)
     )
 
-  raise ValueError('Unknown diffusion kind')
+  raise ValueError('Unknown diffusion name')
