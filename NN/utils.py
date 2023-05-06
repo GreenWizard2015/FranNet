@@ -13,11 +13,34 @@ def ensure4d(src):
   return tf.reshape(src, tf.concat([tf.shape(src)[:3], (-1,)], axis=-1)) # 3d/4d => 4d
 
 def extractInterpolated(data, pos):
+  '''
+    0, 0 - very top left corner
+    1, 1 - very bottom right corner
+  '''
   s = tf.shape(data)
-  hw = tf.cast(tf.stack([s[1], s[2]]), pos.dtype)
-  coords = pos * (hw - 1.0)
+  hwOld = tf.cast(tf.stack([s[1], s[2]]), pos.dtype)
+  # interpolate_bilinear interprets (0, 0) as the center of the top left pixel
+  # interpolate_bilinear interprets (1, 1) as the center of the bottom right pixel
+  # so we need to add padding to the data and shift the coordinates
+  data = tf.pad(data, ((0, 0), (1, 1), (1, 1), (0, 0)), mode='CONSTANT', constant_values=0.0)
+  hw = tf.cast(tf.stack([s[1] + 2, s[2] + 2]), pos.dtype) # new height and width
+  # update the coordinates
+  # old (0, 0) => new (1 / hw, 1 / hw)
+  # old (1, 1) => new (1 - 1 / hw, 1 - 1 / hw)
+  d = 1.0 / hw
+  pos = pos * (hwOld / hw) # scale (0, 0) => (1, 1)
+  pos = (d / 2.0) + pos # shift (0, 0) => (1 / hw, 1 / hw)
+  coords = pos * hw
   return tfa.image.interpolate_bilinear(data, coords, indexing='xy')
 
+# create a grid of coordinates in [0, 1] x [0, 1] with shape (width*width, 2)
+# each point in the grid is the center of a pixel
+def flatCoordsGridTF(width):
+  d = 1.0 / tf.cast(width, tf.float32)
+  xy = (tf.range(width, dtype=tf.float32) * d) + (d / 2.0)
+  coords = tf.meshgrid(xy, xy)
+  return tf.concat([tf.reshape(x, (-1, 1)) for x in coords], axis=-1)
+################
 class CFlatCoordsEncodingLayer(tf.keras.layers.Layer):
   def __init__(self, N=32, **kwargs):
     super().__init__(**kwargs)
@@ -44,3 +67,45 @@ class sMLP(tf.keras.layers.Layer):
   
   def call(self, x, **kwargs):
     return self._F(x, **kwargs)
+
+#######################################
+if '__main__' == __name__:
+  def test_extractInterpolated(hw):
+    x = np.random.uniform(size=(1, hw, hw, 1)).astype(np.float32)
+    d = (1.0 / hw) / 2.0
+    # check that boundaries are not at d
+    a = extractInterpolated(x, np.array([[[0.0, 0.0]]]).astype(np.float32)).numpy()
+    b = extractInterpolated(x, np.array([[[d, d]]]).astype(np.float32)).numpy()
+    assert not np.allclose(a, b)
+    # 
+    for i in range(hw):
+      for j in range(hw):
+        pos = np.array([[[1 + i * 2, 1 + j * 2]]]) * d
+        y = extractInterpolated(x, pos).numpy()
+        target = x[0, j, i, 0]
+        assert np.allclose(y, target, atol=1e-4), '%s != %s' % (y, target)
+        continue
+      continue
+    
+    pos = np.array([[[2 * d, 2 * d]]])
+    y = extractInterpolated(x, pos).numpy()
+    assert np.allclose(y, x[0, :2, :2, 0].mean())
+    return
+  
+  def test_flatCoordsGridTF():
+    grid = flatCoordsGridTF(3).numpy()
+    d = (1.0 / 3) / 2.0
+    target = np.array([
+      [d, d], [(1 + 2) * d, d], [(1 + 4) * d, d],
+      [d, (1 + 2) * d], [(1 + 2) * d, (1 + 2) * d], [(1 + 4) * d, (1 + 2) * d],
+      [d, (1 + 4) * d], [(1 + 2) * d, (1 + 4) * d], [(1 + 4) * d, (1 + 4) * d],
+    ])
+    assert np.allclose(grid, target)
+    return
+
+  # tests
+  for hw in range(3, 16):
+    test_extractInterpolated(hw)
+
+  test_flatCoordsGridTF()
+  pass

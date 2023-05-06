@@ -1,11 +1,5 @@
 import tensorflow as tf
-from NN.utils import extractInterpolated, ensure4d
-
-# create a grid of coordinates in [0, 1] x [0, 1] with shape (width*width, 2)
-def _flatCoordsGridTF(width):
-  xy = tf.linspace(0.0, 1.0, width)
-  coords = tf.meshgrid(xy, xy)
-  return tf.concat([tf.reshape(x, (-1, 1)) for x in coords], axis=-1)
+from NN.utils import extractInterpolated, ensure4d, flatCoordsGridTF
 
 class CNerf2D(tf.keras.Model):
   def __init__(self, encoder, renderer, restorator, samplesN=256, **kwargs):
@@ -84,7 +78,7 @@ class CNerf2D(tf.keras.Model):
     B = tf.shape(src)[0]
     encoded = self._encoder(src, training=False)
 
-    pos = (_flatCoordsGridTF(size) * scale) + shift
+    pos = (flatCoordsGridTF(size) * scale) + shift
     N = tf.shape(pos)[0]
     tf.assert_equal(N, size * size) # just in case
     tf.assert_equal(tf.shape(pos), (N, 2))
