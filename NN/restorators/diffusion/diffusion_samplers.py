@@ -1,6 +1,6 @@
 import tensorflow as tf
 from .diffusion_schedulers import CDiffusionParameters
-from ..CNoiseProvider import CNoiseProvider
+from ..CNoiseProvider import noise_provider_from_config
 
 class IDiffusionSampler:
   def sample(self, *args, **kwargs):
