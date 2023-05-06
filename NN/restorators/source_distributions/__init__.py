@@ -17,7 +17,6 @@ def source_distribution_from_config(config):
     return CResampledNormalSourceDistribution(
       mean=config['mean'],
       stddev=config['stddev'],
-      steps=config['steps'],
       fraction=config['fraction'],
     )
   

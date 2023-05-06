@@ -1,6 +1,6 @@
 {
   "name": "diffusion",
-  "name": "DDPM",
+  "kind": "DDPM",
   "sampler": {
     "name": "DDPM",
     "noise stddev": "correct"

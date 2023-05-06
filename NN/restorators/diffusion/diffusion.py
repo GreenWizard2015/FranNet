@@ -138,7 +138,7 @@ def adjustedTSampling(noise_steps, TShape):
   return tf.reshape(res, )
 
 def diffusion_from_config(config):
-  name = config['name'].lower()
+  name = config['kind'].lower()
   # TODO: add support for time schedule via source distribution
   # t_schedule = None
   # TShedule = config.get('T_schedule', None)

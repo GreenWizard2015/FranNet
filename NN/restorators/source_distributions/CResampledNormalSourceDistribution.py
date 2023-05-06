@@ -21,6 +21,7 @@ class CResampledNormalSourceDistribution(ISourceDistribution):
       'T': tf.random.uniform((B, 1), 0.0, 1.0),
     }
   
+  @tf.function
   def initialValueFor(self, shape_or_values):
     if not isinstance(shape_or_values, tuple):
       shape_or_values = tf.shape(shape_or_values)
@@ -42,9 +43,9 @@ class CResampledNormalSourceDistribution(ISourceDistribution):
     ###
     res, probs = _sample(B)
     fraction = self._fraction
-    Bf = tf.cast(B, tf.float32)
-    M = tf.cast(tf.math.ceil(Bf * fraction), tf.int32)
-    while M < B:
+    f = tf.cast(B, tf.float32) * fraction
+    M = tf.cast(tf.math.ceil(f), tf.int32) + 1
+    while 0 < (B - M):
       # sample from the remaining samples
       res2, probs2 = _sample(B - M)
       # preserve M samples

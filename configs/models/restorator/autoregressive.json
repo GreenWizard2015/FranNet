@@ -1,9 +1,13 @@
 {
   "name": "autoregressive",
-  "source distribution": "normal",
   "sampling": {
-    "threshold": 0.003,
+    "threshold": 0.001,
     "steps limit": 100,
     "step size decay": 0.9
+  },
+  "source distribution": {
+    "name": "normal",
+    "stddev": 1.0,
+    "mean": 0.0
   }
 }
