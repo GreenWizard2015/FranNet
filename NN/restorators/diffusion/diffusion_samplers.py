@@ -174,12 +174,14 @@ def noise_provider_from_config(config):
   raise ValueError('Unknown noise provider: %s' % config)
 
 def sampler_from_config(config):
-  if isinstance(config, dict) and ('ddpm' == config['name'].lower()):
+  assert isinstance(config, dict), 'Sampler config must be a dictionary'
+  name = config['name'].lower()
+  if 'ddpm' == name:
     return CDDPMSampler(
       noise_provider=noise_provider_from_config(config['noise stddev']),
     )
   
-  if isinstance(config, dict) and ('ddim' == config['name'].lower()):
+  if 'ddim' == name:
     return CDDIMSampler(
       stochasticity=config['stochasticity'],
       directionCoef=config['direction scale'],
