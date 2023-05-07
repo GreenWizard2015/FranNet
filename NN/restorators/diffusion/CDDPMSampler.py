@@ -29,17 +29,23 @@ class CDDPMSampler(IDiffusionSampler):
       return(x_prev, variance)
     return reverseStep
   
-  def _stepsSequence(self, startStep, endStep, totalSteps):
-    startStep = totalSteps if startStep is None else startStep
-    steps = tf.range(startStep, endStep, -1, dtype=tf.int32)
-    return steps - 1
+  def _stepsSequence(self, startStep, endStep):
+    steps = tf.range(startStep, endStep - 1, -1, dtype=tf.int32)
+    return steps
   
-  def sample(self, value, model, schedule, startStep, endStep, **kwargs):
+  def sample(self, value, model, schedule, **kwargs):
     assert schedule.is_discrete, 'CDDPMSampler supports only discrete schedules (for now)'
+    maxSteps = schedule.noise_steps - 1
+    startStep = kwargs.get('startStep', None) or maxSteps
+    startStep = tf.clip_by_value(startStep, 0, maxSteps)
+
+    endStep = kwargs.get('endStep', None) or 0
+    endStep = tf.clip_by_value(endStep, 0, startStep)
+
     initShape = tf.shape(value)
-    steps = self._stepsSequence(startStep, endStep, schedule.noise_steps)
+    steps = self._stepsSequence(startStep, endStep)
     reverseStep = self._reverseStep(model, schedule) # returns closure
-    noise_provider = kwargs.get('noise provider', self._noise_provider)
+    noise_provider = kwargs.get('noiseProvider', self._noise_provider)
     for step in steps:
       value, variance = reverseStep(value, step)
       value += noise_provider(initShape, variance)

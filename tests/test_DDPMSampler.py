@@ -10,6 +10,6 @@ def make_sampler(config):
 
 def test_steps():
   sampler = make_sampler({})
-  steps = sampler._stepsSequence(10, 0, None)
-  tf.assert_equal(steps, [9, 8, 7, 6, 5, 4, 3, 2, 1, 0])
+  steps = sampler._stepsSequence(10, 0)
+  tf.assert_equal(steps, [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0])
   return

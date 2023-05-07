@@ -2,19 +2,19 @@ import tensorflow as tf
 from NN.restorators.diffusion.diffusion_samplers import sampler_from_config
 import pytest
 
-DDIM_CONFIG = {
-  'name': 'ddim',
-  'stochasticity': 0.1,
-  'direction scale': 1.0,
-  'noise stddev': 'zero',
-}
 def make_sampler(config):
-  return sampler_from_config(dict(DDIM_CONFIG, **config))
+  return sampler_from_config({
+    'name': 'ddim',
+    'stochasticity': 0.0,
+    'direction scale': 1.0,
+    'noise stddev': 'zero',
+    **config
+  })
 
 def _test_common(config):
   sampler = make_sampler(config)
   for i in range(3, 100):
-    steps, prevSteps = sampler._stepsSequence(i, 0, None)
+    steps, prevSteps = sampler._stepsSequence(i, 0)
     tf.assert_equal(steps[0], [i - 1])
     tf.assert_equal(steps[-1], [1])
     tf.assert_equal(prevSteps[-1], [0])
@@ -42,21 +42,28 @@ def test_quadratic_common():
 
 def test_uniform_steps():
   sampler = make_sampler({ 'steps skip type': { 'name': 'uniform', 'K': 3 } })
-  steps, prevSteps = sampler._stepsSequence(10, 0, 10)
+  steps, prevSteps = sampler._stepsSequence(10, 0)
   tf.assert_equal(steps, [9, 7, 4, 1])
   tf.assert_equal(prevSteps, [7, 4, 1, 0])
   return
 
 def test_quadratic_steps_no_duplicate():
   sampler = make_sampler({ 'steps skip type': 'quadratic' })
-  steps, prevSteps = sampler._stepsSequence(17, 0, None)
+  steps, prevSteps = sampler._stepsSequence(17, 0)
   tf.assert_equal(steps, [16, 8, 4, 2, 1])
   tf.assert_equal(prevSteps, [8, 4, 2, 1, 0])
   return
 
 def test_quadratic_steps_case1():
   sampler = make_sampler({ 'steps skip type': 'quadratic' })
-  steps, prevSteps = sampler._stepsSequence(21, 3, None)
+  steps, prevSteps = sampler._stepsSequence(21, 3)
   tf.assert_equal(steps, [20, 19, 11, 7, 5, 4])
   tf.assert_equal(prevSteps, [19, 11, 7, 5, 4, 3])
+  return
+
+def test_steps_K1():
+  sampler = make_sampler({ 'steps skip type': { 'name': 'uniform', 'K': 1 } })
+  steps, prevSteps = sampler._stepsSequence(10 + 1, 0 - 1)
+  tf.assert_equal(steps, [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0])
+  tf.assert_equal(prevSteps, [9, 8, 7, 6, 5, 4, 3, 2, 1, 0, -1])
   return

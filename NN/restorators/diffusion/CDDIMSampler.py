@@ -17,9 +17,7 @@ class CDDIMSampler(IDiffusionSampler):
     self._noise_provider = noise_provider
     return
 
-  def _stepsSequence(self, startStep, endStep, totalSteps, kwargs={}):
-    startStep = totalSteps - 1 if startStep is None else startStep
-
+  def _stepsSequence(self, startStep, endStep, kwargs={}):
     config = kwargs.get('steps skip type', self._stepsConfig)
     name = config['name'].lower() if isinstance(config, dict) else config.lower()
     if 'uniform' == name:
@@ -58,39 +56,44 @@ class CDDIMSampler(IDiffusionSampler):
       (alpha_prod_t, ) = schedule.parametersForT(t, [ CDiffusionParameters.PARAM_ALPHA_HAT ])
       (alpha_prod_t_prev, ) = schedule.parametersForT(tPrev, [ CDiffusionParameters.PARAM_ALPHA_HAT ])
 
-      variance = self._get_variance(alpha_prod_t, alpha_prod_t_prev)
-      std_dev_t = eta * tf.sqrt(variance)
+      std_dev_t = eta * tf.sqrt( self._get_variance(alpha_prod_t, alpha_prod_t_prev) )
+      stochasticity_var = std_dev_t ** 2
       #######################################
       # "predicted x_0" of formula (12) from https://arxiv.org/pdf/2010.02502.pdf
       scaled_noise = tf.sqrt(1.0 - alpha_prod_t) * predictedNoise
       pred_original_sample = (x - scaled_noise) / tf.sqrt(alpha_prod_t)
 
       # compute "direction pointing to x_t" of formula (12) from https://arxiv.org/pdf/2010.02502.pdf
-      coef = tf.sqrt(1.0 - alpha_prod_t_prev - std_dev_t ** 2)
-      coef = directionCoef * coef # <--- this is the only difference from the original formula
-      pred_sample_direction = coef * predictedNoise
+      coef2 = tf.sqrt(1.0 - alpha_prod_t_prev - stochasticity_var)
+      coef2 = directionCoef * coef2 # <--- this is the only difference from the original formula
       
       # compute x_t without "random noise" of formula (12) from https://arxiv.org/pdf/2010.02502.pdf
       # NOTE: this is same as forward diffusion step (x0, x1, tPrev), but with "space" for noise (std_dev_t ** 2)
-      x_prev = (
-        tf.sqrt(alpha_prod_t_prev) * pred_original_sample + 
-        pred_sample_direction
-      )
-      return(x_prev, std_dev_t ** 2)
+      coef1 = tf.sqrt(alpha_prod_t_prev)
+      x_prev = (coef1 * pred_original_sample) + (coef2 * predictedNoise)
+      return(x_prev, stochasticity_var)
     return f
   
-  def sample(self, value, model, schedule, startStep, endStep, **kwargs):
+  def sample(self, value, model, schedule, **kwargs):
     assert schedule.is_discrete, 'CDIMSampler supports only discrete schedules (for now)'
+    maxSteps = schedule.noise_steps - 1
+    startStep = kwargs.get('startStep', None) or maxSteps
+    startStep = tf.clip_by_value(startStep, 0, maxSteps)
+
+    endStep = kwargs.get('endStep', None) or 0
+    endStep = tf.clip_by_value(endStep, 0, maxSteps)
+
     reverseStep = self._reverseStep(
       model,
-      schedule=kwargs.get('schedule', schedule),
+      schedule=schedule,
       eta=kwargs.get('stochasticity', self._eta),
-      directionCoef=kwargs.get('direction scale', self._directionCoef)
+      directionCoef=kwargs.get('directionScale', self._directionCoef)
     ) # returns closure
 
     initShape = tf.shape(value)
-    noise_provider = kwargs.get('noise provider', self._noise_provider)
-    steps, prevSteps = self._stepsSequence(startStep, endStep, schedule.noise_steps, kwargs)
+    noise_provider = kwargs.get('noiseProvider', self._noise_provider)
+    # TODO: fix _stepsSequence so we don't need to messing with +-1 here
+    steps, prevSteps = self._stepsSequence(startStep + 1, endStep - 1, kwargs)
     for stepInd in tf.range(tf.size(steps)):
       step = steps[stepInd]
       prevStep = prevSteps[stepInd]

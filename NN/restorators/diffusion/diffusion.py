@@ -75,7 +75,7 @@ class CGaussianDiffusion(IRestorationProcess):
     
     raise NotImplementedError('Continuous time diffusion is not implemented yet')
   
-  def reverse(self, value, denoiser, modelT=None, startStep=None, endStep=0, **kwargs):
+  def reverse(self, value, denoiser, modelT=None, **kwargs):
     # NOTE: don't use 'early stopping' here, like in the autoregressive case
     sampler = kwargs.get('sampler', self._sampler)
     if isinstance(value, tuple):
@@ -87,8 +87,6 @@ class CGaussianDiffusion(IRestorationProcess):
       value,
       model=denoiser,
       schedule=self._schedule,
-      # TODO: get startStep/endStep from the schedule
-      startStep=startStep, endStep=endStep,
       **kwargs
     )
     tf.assert_equal(tf.shape(value), initShape)

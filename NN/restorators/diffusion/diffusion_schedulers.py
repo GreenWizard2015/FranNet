@@ -46,7 +46,6 @@ class CDiffusionParameters:
   def parametersForT(self, T):
     raise NotImplementedError("parametersForT not implemented")
   
-
   @property
   def is_discrete(self):
     raise NotImplementedError("is_discrete not implemented")
@@ -74,10 +73,22 @@ class CDPDiscrete(CDiffusionParameters):
     SNR = alpha_hat / (1. - alpha_hat)
 
     self._steps = tf.stack([beta, 1.0 - beta, alpha_hat, posterior_variance, SNR], axis=-1)
+    # prepend "clean" step
+    data = tf.constant([[0.0, 1.0, 1.0, 0.0, float('inf')]], dtype=tf.float32)
+    self._steps = tf.concat([data, self._steps], axis=0)
     return
 
-  def parametersForT(self, T, index):
+  def parametersForT(self, T, index=None):
+    T = tf.cast(T, tf.int32) + 1 # shifted by 1
     p = tf.gather(self._steps, T)
+    if index is None:
+      return {
+        'beta': p[..., self.PARAM_BETA, None],
+        'alpha': p[..., self.PARAM_ALPHA, None],
+        'alpha_hat': p[..., self.PARAM_ALPHA_HAT, None],
+        'posterior_variance': p[..., self.PARAM_POSTERIOR_VARIANCE, None],
+        'SNR': p[..., self.PARAM_SNR, None],
+      }
     return[tf.reshape(p[..., i], (-1, 1)) for i in index]
   
   def debugParams(self):
