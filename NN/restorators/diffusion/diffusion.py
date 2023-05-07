@@ -45,6 +45,7 @@ class CGaussianDiffusion(IRestorationProcess):
     T = sampled['T']
     # convert to discrete time, with floor rounding
     t = tf.cast(tf.floor(T * self._schedule.noise_steps), tf.int32)
+    t = tf.clip_by_value(t, 0, self._schedule.noise_steps - 1)
 
     tf.assert_equal(tf.shape(x0), tf.shape(x1))
     tf.assert_equal(tf.shape(x0)[:1], tf.shape(t)[:1])
