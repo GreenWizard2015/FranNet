@@ -16,15 +16,14 @@ class CDDPMSampler(IDiffusionSampler):
     def reverseStep(x, t):
       predictedNoise = model(x, t)
       # obtain parameters for the current step
-      (variance, alpha, beta, alpha_hat) = schedule.parametersForT(t, [
+      (variance, alpha, alpha_hat) = schedule.parametersForT(t, [
         CDiffusionParameters.PARAM_POSTERIOR_VARIANCE,
         CDiffusionParameters.PARAM_ALPHA,
-        CDiffusionParameters.PARAM_BETA,
         CDiffusionParameters.PARAM_ALPHA_HAT,
       ])
       # scale predicted noise
-      # s = (1 - alpha) / sqrt(1 - alpha_hat)) = beta / sqrt(1 - alpha_hat)
-      s = beta / tf.sqrt(1.0 - alpha_hat)
+      # NOTE: rollbacks only a single step of the diffusion process
+      s = (1 - alpha) / tf.sqrt(1.0 - alpha_hat)
       d = tf.sqrt(alpha)
       # prevent NaNs/Infs
       s = tf.where(tf.math.is_finite(s), s, 0.0)
@@ -124,7 +123,11 @@ class CDDIMSampler(IDiffusionSampler):
       pred_sample_direction = coef * predictedNoise
       
       # compute x_t without "random noise" of formula (12) from https://arxiv.org/pdf/2010.02502.pdf
-      x_prev = tf.sqrt(alpha_prod_t_prev) * pred_original_sample + pred_sample_direction
+      # NOTE: this is same as forward diffusion step (x0, x1, tPrev), but with "space" for noise (std_dev_t ** 2)
+      x_prev = (
+        tf.sqrt(alpha_prod_t_prev) * pred_original_sample + 
+        pred_sample_direction
+      )
       return(x_prev, std_dev_t ** 2)
     return f
   
