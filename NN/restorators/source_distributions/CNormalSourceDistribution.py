@@ -18,5 +18,6 @@ class CNormalSourceDistribution(ISourceDistribution):
     }
   
   def initialValueFor(self, shape_or_values):
-    shape = shape_or_values.shape if hasattr(shape_or_values, 'shape') else shape_or_values
+    shape = shape_or_values
+    if tf.is_tensor(shape): shape = tf.shape(shape_or_values)
     return tf.random.normal(shape, mean=self._mean, stddev=self._std, dtype=tf.float32)
