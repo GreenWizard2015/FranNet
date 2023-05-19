@@ -18,7 +18,12 @@ def _fake_samplers():
   
   x = tf.random.normal([32, 3])
   fakeNoise = tf.random.normal([32, 3])
-  def fakeModel(x, t): return fakeNoise
+  def fakeModel(x, t):
+    # check range of t
+    tf.debugging.assert_less_equal(t, schedule.noise_steps - 1)
+    tf.debugging.assert_greater_equal(t, 0)
+    # any noticable perturbation will lead to different samples
+    return fakeNoise + tf.cast(t + 1, tf.float32) * x
   return { 'ddim': ddim, 'ddpm': ddpm, 'schedule': schedule, 'x': x, 'fakeModel': fakeModel, 'fakeNoise': fakeNoise }
 
 def test_DDPM_eq_DDIM_steps():
@@ -32,7 +37,7 @@ def test_DDPM_eq_DDIM_steps():
   ddimStepF = ddim._reverseStep(fakeModel, schedule=schedule, eta=1.0, directionCoef=1.0)
   ddpmStepF = ddpm._reverseStep(fakeModel, schedule=schedule)
 
-  for t in range(schedule.noise_steps - 1, -1, -1):
+  for t in reversed(range(schedule.noise_steps)):
     t = tf.fill((32, 1), t)
     X_ddim, var_ddim = ddimStepF(x=x, t=t, tPrev=t - 1)
     X_ddpm, var_ddpm = ddpmStepF(x=x, t=t)
@@ -40,6 +45,9 @@ def test_DDPM_eq_DDIM_steps():
     tf.debugging.assert_near(X_ddim, X_ddpm, atol=1e-6)
     tf.debugging.assert_near(var_ddim, var_ddpm, atol=1e-6)
     continue
+  # last step should always have zero variance
+  tf.assert_equal(var_ddim, 0.0)
+  tf.assert_equal(var_ddpm, 0.0)
   return
 
 def test_DDPM_eq_DDIM_sample():

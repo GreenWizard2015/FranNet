@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+from NN.utils import make_steps_sequence
 
 # schedulers
 def cosine_beta_schedule(timesteps, s=0.008):
@@ -13,6 +14,9 @@ def cosine_beta_schedule(timesteps, s=0.008):
 
   f_t = f( tf.linspace(0.0, timesteps, timesteps + 1) )
   betas = 1.0 - (f_t[1:] / f_t[:-1])
+  # NOTE: default value 0.9999 is used in the official implementation, but may cause numerical issues during sampling
+  #       if not clip sampled values
+  #       alternatively, we can change 0.9999 to 0.99
   return tf.clip_by_value(betas, 0.0001, 0.9999)
 
 def linear_beta_schedule(timesteps, beta_start=0.0001, beta_end=0.02):
@@ -49,7 +53,21 @@ class CDiffusionParameters:
   @property
   def is_discrete(self):
     raise NotImplementedError("is_discrete not implemented")
-  pass
+  
+  def to_continuous(self, t):
+    raise NotImplementedError("to_continuous not implemented")
+  
+  def to_discrete(self, t):
+    raise NotImplementedError("to_discrete not implemented")
+  
+  # helper function to calculate posterior variance between two specified steps
+  @staticmethod
+  def varianceBetween(alpha_hat_t, alpha_hat_t_prev):
+    beta_hat_t = 1.0 - alpha_hat_t
+    beta_hat_t_prev = 1.0 - alpha_hat_t_prev
+    variance = (beta_hat_t_prev / beta_hat_t) * (1 - alpha_hat_t / alpha_hat_t_prev)
+    return variance
+# End of CDiffusionParameters
   
 class CDPDiscrete(CDiffusionParameters):
   def __init__(self, beta_schedule, noise_steps):
@@ -103,4 +121,41 @@ class CDPDiscrete(CDiffusionParameters):
   
   @property
   def is_discrete(self): return True
+
+  def to_continuous(self, t):
+    tf.assert_equal(t.dtype, tf.int32)
+    t = tf.cast(t, tf.float32)
+    return t / float(self.noise_steps - 1)
+  
+  def to_discrete(self, t):
+    tf.assert_equal(t.dtype, tf.float32)
+    tf.debugging.assert_greater_equal(t, 0.0)
+    tf.debugging.assert_less_equal(t, 1.0)
+    
+    # convert to discrete time, with floor rounding
+    N = self.noise_steps - 1
+    return tf.cast(tf.floor(t * N), tf.int32)
+  
+  # helper function to create a sequence of steps
+  def steps_sequence(self, startStep, endStep, config, reverse=False):
+    maxSteps = self.noise_steps
+    if startStep is None: startStep = maxSteps
+    if endStep is None: endStep = 0
+    
+    startStep = tf.clip_by_value(startStep, 0, maxSteps)
+    endStep = tf.clip_by_value(endStep, 0, maxSteps)
+    
+    res = make_steps_sequence( startStep=startStep, endStep=endStep - 1, config=config )
+    if reverse: res = tuple(x[::-1] for x in res)
+    return res
 # End of CDPDiscrete 
+
+def schedule_from_config(config):
+  name = config['name'].lower()
+  if name == "discrete":
+    return CDPDiscrete(
+      beta_schedule=get_beta_schedule(config['beta schedule']),
+      noise_steps=config['timesteps']
+    )
+  
+  raise ValueError("Unknown beta schedule name: {}".format(name))

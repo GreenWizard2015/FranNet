@@ -8,6 +8,7 @@ def sampler_from_config(config):
   if 'ddpm' == name:
     return CDDPMSampler(
       noise_provider=noise_provider_from_config(config['noise stddev']),
+      clipping=config.get('clipping', None),
     )
   
   if 'ddim' == name:
@@ -16,6 +17,7 @@ def sampler_from_config(config):
       directionCoef=config['direction scale'],
       noise_provider=noise_provider_from_config(config['noise stddev']),
       steps=config['steps skip type'],
+      clipping=config.get('clipping', None),
     )
   
   raise ValueError('Unknown sampler: %s' % config)

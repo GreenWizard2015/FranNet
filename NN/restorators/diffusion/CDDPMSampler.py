@@ -3,8 +3,9 @@ from .IDiffusionSampler import IDiffusionSampler
 from .diffusion_schedulers import CDiffusionParameters
 
 class CDDPMSampler(IDiffusionSampler):
-  def __init__(self, noise_provider):
+  def __init__(self, noise_provider, clipping):
     self._noise_provider = noise_provider
+    self._clipping = clipping
     return
 
   def _reverseStep(self, model, schedule):
@@ -29,26 +30,28 @@ class CDDPMSampler(IDiffusionSampler):
       return(x_prev, variance)
     return reverseStep
   
-  def _stepsSequence(self, startStep, endStep):
-    steps = tf.range(startStep, endStep - 1, -1, dtype=tf.int32)
-    return steps
-  
   def sample(self, value, model, schedule, **kwargs):
     assert schedule.is_discrete, 'CDDPMSampler supports only discrete schedules (for now)'
-    maxSteps = schedule.noise_steps - 1
-    startStep = kwargs.get('startStep', None) or maxSteps
-    startStep = tf.clip_by_value(startStep, 0, maxSteps)
-
-    endStep = kwargs.get('endStep', None) or 0
-    endStep = tf.clip_by_value(endStep, 0, startStep)
-
+    steps, _ = schedule.steps_sequence(
+      startStep=kwargs.get('startStep', None),
+      endStep=kwargs.get('endStep', None),
+      config={ 'name': 'uniform', 'K': 1} # no skipping steps
+    )
+    
     initShape = tf.shape(value)
-    steps = self._stepsSequence(startStep, endStep)
     reverseStep = self._reverseStep(model, schedule) # returns closure
     noise_provider = kwargs.get('noiseProvider', self._noise_provider)
+    clipping = kwargs.get('clipping', self._clipping)
+    if clipping is None:
+      clipping = lambda x: x
+    else:
+      clipping = lambda x: tf.clip_by_value(x, clip_value_min=clipping['min'], clip_value_max=clipping['max'])
+
+    value = clipping(value)
     for step in steps:
       value, variance = reverseStep(value, step)
       value += noise_provider(initShape, variance)
+      value = clipping(value)
       continue
     tf.assert_equal(tf.shape(value), initShape)
     return value

@@ -1,4 +1,5 @@
 {
+  "inherit": "baseline.json",
   "experiment": {
     "title": "DDIM sampler",
     "description": "Restorator that uses diffusion model with DDIM sampler"
@@ -7,13 +8,12 @@
     "restorator": {
       "sampler": {
         "name": "DDIM",
+        "stochasticity": 0.0,
+        "direction scale": 1.0,
         "steps skip type": {
           "name": "uniform",
           "K": 5
-        },
-        "stochasticity": 0.0,
-        "direction scale": 1.0,
-        "noise stddev": "correct"
+        }
       }
     }
   }

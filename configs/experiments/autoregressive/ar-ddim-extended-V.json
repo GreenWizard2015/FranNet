@@ -1,0 +1,16 @@
+{
+  "inherit": "ar-ddim-extended.json",
+  "experiment": {
+    "title": "Autoregressive DDIM with V objective",
+    "description": "DDIM-V with autoregressive model"
+  },
+  "model": {
+    "restorator": {
+      "sampler": {
+        "interpolant": {
+          "name": "diffusion-V"
+        }
+      }
+    }
+  }
+}

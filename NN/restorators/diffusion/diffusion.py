@@ -1,9 +1,10 @@
 import tensorflow as tf
 import numpy as np
 from ..IRestorationProcess import IRestorationProcess
-from .diffusion_schedulers import CDiffusionParameters, CDPDiscrete, get_beta_schedule
+from .diffusion_schedulers import schedule_from_config
 from .diffusion_samplers import sampler_from_config
 from ..source_distributions import source_distribution_from_config
+from ..timeHelper import make_discrete_time_encoder
 
 # simple gaussian diffusion process
 class CGaussianDiffusion(IRestorationProcess):
@@ -21,17 +22,30 @@ class CGaussianDiffusion(IRestorationProcess):
     self._sourceDistribution = sourceDistribution
     return
   
-  def _forwardStep(self, x0, noise, t):
-    (alphaHatT, SNR, ) = self._schedule.parametersForT(t, [CDiffusionParameters.PARAM_ALPHA_HAT, CDiffusionParameters.PARAM_SNR, ])
+  def _extractTime(self, kwargs):
+    if 'T' in kwargs:
+      return self._schedule.to_discrete(kwargs['T']), kwargs['T']
+    
+    return self._schedule.to_discrete(kwargs['t']), kwargs['t']
+  
+  def _forwardStep(self, x0, noise, **kwargs):
+    t, T = self._extractTime(kwargs)
+    tf.assert_equal(tf.shape(t)[1], 1)
+    tf.assert_equal(tf.shape(t), tf.shape(T))
+    tf.assert_equal(tf.rank(t), 2)
+    step = self._schedule.parametersForT(t[:, 0])
+    alphaHatT = step['alpha_hat']
+
     signal_rate, noise_rate = tf.sqrt(alphaHatT), tf.sqrt(1.0 - alphaHatT)
     xT = (signal_rate * x0) + (noise_rate * noise)
     tf.assert_equal(tf.shape(xT), tf.shape(x0))
+    tf.assert_equal(tf.shape(x0)[:1], tf.shape(t)[:1])
     return {
       'xT': xT,
       't': t, # discrete time
-      'T': tf.cast(t, tf.float32) / self._schedule.noise_steps, # continuous time
+      'T': T, # continuous time
       'target': noise,
-      'SNR': SNR,
+      'SNR': step['SNR'],
     }
   
   def forward(self, x0):
@@ -42,32 +56,23 @@ class CGaussianDiffusion(IRestorationProcess):
     x0 = tf.ensure_shape(x0, (None, self._channels))
     sampled = self._sourceDistribution.sampleFor(x0)
     x1 = sampled['xT']
-    T = sampled['T']
-    # convert to discrete time, with floor rounding
-    t = tf.cast(tf.floor(T * self._schedule.noise_steps), tf.int32)
-    t = tf.clip_by_value(t, 0, self._schedule.noise_steps - 1)
-
     tf.assert_equal(tf.shape(x0), tf.shape(x1))
-    tf.assert_equal(tf.shape(x0)[:1], tf.shape(t)[:1])
-    return self._forwardStep(x0, x1, t)
+    return self._forwardStep(x0, x1, T=sampled['T'])
   
   def _makeDenoiser(self, denoiser, modelT, valueShape):
     if self._schedule.is_discrete: # discrete time diffusion
       noise_steps = self._schedule.noise_steps
-      encodedT = tf.cast(tf.range(noise_steps), tf.float32) / noise_steps
-      encodedT = tf.reshape(encodedT, (noise_steps, 1))
-      if not(modelT is None):
-        encodedT = modelT(encodedT) # (noise_steps, M)
-      M = tf.shape(encodedT)[-1]
-      tf.assert_equal(tf.shape(encodedT), (noise_steps, M))
+      
+      timeEncoder = make_discrete_time_encoder(
+        modelT=modelT,
+        allT=self._schedule.to_continuous( tf.range(noise_steps)[:, None] )
+      )
 
-      def predictNoise(x, t):
+      def predictNoise(x, T, **kwargs):
         B = valueShape[0]
         # populate encoded T
-        T = tf.gather(encodedT, t)
-        T = tf.reshape(T, (1, M))
-        T = tf.tile(T, (B, 1))
-        tf.assert_equal(tf.shape(T), (B, M))
+        T = timeEncoder(t=T, B=B)
+        tf.assert_equal(tf.shape(T)[:1], (B,))
         tf.assert_equal(tf.shape(x), valueShape)
         return denoiser(x=x, t=T)
       
@@ -149,12 +154,9 @@ def diffusion_from_config(config):
     sourceDistributionConfigs = config['source distribution']
     return CGaussianDiffusion(
       channels=config['channels'],
-      schedule=CDPDiscrete(
-        beta_schedule=get_beta_schedule(config['beta_schedule']),
-        noise_steps=config['noise_steps']
-      ),
+      schedule=schedule_from_config(config['schedule']),
       sampler=sampler_from_config(config['sampler']),
-      lossScaling=config['loss_scaling'],
+      lossScaling=config['loss scaling'],
       sourceDistribution=source_distribution_from_config(sourceDistributionConfigs)
     )
 

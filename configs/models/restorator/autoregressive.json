@@ -1,9 +1,8 @@
 {
   "name": "autoregressive",
-  "sampling": {
-    "threshold": 0.001,
-    "steps limit": 100,
-    "step size decay": 0.9
+  "sampler": {
+    "name": "autoregressive",
+    "noise provider": "normal"
   },
   "source distribution": {
     "name": "normal",

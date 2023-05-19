@@ -130,3 +130,8 @@ def masking_from_config(config):
     return _applyMasking_
   
   raise ValueError('Unknown masking name: %s' % name)
+
+def CFakeObject(**kwargs):
+  # create a namedtuple with the given kwargs
+  from collections import namedtuple
+  return namedtuple('CFakeObject', kwargs.keys())(**kwargs)

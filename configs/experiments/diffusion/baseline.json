@@ -6,7 +6,17 @@
   },
   "model": {
     "restorator": {
-      "inherit": "configs/models/restorator/ddpm.json"
+      "inherit": "configs/models/restorator/ddpm.json",
+      "sampler": {
+        "name": "DDPM",
+        "noise stddev": "correct",
+        "clipping": null
+      },
+      "schedule": {
+        "name": "discrete",
+        "beta schedule": "cosine",
+        "timesteps": 100
+      }
     }
   }
 }

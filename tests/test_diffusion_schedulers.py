@@ -25,3 +25,21 @@ def test_monotonicity():
     tf.debugging.assert_less_equal(data[1:], data[:-1], f'{name} is not monotonic')
     continue
   return
+
+# test conversion from continuous to discrete time
+def test_continuous_to_discrete():
+  schedule = CDPDiscrete( beta_schedule=get_beta_schedule('linear'), noise_steps=10 )
+  T = schedule.to_discrete( tf.linspace(0.0, 1.0, schedule.noise_steps) )
+  tf.assert_equal(T, tf.range(schedule.noise_steps))
+  tf.assert_equal(T[0], 0, 'first time step should be 0')
+  tf.assert_equal(T[-1], schedule.noise_steps - 1, 'last time step should be noise_steps - 1')
+  return
+
+# test conversion from discrete to continuous time
+def test_discrete_to_continuous():
+  schedule = CDPDiscrete( beta_schedule=get_beta_schedule('linear'), noise_steps=10 )
+  t = schedule.to_continuous( tf.range(schedule.noise_steps) )
+  tf.assert_equal(t, tf.linspace(0.0, 1.0, schedule.noise_steps))
+  tf.assert_equal(t[0], 0.0, 'first time step should be 0.0')
+  tf.assert_equal(t[-1], 1.0, 'last time step should be 1.0')
+  return

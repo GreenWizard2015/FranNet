@@ -67,3 +67,38 @@ class sMLP(tf.keras.layers.Layer):
   
   def call(self, x, **kwargs):
     return self._F(x, **kwargs)
+
+#######################################
+# generate a sequence of steps for diffusion process
+# returns (steps, prevSteps) ordered from the last to the first
+def make_steps_sequence(startStep, endStep, config):
+  tf.debugging.assert_greater_equal(startStep, endStep, message='startStep must be >= endStep')
+  name = config['name'].lower() if isinstance(config, dict) else config.lower()
+  if 'uniform' == name:
+    # TODO: add support for specifying the number of steps, instead of the step size
+    return make_uniform_steps_sequence(startStep, endStep, config['K'])
+  
+  if 'quadratic' == name:
+    return make_quadratic_steps_sequence(startStep, endStep)
+  
+  raise NotImplementedError('Unknown steps sequence name: {}'.format(name))
+
+def make_uniform_steps_sequence(startStep, endStep, K):
+  # should always include the startStep, endStep + 1 and endStep
+  steps = tf.range(endStep + 2, startStep - 1, K, dtype=tf.int32)[::-1]
+  steps = tf.concat([[startStep - 1], steps, [endStep + 1]], axis=0)
+  prevSteps = tf.concat([steps[1:], [endStep]], axis=0)
+  return steps, prevSteps
+
+def make_quadratic_steps_sequence(startStep, endStep):
+  N = tf.cast(tf.abs(startStep - endStep), tf.float32)
+  logN = tf.math.ceil(tf.math.log(N) / tf.math.log(2.0))
+  logN = tf.cast(logN, tf.int32)
+  steps = tf.range(logN, dtype=tf.int32)
+  steps = endStep + tf.pow(2, steps)
+
+  steps = tf.cast(steps, tf.int32)[::-1]
+  steps = tf.concat([[startStep - 1], steps], axis=0)
+  steps = tf.unique(steps).y # i'm too lazy to write proper code for this :D
+  prevSteps = tf.concat([steps[1:], [endStep]], axis=0)
+  return steps, prevSteps

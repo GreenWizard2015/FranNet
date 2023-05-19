@@ -8,7 +8,8 @@ from NN import model_from_config
 from Utils import dataset_from_config
 from Utils.visualize import generateImage
 from Utils.CFilesDataLoader import CFilesDataLoader
-   
+
+# TODO: figure out why upscaled images have swapped channels
 def makeImageProcessor(unnormalizeImg):
   def _processImage(img):
     img = unnormalizeImg(img)

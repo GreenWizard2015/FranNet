@@ -1,0 +1,32 @@
+{
+  "inherit": "configs/basic.json",
+  "experiment": {
+    "title": "Autoregressive DDIM",
+    "description": "DDIM with autoregressive model"
+  },
+  "model": {
+    "restorator": {
+      "inherit": "configs/models/restorator/autoregressive.json",
+      "sampler": {
+        "name": "DDIM",
+        "interpolant": {
+          "name": "diffusion"
+        },
+        "stochasticity": 0.0,
+        "noise stddev": "squared",
+        "clipping": {
+          "min": -1.0,
+          "max": 1.0
+        },
+        "steps skip type": {
+          "name": "quadratic"
+        },
+        "schedule": {
+          "name": "discrete",
+          "beta schedule": "cosine",
+          "timesteps": 100
+        }
+      }
+    }
+  }
+}
