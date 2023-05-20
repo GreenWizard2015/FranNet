@@ -7,15 +7,17 @@
   "model": {
     "restorator": {
       "inherit": "configs/models/restorator/autoregressive.json",
-      "threshold": 0.001, 
-      "steps": {
-        "start": 1.0,
-        "end": 0.001,
-        "steps": 100,
-        "decay": 0.9
-      },
-      "interpolant": {
-        "name": "direction"
+      "sampler": {
+        "threshold": 0.001, 
+        "steps": {
+            "start": 1.0,
+            "end": 0.001,
+            "steps": 100,
+            "decay": 0.9
+        },
+        "interpolant": {
+            "name": "direction"
+        }
       }
     }
   }
