@@ -61,6 +61,7 @@ if __name__ == "__main__": # test masking
     src = src[0].numpy()
     img = img[0].numpy()
     src = dataset.unnormalizeImg(src)
+    img = dataset.unnormalizeImg(img)
     # upscale src by 4x
     src = cv2.resize(src, (256, 256), interpolation=cv2.INTER_NEAREST)
     cv2.imshow('src', src)
