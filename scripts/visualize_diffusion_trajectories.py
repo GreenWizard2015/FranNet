@@ -1,3 +1,7 @@
+import os, sys
+# add the root folder of the project to the path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import matplotlib
 import matplotlib.pyplot as plt
 import tensorflow as tf

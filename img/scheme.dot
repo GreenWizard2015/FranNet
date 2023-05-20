@@ -1,0 +1,53 @@
+// Created with https://edotor.net/
+digraph FranNet {
+    rankdir=TB;
+    splines=ortho;
+    compound=true;
+    ranksep=1;
+
+    node [shape=rectangle, style=filled, color=lightblue];
+    edge [arrowhead=normal];
+    
+    {
+        rank=same;
+        Input [label="Corrupted image"];
+        Points [label="Points (2D, 0..1)"];
+    }
+    Output [label="Restored pixels"];
+    CoordsEnc [label="Learnable encoding"];
+    
+    subgraph cluster_Encoder {
+        style=filled;
+        color=lightgrey;
+        node [color=white, style=solid];
+        
+        Encoder [label = "              Convolutional encoder              "];
+        Encoder -> LatentVector;
+        Encoder -> LocalFeatureMaps;
+
+        LatentVector -> Extractor [lhead=cluster_Renderer];
+        LocalFeatureMaps -> Extractor [lhead=cluster_Renderer];
+        { rank=same; LatentVector -> dummy ->LocalFeatureMaps [style=invis]; }
+        dummy[style=invis]
+        
+        LatentVector [label="Global latent"];
+        LocalFeatureMaps [label="Local features"];
+        
+        subgraph cluster_Renderer {
+            label="Renderer";
+            style=filled;
+            color=grey;
+
+            node [color=white, style=solid];
+            Restorator [label="Restorator + decoder"]
+            Extractor [label="Features\nextractor/mixer"]
+        }
+    }
+    
+    Input -> Encoder [lhead=cluster_Encoder];
+    Points -> CoordsEnc;
+    CoordsEnc -> Extractor [lhead=cluster_Renderer];
+    Extractor -> Restorator;
+    Restorator -> Output;
+}
+ 

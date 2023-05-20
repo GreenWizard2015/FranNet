@@ -1,39 +1,87 @@
 # Frankenstein Network (FranNet)
 
-(ChatGPT generated project description)
+FranNet is a neural network architecture that combines a CNN encoder with a NeRF-like decoder to perform upscaling, denoising, and colorization of input images. The purpose of this project is to explore the capabilities and limitations of this approach and implement it as a proof of concept. A bit more detailed description of the network can be found in the [overview](overview.md).
 
-FranNet is a neural network architecture that incorporates a CNN encoder with a NeRF-like decoder to perform upscaling, denoising, and colorization of an input image. The main purpose of this project is to explore the possibilities and limitations of this approach, and to implement it as a proof of concept.
+<img src="img/scheme.png" width="70%" style="display: block; margin: auto;" />
 
-## Main Parts of the Network
+The choice of upscaling and colorization tasks was made because they are interesting and visually appealing, and they do not require a significant amount of resources. Additionally, these tasks lend themselves well to the application of NeRF (Neural Radiance Fields). While NeRF is typically used for different purposes, I was intrigued by its ability to generate images from individual rays/points, which is ideal for upscaling.
 
-### Encoder
+Due to extremely limited resources, achieving photorealism is not a feasible goal. The project is primarily exploratory in nature and currently lacks practical applicability.
 
-The encoder is a simple CNN that takes an input image (downsampled and converted to grayscale) and produces a single main latent vector and a bunch of feature maps with different resolutions. The encoder's role is to extract high-level features from the input image and produce a compressed representation that is fed into the decoder.
+## Current setup and dataset description
 
-### Decoder
+At present, the project utilizes the [CelebA dataset](https://paperswithcode.com/dataset/celeba), which consists of facial images of individuals at a resolution of 178×218 pixels. These images are cropped to a size of 178×178 pixels, then downscaled to 64×64 pixels and converted to grayscale, which serves as the input for FranNet. The color version of the 178×178 image is used as an example of the correct inverse transformation.
 
-The decoder receives as input the coordinates of a point (x and y, in the range 0..1) to reconstruct, the main latent vector, and extracted from a feature map correspondent vectors. The decoder predicts noise that is added to the initial point color to produce the final output. Initially, the decoder was just an ordinary NeRF-like network that immediately outputs predicted RGB values, but later it was modified to use a diffusion approach.
+![Example of the dataset](img/examples-grid.jpg)
 
-## Single step Approach
+Unfortunately, due to the time-consuming nature of the complete validation process, a small portion of the test dataset is used for validation. This measure is necessary to accelerate the training process, despite its potential implications as a suboptimal practice.
 
-In the single-step approach, the decoder produces the final output in a single step. This approach can produce images of arbitrary size and performs diffusion on each point independently, which is much more efficient.
+Furthermore, the neural network itself has fewer than 600,000 parameters. On one hand, this significantly reduces the overall quality. On the other hand, I consider this approach more appropriate than pursuing higher quality at the expense of increasing the network's size.
 
-## Diffusion Approach
+## Baseline oracles
 
-In the diffusion approach, the decoder predicts noise that is added to the initial point color. This approach is more robust to noise and can produce better results than the single-step approach, but it requires more training time and memory.
+The baseline for upscaling and colorization is a naive approach used as a reference point for comparison. Upscaling simply applies a basic upscaling method, such as bilinear or bicubic interpolation, to the input image. Colorization is performed either by using the color version of the image as a reference or by simply returning the grayscale image as the result.
 
-## Autoregressive Approach
+Using the color version of the image as a reference for the oracle would provide an unfair advantage, as it would essentially be using the ground truth information to perform the task. Therefore, the oracle is evaluated with and without using the color image as a reference to assess its performance objectively. As can be seen from the table, even when using the color image as a reference, the results are not perfect due to information loss during resizing.
 
-In the autoregressive approach, the decoder produces the final output pixel-by-pixel in a sequential manner. This approach can produce high-quality results but is slow and computationally expensive.
+<style>
+  .myTable {
+    border-collapse: collapse;
+    border: 1px solid black;
+  }
 
-## Advantages of the Approach
+  .myTable th, .myTable td {
+    border: 1px solid black;
+    padding: 5px;
+    margin: auto;
+    text-align: center;
+  }
 
-The main advantage of FranNet is that it can perform upscaling, denoising, and colorization of an input image using a single neural network architecture. It is also able to produce images of arbitrary size and can be trained using only a small fraction of target values, which allows us to control the trade-off between performance and training speed and/or memory usage.
+  .myTable .used {
+    background-color: #e0e0e0;
+  }
+</style>
 
-## Applications of the Architecture
 
-FranNet can be used in a variety of applications, including image editing and restoration, computer vision, and graphics. It can also be used in real-time applications where speed and efficiency are crucial.
+<table class="myTable">
+    <tr>
+      <th></th>
+      <th colspan="2">with color reference</th>
+      <th colspan="2">without color reference</th>
+    </tr>
+    <tr>
+      <th>Method</th>
+      <th>RGB MSE</th>
+      <th>Grayscale MSE</th>
+      <th>RGB MSE</th>
+      <th>Grayscale MSE</th>
+    </tr>
+  <tr>
+  <td>nearest</td>
+  <td>0.00302</td>  <td>0.00297</td>
+  <td>0.01256</td>  <td>0.00296</td>
+</tr>
+<tr class='used'>
+  <td>bilinear</td>
+  <td>0.00149</td>  <td>0.00148</td>
+  <td>0.01107</td>  <td>0.00148</td>
+</tr>
+<tr>
+  <td>bicubic</td>
+  <td>0.00141</td>  <td>0.00140</td>
+  <td>0.01100</td>  <td>0.00140</td>
+</tr>
+<tr>
+  <td>area</td>
+  <td>0.00174</td>  <td>0.00171</td>
+  <td>0.01131</td>  <td>0.00171</td>
+</tr>
+</table>
 
-## Conclusion
+(data was collected via running `python3 scripts/test-oracle.py --config configs/basic.json`)
 
-FranNet is a neural network architecture that incorporates a CNN encoder with a NeRF-like decoder to perform upscaling, denoising, and colorization of an input image. It is a proof of concept and not a state-of-the-art approach, but it shows the potential and limitations of this approach. FranNet can be useful in a variety of applications and is a promising area of research for future work.
+`Bilinear` is used as the default scaling method for the project during training and under the hood of some parts of the neural network.
+
+## Experiments
+
+While working on the project, I encountered various aspects, including the ease of conducting experiments. All parts of the neural network are implemented in a highly flexible manner and configured through JSON. Integration with [Weights&Biases](https://wandb.ai/green_wizard/FranNet) is also implemented.

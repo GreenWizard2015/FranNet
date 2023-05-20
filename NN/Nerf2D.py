@@ -1,18 +1,18 @@
 import tensorflow as tf
-from NN.utils import extractInterpolated, ensure4d, flatCoordsGridTF
+from .utils import extractInterpolated, ensure4d, flatCoordsGridTF
+from .CBaseModel import CBaseModel
 
-class CNerf2D(tf.keras.Model):
+class CNerf2D(CBaseModel):
   def __init__(self, encoder, renderer, restorator, samplesN=256, **kwargs):
     super().__init__(**kwargs)
-    self._loss = tf.keras.metrics.Mean(name="loss")
     self._encoder = encoder
     self._renderer = renderer
     self._restorator = restorator
     self.samplesN = samplesN
     return
   
-  def train_step(self, images):
-    (src, dest) = images
+  def train_step(self, data):
+    (src, dest) = data
     src = ensure4d(src)
     dest = ensure4d(dest)
     
@@ -46,7 +46,7 @@ class CNerf2D(tf.keras.Model):
     
     self.optimizer.minimize(loss, self.trainable_variables, tape=tape)
     self._loss.update_state(loss)
-    return self._metricsDict()
+    return self.metrics_to_dict(self._loss)
   
   def test_step(self, images):
     (src, dest) = images
@@ -54,19 +54,8 @@ class CNerf2D(tf.keras.Model):
     dest = ensure4d(dest)
     
     reconstructed = self(src, size=tf.shape(dest)[1], training=False)
-    reconstructed = tf.reshape(reconstructed, tf.shape(dest)) # just in case
+    return self._testMetrics(dest, reconstructed)
 
-    loss = tf.losses.mse(dest, reconstructed)
-    self._loss.update_state(loss)
-    return self._metricsDict()
-    
-  @property
-  def metrics(self):
-    return [self._loss, ]
-
-  def _metricsDict(self):
-    return {x.name: x.result() for x in self.metrics}
-  
   #####################################################
   @tf.function
   def call(self, 

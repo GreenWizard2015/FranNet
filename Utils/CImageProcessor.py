@@ -18,6 +18,7 @@ class CImageProcessor:
     if self._normalizeRange:
       img = tf.cast(img, tf.float32) / 255.0
     
+    # TODO: add support for random cropping
     s = tf.shape(img)
     H, W = s[1], s[2]
     crop_size = tf.minimum(H, W)
