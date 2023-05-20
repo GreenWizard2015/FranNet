@@ -24,25 +24,6 @@ The baseline for upscaling and colorization is a naive approach used as a refere
 
 Using the color version of the image as a reference for the oracle would provide an unfair advantage, as it would essentially be using the ground truth information to perform the task. Therefore, the oracle is evaluated with and without using the color image as a reference to assess its performance objectively. As can be seen from the table, even when using the color image as a reference, the results are not perfect due to information loss during resizing.
 
-<style>
-  .myTable {
-    border-collapse: collapse;
-    border: 1px solid black;
-  }
-
-  .myTable th, .myTable td {
-    border: 1px solid black;
-    padding: 5px;
-    margin: auto;
-    text-align: center;
-  }
-
-  .myTable .used {
-    background-color: #e0e0e0;
-  }
-</style>
-
-
 <table class="myTable">
     <tr>
       <th></th>
