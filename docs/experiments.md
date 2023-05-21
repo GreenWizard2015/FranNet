@@ -29,3 +29,31 @@ In the root of the [configs/experiments](../configs/experiments) folder, there a
 - [masking.json](../configs/experiments/masking.json) - Enables the masking of the input image during the training process. The input image is split into 16x16 grid of patches, and then random masking is applied to up to 75% of the patches. The neural network should not only restore the color of the image but also the masked patches. You can see the example of the masked image [here](img/masking-grid.jpg).
 - [sd-halton.json](../configs/experiments/sd-halton.json) -  customize the way noise is sampled during the training process. In some cases, quasi-random sequences can be used as a replacement for normally distributed noise. The specified range is `-4` to `4`, which corresponds to 4 sigmas of the normal distribution.
 - [sd-resampled.json](../configs/experiments/sd-resampled.json) - This config file is similar to the previous one, but it uses resampled noise instead of quasi-random noise.
+
+## Reports, results, and todo-list
+
+Models to be trained:
+
+- [ ] Single-pass restorator
+  - [ ] Basic
+  - [ ] With masking
+  - [ ] With complex encoder
+- [ ] Diffusion restorator
+  - [ ] DDPM sampler
+    - [ ] Basic
+    - [ ] With halton quasi-random noise
+  - [ ] DDIM sampler
+    - [ ] Train basic setup, compare with DDPM and decide what to do next (although DDIM is just a sampler, but produced models may be different)
+  - [ ] Autoregressive restorator
+    - [ ] Direction
+    - [ ] DDIM extended
+    - [ ] DDIM extended with V-objective
+
+Studies to be conducted:
+
+- [ ] Compare with and without masking
+- [ ] Compare with and without complex encoder
+- [ ] Compare different parameters for DDIM sampler, compare with DDPM
+- [ ] Compare different parameters for autoregressive "direction" restorator sampler
+- [ ] Show that ordinary DDIM and autoregressive DDIM are the same, in terms of inference and training
+- [ ] Visualize the trajectories of the color values during the sampling process
