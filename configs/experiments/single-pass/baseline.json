@@ -1,5 +1,4 @@
 {
-  "inherit": "configs/basic.json",
   "experiment": {
     "title": "Basic single pass restorator",
     "description": "Baseline for restorators"

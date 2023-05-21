@@ -1,8 +1,8 @@
 # Frankenstein Network (FranNet)
 
-FranNet is a neural network architecture that combines a CNN encoder with a NeRF-like decoder to perform upscaling, denoising, and colorization of input images. The purpose of this project is to explore the capabilities and limitations of this approach and implement it as a proof of concept. A bit more detailed description of the network can be found in the [overview](overview.md).
+FranNet is a neural network architecture that combines a CNN encoder with a NeRF-like decoder to perform upscaling, denoising, and colorization of input images. The purpose of this project is to explore the capabilities and limitations of this approach and implement it as a proof of concept. A bit more detailed description of the network can be found in the [overview](docs/overview.md).
 
-<img src="img/scheme.png" width="70%" style="display: block; margin: auto;" />
+<img src="docs/img/scheme.png" width="70%" style="display: block; margin: auto;" />
 
 The choice of upscaling and colorization tasks was made because they are interesting and visually appealing, and they do not require a significant amount of resources. Additionally, these tasks lend themselves well to the application of NeRF (Neural Radiance Fields). While NeRF is typically used for different purposes, I was intrigued by its ability to generate images from individual rays/points, which is ideal for upscaling.
 
@@ -12,7 +12,7 @@ Due to extremely limited resources, achieving photorealism is not a feasible goa
 
 At present, the project utilizes the [CelebA dataset](https://paperswithcode.com/dataset/celeba), which consists of facial images of individuals at a resolution of 178×218 pixels. These images are cropped to a size of 178×178 pixels, then downscaled to 64×64 pixels and converted to grayscale, which serves as the input for FranNet. The color version of the 178×178 image is used as an example of the correct inverse transformation.
 
-![Example of the dataset](img/examples-grid.jpg)
+![Example of the dataset](docs/img/examples-grid.jpg)
 
 Unfortunately, due to the time-consuming nature of the complete validation process, a small portion of the test dataset is used for validation. This measure is necessary to accelerate the training process, despite its potential implications as a suboptimal practice.
 
@@ -66,3 +66,5 @@ Using the color version of the image as a reference for the oracle would provide
 ## Experiments
 
 While working on the project, I encountered various aspects, including the ease of conducting experiments. All parts of the neural network are implemented in a highly flexible manner and configured through JSON. Integration with [Weights&Biases](https://wandb.ai/green_wizard/FranNet) is also implemented.
+
+Read more about the experiments in the [experiments.md](docs/experiments.md).

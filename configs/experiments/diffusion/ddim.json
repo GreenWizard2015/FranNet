@@ -1,5 +1,5 @@
 {
-  "inherit": "baseline.json",
+  "inherit": "ddpm.json",
   "experiment": {
     "title": "DDIM sampler",
     "description": "Restorator that uses diffusion model with DDIM sampler"

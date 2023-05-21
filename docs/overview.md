@@ -36,12 +36,12 @@ Autoregressive restoration is a versatile approach that encompasses both single-
 
 One intriguing aspect of the autoregressive approach is its compatibility with the concept of interpolants. In this context, the restoration process can be seen as an interpolation between the correct pixel value (`x0`) and an arbitrary value (`x1`), which depends on a parameter `t`. The interpolation method can be chosen arbitrarily as long as it can produce `x0`.
 
-By disregarding the `t` and `x1` values and solely focusing on producing `x0`, we arrive at the single-step approach (see [`CConstantInterpolant`](NN/restorators/interpolants/basic.py)). Although I set `t` and `x1` to zero to improve convergence speed, it is not necessary, as the decoder can learn to ignore them.
+By disregarding the `t` and `x1` values and solely focusing on producing `x0`, we arrive at the single-step approach (see [`CConstantInterpolant`](../NN/restorators/interpolants/basic.py)). Although I set `t` and `x1` to zero to improve convergence speed, it is not necessary, as the decoder can learn to ignore them.
 
 When we aim to produce `x0 - x1` (the direction toward `x0`), treating the current `x` as `x1`, and disregarding `t`, we obtain the standard autoregressive approach. To generate the final output, we can start from some noise and progressively move toward the target `x0` value. This description is quite abstract because there are various ways to implement it, but I hope you grasp the main idea.
 
-Finally, we can choose to produce `x1`, either directly or indirectly, using `t` as a conditional parameter and connecting it with beta schedulers and properties of the Gaussian distribution. This corresponds to the diffusion approach. As a proof of concept, I implemented it in the [`CDDIMInterpolantSampler`](NN/restorators/samplers/CDDIMInterpolantSampler.py) class, which can be seamlessly integrated as a replacement for the conventional DDIM/DDPM sampler.
+Finally, we can choose to produce `x1`, either directly or indirectly, using `t` as a conditional parameter and connecting it with beta schedulers and properties of the Gaussian distribution. This corresponds to the diffusion approach. As a proof of concept, I implemented it in the [`CDDIMInterpolantSampler`](../NN/restorators/samplers/CDDIMInterpolantSampler.py) class, which can be seamlessly integrated as a replacement for the conventional DDIM/DDPM sampler.
 
-## Diffusion Approach
+## Diffusion
 
-In the diffusion approach, the decoder predicts noise that is added to the initial color and than we perform reverse diffusion to get the final output. Yeah, such a complex topic could be explained in a single sentence :)
+In the diffusion restorator, the decoder predicts noise that is added to the initial color and than we perform reverse diffusion to get the final output. Yeah, such a complex topic could be explained in a single sentence :)

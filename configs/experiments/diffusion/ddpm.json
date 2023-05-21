@@ -1,5 +1,4 @@
 {
-  "inherit": "configs/basic.json",
   "experiment": {
     "title": "Basic DDPM restorator",
     "description": "Baseline for DDPM restorators"

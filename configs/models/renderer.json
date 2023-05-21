@@ -1,4 +1,5 @@
 {
   "position encoding": "learned",
-  "time encoding": "learned"
+  "time encoding": "learned",
+  "batch_size": 262144
 }

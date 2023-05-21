@@ -1,5 +1,4 @@
 {
-  "inherit": "configs/basic.json",
   "experiment": {
     "title": "Autoregressive restorator (direction)",
     "description": "Autoregressive restorators that predict the direction towards the target"
