@@ -63,11 +63,11 @@ class CDDIMSampler(IDiffusionSampler):
 
     initShape = tf.shape(value)
     noise_provider = kwargs.get('noiseProvider', self._noise_provider)
-    clipping = kwargs.get('clipping', self._clipping)
-    if clipping is None:
+    clippingArgs = kwargs.get('clipping', self._clipping)
+    if clippingArgs is None:
       clipping = lambda x: x
     else:
-      clipping = lambda x: tf.clip_by_value(x, clip_value_min=clipping['min'], clip_value_max=clipping['max'])
+      clipping = lambda x: tf.clip_by_value(x, clip_value_min=clippingArgs['min'], clip_value_max=clippingArgs['max'])
 
     value = clipping(value)
     for stepInd in tf.range(tf.size(steps)):
