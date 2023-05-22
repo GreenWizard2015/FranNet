@@ -39,15 +39,14 @@ Models to be trained:
   - [ ] With masking
   - [ ] With complex encoder
 - [ ] Diffusion restorator
-  - [ ] DDPM sampler
+  - [ ] DDPM sampler (save each epoch to cherry-pick the best one later for DDIM sampler)
     - [ ] Basic
     - [ ] With halton quasi-random noise
   - [ ] DDIM sampler
-    - [ ] Train basic setup, compare with DDPM and decide what to do next (although DDIM is just a sampler, but produced models may be different)
-  - [ ] Autoregressive restorator
-    - [ ] Direction
-    - [ ] DDIM extended
-    - [ ] DDIM extended with V-objective
+- [ ] Autoregressive restorator
+  - [ ] Direction
+  - [ ] DDIM extended
+  - [ ] DDIM extended with V-objective
 
 Studies to be conducted:
 
