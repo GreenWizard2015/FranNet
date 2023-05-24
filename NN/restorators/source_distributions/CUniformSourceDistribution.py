@@ -1,6 +1,7 @@
 import tensorflow as tf
 import tensorflow_probability as tfp
 from .ISourceDistribution import ISourceDistribution
+from NN.utils import shuffleBatch
 
 '''
 Implements a uniform distribution of values in the given range.
@@ -28,11 +29,6 @@ class CUniformSourceDistribution(ISourceDistribution):
     return noise
 # End of CUniformSourceDistribution
 
-def _shuffleBatch(batch):
-  indices = tf.range(tf.shape(batch)[0])
-  indices = tf.random.shuffle(indices)
-  return tf.gather(batch, indices)
-
 def _get_exact_shape(tensor_or_shape):
   if isinstance(tensor_or_shape, tuple): return tensor_or_shape
   
@@ -51,7 +47,7 @@ def _get_distribution(name):
     def halton(shape):
       shape = _get_exact_shape(shape)
       res = tfp.mcmc.sample_halton_sequence(shape[-1], num_results=shape[0], randomized=True)
-      return _shuffleBatch(res)
+      return shuffleBatch(res)
     return halton
   
   if 'sobol' == name:
@@ -60,7 +56,7 @@ def _get_distribution(name):
       MAX_SKIP = 100000000 # magic number
       skip = tf.random.uniform((1,), 0, MAX_SKIP, tf.int32)[0] # randomize the sequence
       res = tf.math.sobol_sample(dim=shape[-1], num_results=shape[0], skip=skip)
-      return _shuffleBatch(res)
+      return shuffleBatch(res)
     return sobol
   
   raise ValueError('Unknown distribution')

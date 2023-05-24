@@ -1,0 +1,11 @@
+{
+  "dataset": {
+    "train": {
+      "masking": {
+        "name": "grid",
+        "size": 32,
+        "min": 0, "max": 0.75
+      }
+    }
+  }
+}

@@ -1,8 +1,21 @@
 import tensorflow as tf
 import tensorflow_addons as tfa
-import numpy as np
+import tensorflow_probability as tfp
 import tensorflow.keras.layers as L
 from NN.CCoordsEncodingLayer import CCoordsEncodingLayer
+
+def shuffleBatch(batch):
+  indices = tf.range(tf.shape(batch)[0])
+  indices = tf.random.shuffle(indices)
+  return tf.gather(batch, indices)
+
+def sample_halton_sequence(shape, dim):
+  # TODO: find way to generate halton sequences per sample (tf.map_fn?)
+  num_results = tf.math.reduce_prod(shape)
+  samples = tfp.mcmc.sample_halton_sequence(dim, num_results=num_results, randomized=True)
+  samples = shuffleBatch(samples)
+  samples = tf.reshape(samples, tf.concat([shape, (dim,)], axis=-1))
+  return samples
 
 def normVec(x):
   V, L = tf.linalg.normalize(x, axis=-1)

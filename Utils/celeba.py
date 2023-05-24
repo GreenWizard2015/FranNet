@@ -51,8 +51,8 @@ if __name__ == "__main__": # test masking
       'batch_size': 1, 'limit': 16,
       'masking': {
         'name': 'grid',
-        'size': 8, # 8x8 grid
-        'min': 0, 'max': -1, # min and max number of masked squares
+        'size': [5, 7, 11, 13, 17, 19, 23, 29, 31],
+        'min': 0, 'max': 0.75, # min and max number of masked squares
         'mask value': -1.0, # normalized value of masked squares
       }
     }, 'train'

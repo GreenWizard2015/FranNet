@@ -26,22 +26,29 @@ Folder structure and brief description of some of the currently available experi
 In the root of the [configs/experiments](../configs/experiments) folder, there are some common customizations for the experiments:
 
 - [complex-encoder.json](../configs/experiments/complex-encoder.json) - This config file contains customizations for the encoder. It uses a more complex encoder architecture that provides more flexibility for feature extraction from the input image.
-- [masking.json](../configs/experiments/masking.json) - Enables the masking of the input image during the training process. The input image is split into 16x16 grid of patches, and then random masking is applied to up to 75% of the patches. The neural network should not only restore the color of the image but also the masked patches. You can see the example of the masked image [here](img/masking-grid.jpg).
+- [masking.json](../configs/experiments/masking.json) - Enables the masking of the input image during the training process. The input image is split into 16x16 grid of patches, and then random masking is applied to up to 75% of the patches. The neural network should not only restore the color of the image but also the masked patches. You can see the example of the masked image [here](img/masking-grid.jpg). (other `masking-*.json` are the same, but with different grid sizes and other parameters)
 - [sd-halton.json](../configs/experiments/sd-halton.json) -  customize the way noise is sampled during the training process. In some cases, quasi-random sequences can be used as a replacement for normally distributed noise. The specified range is `-4` to `4`, which corresponds to 4 sigmas of the normal distribution.
 - [sd-resampled.json](../configs/experiments/sd-resampled.json) - This config file is similar to the previous one, but it uses resampled noise instead of quasi-random noise.
 
 ## Reports, results, and todo-list
 
+> **NOTE**: please be aware that the training process involves a significant level of sparsity, which leads to very noisy metrics. When it was reasonable, I tried to run the training process multiple times and then averaged the results. However, in some cases, I had to use the results from a single run.
+
 Models to be trained:
 
 - [ ] Single-pass restorator
-  - [ ] Basic
-  - [ ] With masking
+  - [x] Basic
+  - [x] With masking (up to 75% of patches are masked)
+    - [x] 16x16 grid
+    - [x] 8x8 grid
+    - [x] 4x4 grid
+    - [x] Other grid sizes
   - [ ] With complex encoder
 - [ ] Diffusion restorator
   - [ ] DDPM sampler (save each epoch to cherry-pick the best one later for DDIM sampler)
     - [ ] Basic
     - [ ] With halton quasi-random noise
+    - [ ] With loss weighting
   - [ ] DDIM sampler
 - [ ] Autoregressive restorator
   - [ ] Direction
@@ -50,9 +57,13 @@ Models to be trained:
 
 Studies to be conducted:
 
-- [ ] Compare with and without masking
+- [x] [Compare with and without masking](masking-ablation.md)
 - [ ] Compare with and without complex encoder
 - [ ] Compare different parameters for DDIM sampler, compare with DDPM
 - [ ] Compare different parameters for autoregressive "direction" restorator sampler
 - [ ] Show that ordinary DDIM and autoregressive DDIM are the same, in terms of inference and training
 - [ ] Visualize the trajectories of the color values during the sampling process
+- [ ] Compare different model sizes (**600k**, x4, x16?)
+- [ ] Compare different noise sampling methods (**normal**, halton, resampled)
+- [ ] Try to use quasi-random generator to sample points for training (**uniform**, halton)
+- [ ] Try incorporating additional information into the input image (e.g., applying edge detection and adding the result as an additional channel).
