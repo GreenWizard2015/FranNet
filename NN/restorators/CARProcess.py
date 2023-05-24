@@ -37,12 +37,12 @@ class CARProcess(IRestorationProcess):
       return model(x=x, t=T, mask=kwargs.get('mask', None))
     return denoiser
 
-  def reverse(self, value, denoiser, modelT=None):
+  def reverse(self, value, denoiser, modelT=None, **kwargs):
     if isinstance(value, tuple):
       value = self._sourceDistribution.initialValueFor(value + (self._channels, ))
 
     denoiser = self._makeDenoiser(denoiser, modelT)
-    res = self._sampler.sample(value=value, model=denoiser)
+    res = self._sampler.sample(value=value, model=denoiser, **kwargs)
     tf.assert_equal(tf.shape(res), tf.shape(value))
     return res
 # End of CARProcess

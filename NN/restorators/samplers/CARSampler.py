@@ -2,6 +2,8 @@ import tensorflow as tf
 from Utils.utils import CFakeObject
 from .CBasicInterpolantSampler import CBasicInterpolantSampler, ISamplingAlgorithm
 
+# TODO: adjust variance based on the "distance" between steps prevT and prevT - 1
+# TODO: find a way to jump to the T=0.0, if we converged or exceeded the steps limit
 class CProcessStepsDecayed:
   def __init__(self, start, end, steps, decay):
     self._start = start

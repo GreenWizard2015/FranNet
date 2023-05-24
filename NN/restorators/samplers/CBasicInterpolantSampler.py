@@ -1,18 +1,5 @@
 import tensorflow as tf
-
-class ISamplingAlgorithm:
-  def firstStep(self, **kwargs):
-    raise NotImplementedError()
-  
-  def nextStep(self, **kwargs):
-    raise NotImplementedError()
-  
-  def inference(self, **kwargs):
-    raise NotImplementedError()
-  
-  def solve(self, **kwargs):
-    raise NotImplementedError()
-# End of ISamplingAlgorithm
+from .ISamplingAlgorithm import ISamplingAlgorithm
 
 class CBasicInterpolantSampler:
   def __init__(self, interpolant, algorithm):
@@ -26,16 +13,28 @@ class CBasicInterpolantSampler:
   @tf.function
   def sample(self, value, model, **kwargs):
     kwargs = dict(**kwargs, interpolant=self._interpolant) # add interpolant to kwargs
-    step = self._algorithm.firstStep(value=value, **kwargs)
+    # wrap algorithm with hook, if provided
+    algorithm = kwargs.get('algorithmInterceptor', lambda x: x)( self._algorithm )
+    assert isinstance(algorithm, ISamplingAlgorithm), f'Algorithm must be an instance of ISamplingAlgorithm, but got {type(algorithm)}'
+
+    # perform sampling
+    step = algorithm.firstStep(value=value, iteration=0, **kwargs)
+    iteration = tf.constant(1, dtype=tf.int32) # first step is already done
     while tf.reduce_any(step.active):
-      x_hat = self._algorithm.inference(model=model, step=step, value=value, **kwargs)
+      KWArgs = dict(
+        value=value, step=step, iteration=iteration,
+        **kwargs
+      ) # for simplicity
+      # inference
+      x_hat = algorithm.inference(model=model, **KWArgs)
       # solve
-      solution = self._algorithm.solve(x_hat=x_hat, step=step, value=value, **kwargs)
+      solution = algorithm.solve(x_hat=x_hat, **KWArgs)
       # make next step
-      step = self._algorithm.nextStep(x_hat=x_hat, step=step, solution=solution, value=value, **kwargs)
+      step = algorithm.nextStep(x_hat=x_hat, solution=solution, **KWArgs)
       # update value
       tf.assert_equal(tf.shape(value), tf.shape(solution.value))
       value = solution.value
+      iteration += 1
       continue
     
     return value
