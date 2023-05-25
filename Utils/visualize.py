@@ -1,6 +1,9 @@
 import os
 import numpy as np
+import tensorflow as tf
 import cv2
+from Utils.CFilesDataLoader import CFilesDataLoader
+from Utils import dataset_from_config
 
 def generateImage_sideBySide(
   images, titles, margin,
@@ -90,3 +93,23 @@ def generateImage(data, folder, index, params):
     return
   
   raise ValueError(f'Unknown mode: {mode}')
+
+def data_from_dataset(config):
+  datasetConfig = config['dataset']
+  dataset = dataset_from_config(datasetConfig)
+  data = dataset.make_dataset(datasetConfig['test'], split='test')
+  return data.prefetch(buffer_size=tf.data.experimental.AUTOTUNE), dataset
+
+def data_from_input(input, inputShape):
+  files = []
+  if os.path.isdir(input):
+    # load all files from folder, filter by extension, only png and jpg
+    files = [os.path.join(input, f) for f in os.listdir(input) if f.endswith('.png') or f.endswith('.jpg')]
+  if os.path.isfile(input):
+    files = [input]
+
+  if len(files) == 0:
+    raise ValueError(f'No files found in {input}')
+  
+  dataloader = CFilesDataLoader(files, targetSize=inputShape[:2], srcSize=(256, 256))
+  return dataloader.iterator(), dataloader

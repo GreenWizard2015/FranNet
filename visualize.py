@@ -1,15 +1,14 @@
-from Utils.utils import setupGPU, load_config, setGPUMemoryLimit
+from Utils.utils import setupGPU, load_config, setGPUMemoryLimit, merge_configs
 setupGPU() # call it on startup to prevent OOM errors on my machine
 
 import tensorflow as tf
 import numpy as np
-import cv2, os, argparse, shutil
+import cv2, os, argparse, shutil, re
+from collections import defaultdict
 from NN import model_from_config
-from Utils import dataset_from_config
-from Utils.visualize import generateImage
-from Utils.CFilesDataLoader import CFilesDataLoader
+from Utils.visualize import generateImage, data_from_dataset, data_from_input
+from Utils.WandBUtils import CWBProject
 
-# TODO: figure out why upscaled images have swapped channels
 def makeImageProcessor(unnormalizeImg):
   def _processImage(img):
     img = unnormalizeImg(img)
@@ -42,65 +41,28 @@ def _processData(data, model, processImage):
       yield {
         'original': processImage(dstB[i]),
         'input': processImage(srcB[i]),
-        'upscaled': processImage(upscaledB[i])
+        'upscaled': processImage(upscaledB[i])[..., ::-1] # RGB -> BGR
       }
     continue
   return
 
-def _data_from_dataset(config):
-  datasetConfig = config['dataset']
-  dataset = dataset_from_config(datasetConfig)
-  data = dataset.make_dataset(datasetConfig['test'], split='test')
-  return data.prefetch(buffer_size=tf.data.experimental.AUTOTUNE), dataset
-
-def _data_from_input(input, inputShape):
-  files = []
-  if os.path.isdir(input):
-    # load all files from folder, filter by extension, only png and jpg... mind reading by copilot :)
-    files = [os.path.join(input, f) for f in os.listdir(input) if f.endswith('.png') or f.endswith('.jpg')]
-  if os.path.isfile(input):
-    files = [input]
-
-  if len(files) == 0:
-    raise ValueError(f'No files found in {input}')
-  
-  dataloader = CFilesDataLoader(files, targetSize=inputShape[:2], srcSize=(256, 256))
-  return dataloader.iterator(), dataloader
-  
-def main(args):
-  folder = os.path.dirname(__file__)
-  config = load_config(args.config, folder=folder)
-  
-  if args.folder:
-    folder = os.path.abspath(args.folder)
-    # clear or create folder
-    if os.path.exists(folder): shutil.rmtree(folder)
-    os.makedirs(folder)
-
-  model = model_from_config(config['model'])
-  model.load_weights(args.model)
-  print('Model loaded successfully.')
-  
-  data, dataset = _data_from_dataset(config) if args.input is None else _data_from_input(args.input, model.get_input_shape()[1:])
+def process(folder, visualizationConfig, model, modelArgsOverride, datasetProvider):
+  if not os.path.exists(folder): os.makedirs(folder)
+  data, dataset = datasetProvider(model.get_input_shape()[1:])
   ##############################
   modelArgs = {} # inference args: size, scale, shift, reverseArgs
-  generationOutputArgs = {
+  generationParams = {
     'mode': 'side by side',
     'format': 'png',
     'resize': 'resize',
   }
   
-  if 'visualization' in config:
-    visualizationConfig = config['visualization']
+  if not(visualizationConfig is None):
     modelArgs.update(visualizationConfig['model args'])
-    generationOutputArgs = visualizationConfig.get('output', generationOutputArgs)
-  # override config value by command line arg
-  if args.target_size:
-    modelArgs['size'] = args.target_size
-
-  if args.renderer_batch_size:
-    modelArgs['batchSize'] = args.renderer_batch_size
-  
+    generationParams = visualizationConfig.get('output', generationParams)
+  # force override model args
+  modelArgs.update(modelArgsOverride)
+  ##############################
   dataIttr = _processData(
     data,
     model=lambda x: model(x, **modelArgs),
@@ -111,10 +73,77 @@ def main(args):
       data=data,
       folder=folder,
       index=index,
-      params=generationOutputArgs
+      params=generationParams
     )
     continue
-  print('Done.')
+  return
+
+def datasetFrom(args, config):
+  if args.input is None:
+    return lambda input_shape: data_from_dataset(config)
+  # otherwise from input
+  return lambda input_shape: data_from_input(args.input, input_shape)
+
+def modelArgsOverrideFromArgs(args):
+  modelArgs = {}
+  if args.target_size:
+    modelArgs['size'] = args.target_size
+
+  if args.renderer_batch_size:
+    modelArgs['batchSize'] = args.renderer_batch_size
+  return modelArgs
+
+def _bestRuns(runs):
+  byName = defaultdict(list)
+  for run in runs:
+    byName[run.name].append(run)
+    continue
+  # in each group select the best run
+  return [min(runs, key=lambda run: run.bestLoss) for runs in byName.values()]
+
+def modelsFromArgs(args, config):
+  if args.model: # load from file
+    model = model_from_config(config['model'])
+    model.load_weights(args.model)
+    print('Model loaded successfully.')
+    return [(model, None)]
+  # otherwise from wandb project
+  project = CWBProject(args.wandb_project)
+
+  def isAccepted(runName):
+    runName = runName.lower()
+    return args.wandb_run_name.lower() in runName
+  
+  acceptedRuns = [run for run in project.runs() if isAccepted(run.name)]
+  assert len(acceptedRuns) > 0, f'No runs found for {args.wandb_run_name}'
+  if args.wandb_only_best: acceptedRuns = _bestRuns(acceptedRuns)
+  print(f'Found {len(acceptedRuns)} runs for {args.wandb_run_name}:')
+  for run in acceptedRuns: print(f'  {run.name} ({run.fullId}, loss: {run.bestLoss})')
+
+  # ensure that user wants to continue and use from all selected runs evaluate the best model
+  answer = input('Continue? [y/n]: ')
+  assert answer.lower() == 'y', 'Aborted by user'
+
+  def escape_directory_name(directory_name):
+    directory_name = directory_name.strip()
+    directory_name = re.sub(r'[\.<>:"/\\|?*]', '_', directory_name)
+    return directory_name
+
+  byName = defaultdict(list)
+  for run in acceptedRuns: byName[run.name].append(run)
+  # return iterator of (model, modelArgs)
+  for runGroup in byName.values():
+    for run in runGroup:
+      print(f'Loading model from {run.name} ({run.fullId})...')
+      modelConfigs = merge_configs(run.config, config) # override config with run config
+      bestModel = run.bestModel.pathTo()
+      model = model_from_config(modelConfigs['model'])
+      model.load_weights(bestModel)
+      print('Model loaded successfully.')
+      parts = [escape_directory_name(run.name)]
+      if 1 < len(runGroup): parts.append(escape_directory_name(run.id))
+      yield (model, os.path.join(*parts))
+    continue
   return
 
 if __name__ == "__main__":
@@ -124,15 +153,48 @@ if __name__ == "__main__":
     help='Path to a single config file or a multiple config files (they will be merged in order of appearance)',
     default=[], action='append', 
   )
-  parser.add_argument('--model', type=str, help='Path to model weights file', required=True)
+  parser.add_argument('--model', type=str, help='Path to model weights file')
   parser.add_argument('--target-size', type=int, help='Target size (optional)')
   parser.add_argument('--input', type=str, help='Path to image file or folder (optional)', default=None)
   # misc
   parser.add_argument('--folder', type=str, help='Path to output folder (optional)', default=None)
   parser.add_argument('--gpu-memory-mb', type=int, help='GPU memory limit in Mb (optional)')
   parser.add_argument('--renderer-batch-size', type=int, help='Renderer batch size (optional)')
+  # wandb integration
+  parser.add_argument('--wandb-project', type=str, help='Wandb project full name (entity/project) (optional)')
+  parser.add_argument('--wandb-run-name', type=str, help='Wandb run name (optional, requires --wandb-project)')
+  parser.add_argument('--wandb-only-best', action='store_true', help='Only use best model from wandb run (optional)')
   ########################### 
   args = parser.parse_args()
+  # validate
+  if args.wandb_project:
+    assert args.wandb_run_name is not None, 'wandb-project requires wandb-run-name'
+  assert (args.model is not None) or (args.wandb_project is not None), 'either model weights or wandb-project is required'
+  assert (args.model is None) or (args.wandb_project is None), 'cannot use both model weights and wandb-project'
+  ###########################
   if args.gpu_memory_mb: setGPUMemoryLimit(args.gpu_memory_mb)
-  main(args)
+
+  folder = os.getcwd()
+  if args.folder:
+    folder = os.path.abspath(args.folder)
+    # clear/create folder
+    if os.path.exists(folder): shutil.rmtree(folder)
+    os.makedirs(folder)
+    pass
+
+  config = load_config(args.config, folder=os.getcwd())
+  # should be specified input flag or config contains 'dataset' section
+  assert (args.input is not None) or ('dataset' in config), 'either input or dataset section in config is required'
+  
+  models = modelsFromArgs(args, config)
+  for model, savePath in models:
+    process(
+      model=model,
+      folder=os.path.join(folder, savePath) if savePath else folder,
+      modelArgsOverride=modelArgsOverrideFromArgs(args),
+      datasetProvider=datasetFrom(args, config),
+      visualizationConfig=config.get('visualization', None),
+    )
+    continue
+  print('Done.')
   pass

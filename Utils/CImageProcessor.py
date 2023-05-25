@@ -28,7 +28,8 @@ class CImageProcessor:
     if not (W == crop_size):
       d = (W - crop_size) // 2
       img = img[:, :, d:-d, :]
-    
+
+    # NOTE: its a bug, should be in _srcImage, but some models were trained with the channels reversed, so keep it
     if self._reverseChannels: img = img[..., ::-1]
     return img
     
