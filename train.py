@@ -54,12 +54,14 @@ def main(args):
 
   if args.no_train: return
 
+  saveAllModels = True if args.save_all_models else False # hard convertation to bool, just in case
   latestModel = os.path.join(folder, 'model-latest.h5')
   callbacks = [
     tf.keras.callbacks.ModelCheckpoint(
       filepath=os.path.join(folder, 'model-{epoch:02d}.h5'),
       initial_value_threshold=modelLoss,
-      save_weights_only=True, save_best_only=True, monitor='val_loss', verbose=1
+      save_weights_only=True, monitor='val_loss', verbose=1,
+      save_best_only=not saveAllModels,
     ),
     tf.keras.callbacks.ModelCheckpoint(
       filepath=latestModel,
@@ -72,10 +74,12 @@ def main(args):
   if args.wandb: # init wandb
     import wandb
     wandb.init(project=args.wandb, entity=args.wandb_entity, config=config)
+    # track model metrics only
     callbacks.append(wandb.keras.WandbCallback(
       save_model=False, # save model to wandb manually
       save_graph=False,
     ))
+    # models are saved manually, because wandb callback can't handle complex model
     pass
   ########################
   try:
@@ -87,9 +91,12 @@ def main(args):
       callbacks=callbacks
     )
   finally:
-    # if using wandb, save the best model to wandb
     if args.wandb:
-      wandb.log_artifact(latestModel, type='bytes')
+      files = [latestModel]
+      if saveAllModels:
+        files = [os.path.join(folder, f) for f in os.listdir(folder) if f.endswith('.h5')]
+      for f in files:
+        wandb.log_artifact(f, type='bytes')
       wandb.finish()
   return
 
@@ -107,6 +114,7 @@ if __name__ == "__main__":
   parser.add_argument('--gpu-memory-mb', type=int, help='GPU memory limit in Mb (optional)')
   parser.add_argument('--renderer-batch-size', type=int, help='Renderer batch size (optional)')
   parser.add_argument('--dump-config', type=str, help='Dump config to file (optional)')
+  parser.add_argument('--save-all-models', action='store_true', help='Save all models, not only the best one (optional)')
 
   parser.add_argument('--wandb', type=str, help='Wandb project name (optional)')
   parser.add_argument('--wandb-entity', type=str, help='Wandb entity name (optional)')
