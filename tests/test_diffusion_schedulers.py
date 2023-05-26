@@ -1,4 +1,5 @@
 import tensorflow as tf
+import pytest
 from NN.restorators.diffusion.diffusion_schedulers import CDPDiscrete, get_beta_schedule
 
 def test_minus1_step():
@@ -42,4 +43,15 @@ def test_discrete_to_continuous():
   tf.assert_equal(t, tf.linspace(0.0, 1.0, schedule.noise_steps))
   tf.assert_equal(t[0], 0.0, 'first time step should be 0.0')
   tf.assert_equal(t[-1], 1.0, 'last time step should be 1.0')
+  return
+
+# posterior variance should be equal to varianceBetween
+@pytest.mark.parametrize('schedule', ['linear', 'quadratic', 'sigmoid', 'cosine'])
+def test_posterior_variance(schedule):
+  schedule = CDPDiscrete( beta_schedule=get_beta_schedule(schedule), noise_steps=10 )
+  steps = schedule.parametersForT(tf.range(-1, 10))
+  t = steps['alpha_hat']
+  var = steps['posterior_variance'][1:]
+  varianceBetween = schedule.varianceBetween(t[1:], t[:-1])
+  tf.debugging.assert_near(var, varianceBetween, atol=1e-6)
   return

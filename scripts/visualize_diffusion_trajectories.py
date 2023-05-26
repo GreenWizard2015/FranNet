@@ -1,3 +1,5 @@
+# this script visualizes the trajectories of the fixed points of the diffusion process for different beta schedules
+# NOT diffusion process during inference
 import os, sys
 # add the root folder of the project to the path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
