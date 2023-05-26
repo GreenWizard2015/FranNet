@@ -57,6 +57,23 @@ class CNerf2D(CBaseModel):
     return self._testMetrics(dest, reconstructed)
 
   #####################################################
+  def _prepareGrid(self, size, scale, shift):
+    # prepare coordinates
+    scale = tf.cast(scale, tf.float32)
+    shift = tf.cast(shift, tf.float32)
+    # make sure that scale and shift 2 rank tensors 2 elements
+    # (flatten them, concatenate with themselves, take first 2 elements, reshape)
+    scale = tf.reshape(scale, (-1,))
+    scale = tf.concat([scale, scale], axis=0)[:2]
+    scale = tf.reshape(scale, (1, 2))
+
+    shift = tf.reshape(shift, (-1,))
+    shift = tf.concat([shift, shift], axis=0)[:2]
+    shift = tf.reshape(shift, (1, 2))
+    # prepare coordinates
+    pos = flatCoordsGridTF(size)
+    return (pos * scale) + shift
+
   @tf.function
   def call(self, 
     src,
@@ -67,7 +84,7 @@ class CNerf2D(CBaseModel):
     B = tf.shape(src)[0]
     encoded = self._encoder(src, training=False)
 
-    pos = (flatCoordsGridTF(size) * scale) + shift
+    pos = self._prepareGrid(size, scale, shift)
     N = tf.shape(pos)[0]
     tf.assert_equal(N, size * size) # just in case
     tf.assert_equal(tf.shape(pos), (N, 2))

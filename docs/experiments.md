@@ -67,3 +67,4 @@ Studies to be conducted:
 - [ ] Compare different noise sampling methods (**normal**, halton, resampled)
 - [ ] Try to use quasi-random generator to sample points for training (**uniform**, halton)
 - [ ] Try incorporating additional information into the input image (e.g., applying edge detection and adding the result as an additional channel).
+- [ ] Compare inference time for different models

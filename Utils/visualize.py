@@ -113,3 +113,48 @@ def data_from_input(input, inputShape):
   
   dataloader = CFilesDataLoader(files, targetSize=inputShape[:2], srcSize=(256, 256))
   return dataloader.iterator(), dataloader
+
+def withText(
+  img, text,
+  position='top',
+  color=(0, 0, 255), background=(255, 255, 255),
+  thickness=1, font=cv2.FONT_HERSHEY_SIMPLEX, scale=1.0,
+  margin=10
+):
+  assert position in ['top'], 'Unknown position: %s' % position
+  assert len(img.shape) == 3 and img.shape[2] == 3, 'Image must be 3-channel RGB'
+  assert len(color) == 3, 'Color must be 3-channel RGB'
+  assert len(background) == 3, 'Background must be 3-channel RGB'
+
+  # calculate text size
+  textSz, baseline = cv2.getTextSize(text, font, scale, thickness)
+  textSz = (textSz[0], textSz[1] + baseline)
+
+  # add space for text
+  img = cv2.copyMakeBorder(img, textSz[1] + margin * 2, 0, 0, 0, cv2.BORDER_CONSTANT, value=background)
+  # calculate text position
+  width = img.shape[1]
+
+  # draw text at center top
+  pos = (width // 2 - textSz[0] // 2, textSz[1] + margin)
+  cv2.putText(img, text, pos, font, scale, color, thickness)
+  return img
+
+def makeGrid(images, columns):
+  rows = (len(images) + columns - 1) // columns
+  gridRows = []
+  for i in range(rows):
+    chunk = images[i * columns : (i + 1) * columns]
+    row = np.concatenate(chunk, axis=1)
+    gridRows.append(row)
+    continue
+  # pad last row to make it the same size as others
+  if len(gridRows) > 1:
+    lastRow, firstRow = gridRows[-1], gridRows[0]
+    if not (lastRow.shape == firstRow.shape):
+      padding = np.subtract(firstRow.shape, lastRow.shape)
+      padding = tuple([(0, x) for x in padding])
+      gridRows[-1] = np.pad(lastRow, padding, mode='constant', constant_values=255)
+  # concatenate rows into a grid
+  grid = np.concatenate(gridRows, axis=0)
+  return grid

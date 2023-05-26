@@ -102,7 +102,7 @@ Using the color version of the image as a reference for the oracle would provide
 
 In brief, the RGB MSE value of `0.01100` can be considered the primary baseline since it represents the ability to restore color from grayscale images. Achieving a value close to `0.003` is considered close to ideal, indicating high accuracy in restoring the color channels.
 
-Monitoring the Grayscale MSE is also important. The value of `0.00297` for this metric is crucial. If this metric is higher, it means that the network fails to perform the naive upscale of grayscale images accurately.
+Monitoring the Grayscale MSE is also important. Naive upscale gives `0.00297` Grayscale MSE, so if this metric is higher, it means that the network completely fails to capture the color information.
 
 Both the RGB MSE and Grayscale MSE metrics provide valuable insights into the performance of the network.
 
