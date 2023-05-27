@@ -72,22 +72,22 @@ def main(args):
 
 if '__main__' == __name__:
   parser = argparse.ArgumentParser(description='Generate grid from folder')
-  # parser.add_argument('--folder', help='folder with images or subfolders with images')
-  # parser.add_argument('--columns', type=int, default=5, help='number of columns')
-  # parser.add_argument('--padding', type=int, default=5, help='padding between images')
-  # parser.add_argument('--size', type=int, default=256, help='size of the images')
-  # parser.add_argument('--text', type=str, help='text to display at the top of the grid (optional)')
-  # parser.add_argument('--panorama', action='store_true', help='create a panorama instead of a grid')
-  # parser.add_argument('--panoramaColumns', type=int, default=50, help='number of columns in the panorama')
+  parser.add_argument('--folder', help='folder with images or subfolders with images')
+  parser.add_argument('--columns', type=int, default=5, help='number of columns')
+  parser.add_argument('--padding', type=int, default=5, help='padding between images')
+  parser.add_argument('--size', type=int, default=256, help='size of the images')
+  parser.add_argument('--text', type=str, help='text to display at the top of the grid (optional)')
+  parser.add_argument('--panorama', action='store_true', help='create a panorama instead of a grid')
+  parser.add_argument('--panoramaColumns', type=int, default=50, help='number of columns in the panorama')
 
   args = parser.parse_args()
   # used for creating an illustrations
-  args.folder = 'd:/visualized/2/'
-  args.columns = 1
-  args.padding = 5
-  args.size = 256
-  args.text = '{folder}'
-  args.panorama = True
-  args.panoramaColumns = 5
+  # args.folder = 'd:/visualized/2/'
+  # args.columns = 1
+  # args.padding = 5
+  # args.size = 256
+  # args.text = '{folder}'
+  # args.panorama = True
+  # args.panoramaColumns = 5
   main(args)
   pass

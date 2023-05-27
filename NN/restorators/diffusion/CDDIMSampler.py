@@ -1,6 +1,7 @@
 import tensorflow as tf
 from .IDiffusionSampler import IDiffusionSampler
 from .diffusion_schedulers import CDiffusionParameters
+from ..common import clipping_from_config
 
 # useful links:
 #   https://github.com/cloneofsimo/minDiffusion/blob/master/mindiffusion/ddim.py
@@ -63,12 +64,7 @@ class CDDIMSampler(IDiffusionSampler):
 
     initShape = tf.shape(value)
     noise_provider = kwargs.get('noiseProvider', self._noise_provider)
-    clippingArgs = kwargs.get('clipping', self._clipping)
-    if clippingArgs is None:
-      clipping = lambda x: x
-    else:
-      clipping = lambda x: tf.clip_by_value(x, clip_value_min=clippingArgs['min'], clip_value_max=clippingArgs['max'])
-
+    clipping = clipping_from_config(kwargs.get('clipping', self._clipping))
     value = clipping(value)
     for stepInd in tf.range(tf.size(steps)):
       step = steps[stepInd]
