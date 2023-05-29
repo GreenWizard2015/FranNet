@@ -34,7 +34,7 @@ def test_DDPM_eq_DDIM_steps():
   x = samplers['x']
   fakeModel = samplers['fakeModel']
   ########
-  ddimStepF = ddim._reverseStep(fakeModel, schedule=schedule, eta=1.0, directionCoef=1.0)
+  ddimStepF = ddim._reverseStep(fakeModel, schedule=schedule, eta=1.0)
   ddpmStepF = ddpm._reverseStep(fakeModel, schedule=schedule)
 
   for t in reversed(range(schedule.noise_steps)):

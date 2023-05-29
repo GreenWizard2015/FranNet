@@ -14,7 +14,6 @@ def sampler_from_config(config):
   if 'ddim' == name:
     return CDDIMSampler(
       stochasticity=config['stochasticity'],
-      directionCoef=config['direction scale'],
       noise_provider=noise_provider_from_config(config['noise stddev']),
       steps=config['steps skip type'],
       clipping=config.get('clipping', None),

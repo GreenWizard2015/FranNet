@@ -7,20 +7,16 @@ from ..common import clipping_from_config
 #   https://github.com/cloneofsimo/minDiffusion/blob/master/mindiffusion/ddim.py
 #   https://github.com/filipbasara0/simple-diffusion/blob/main/scheduler/ddim.py
 #   https://github.com/huggingface/diffusers/blob/main/src/diffusers/schedulers/scheduling_ddim.py
-# 
-# "direction pointing to x_t" cause a problem, so I introduce "directionCoef" parameter to control it (original value is 1.0)
-# turns out, that it is not a problem, but I leave it here, because it is a nice parameter to have
 class CDDIMSampler(IDiffusionSampler):
-  def __init__(self, stochasticity, directionCoef, noise_provider, steps, clipping):
+  def __init__(self, stochasticity, noise_provider, steps, clipping):
     assert (0.0 <= stochasticity <= 1.0), 'Stochasticity must be in [0, 1] range'
     self._eta = stochasticity
     self._stepsConfig = steps
-    self._directionCoef = directionCoef
     self._noise_provider = noise_provider
     self._clipping = clipping
     return
 
-  def _reverseStep(self, model, schedule, eta, directionCoef):
+  def _reverseStep(self, model, schedule, eta):
     def f(x, t, tPrev):
       predictedNoise = model(x, t)
       # based on https://github.com/filipbasara0/simple-diffusion/blob/main/scheduler/ddim.py
@@ -38,7 +34,6 @@ class CDDIMSampler(IDiffusionSampler):
 
       # compute "direction pointing to x_t" of formula (12) from https://arxiv.org/pdf/2010.02502.pdf
       coef2 = tf.sqrt(1.0 - alpha_prod_t_prev - stochasticity_var)
-      coef2 = directionCoef * coef2 # <--- this is the only difference from the original formula
       
       # compute x_t without "random noise" of formula (12) from https://arxiv.org/pdf/2010.02502.pdf
       # NOTE: this is same as forward diffusion step (x0, x1, tPrev), but with "space" for noise (std_dev_t ** 2)
@@ -59,7 +54,6 @@ class CDDIMSampler(IDiffusionSampler):
       model,
       schedule=schedule,
       eta=kwargs.get('stochasticity', self._eta),
-      directionCoef=kwargs.get('directionScale', self._directionCoef)
     ) # returns closure
 
     initShape = tf.shape(value)
