@@ -9,7 +9,6 @@
       "sampler": {
         "name": "DDIM",
         "stochasticity": 0.0,
-        "direction scale": 1.0,
         "steps skip type": {
           "name": "uniform",
           "K": 5
