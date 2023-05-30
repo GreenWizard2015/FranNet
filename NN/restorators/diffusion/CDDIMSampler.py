@@ -28,8 +28,7 @@ class CDDIMSampler(IDiffusionSampler):
       (alpha_prod_t_prev, ) = schedule.parametersForT(tPrev, [ CDiffusionParameters.PARAM_ALPHA_HAT ])
 
       stepVariance = schedule.varianceBetween(alpha_prod_t, alpha_prod_t_prev)
-      # std_dev_t = eta * tf.sqrt( schedule.varianceBetween(alpha_prod_t, alpha_prod_t_prev) )
-      stochasticity_var = (eta ** 2) * stepVariance # same as std_dev_t ** 2, but more numerically stable
+      stochasticity_var = tf.square( eta * tf.sqrt(stepVariance) )
       #######################################
       # "predicted x_0" of formula (12) from https://arxiv.org/pdf/2010.02502.pdf
       scaled_noise = tf.sqrt(1.0 - alpha_prod_t) * predictedNoise
