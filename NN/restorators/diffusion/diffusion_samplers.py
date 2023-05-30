@@ -17,6 +17,7 @@ def sampler_from_config(config):
       noise_provider=noise_provider_from_config(config['noise stddev']),
       steps=config['steps skip type'],
       clipping=config.get('clipping', None),
+      projectNoise=config.get('project noise', False),
     )
   
   raise ValueError('Unknown sampler: %s' % config)

@@ -39,14 +39,14 @@ def test_DDPM_eq_DDIM_steps():
 
   for t in reversed(range(schedule.noise_steps)):
     t = tf.fill((32, 1), t)
-    X_ddim, var_ddim = ddimStepF(x=x, t=t, tPrev=t - 1)
+    ddimS = ddimStepF(x=x, t=t, tPrev=t - 1)
     X_ddpm, var_ddpm = ddpmStepF(x=x, t=t)
     
-    tf.debugging.assert_near(X_ddim, X_ddpm, atol=1e-6)
-    tf.debugging.assert_near(var_ddim, var_ddpm, atol=1e-6)
+    tf.debugging.assert_near(ddimS.x_prev, X_ddpm, atol=1e-6)
+    tf.debugging.assert_near(ddimS.variance, var_ddpm, atol=1e-6)
     continue
   # last step should always have zero variance
-  tf.assert_equal(var_ddim, 0.0)
+  tf.assert_equal(ddimS.variance, 0.0)
   tf.assert_equal(var_ddpm, 0.0)
   return
 
