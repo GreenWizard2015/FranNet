@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from NN.utils import make_steps_sequence
+from Utils.utils import CFakeObject
 
 # schedulers
 def cosine_beta_schedule(timesteps, s=0.008):
@@ -41,12 +42,6 @@ def get_beta_schedule(name):
   raise ValueError("Unknown beta schedule name: {}".format(name))
 
 class CDiffusionParameters:
-  PARAM_BETA = 0
-  PARAM_ALPHA = 1
-  PARAM_ALPHA_HAT = 2
-  PARAM_POSTERIOR_VARIANCE = 3
-  PARAM_SNR = 4
-
   def parametersForT(self, T):
     raise NotImplementedError("parametersForT not implemented")
   
@@ -96,18 +91,32 @@ class CDPDiscrete(CDiffusionParameters):
     self._steps = tf.concat([data, self._steps], axis=0)
     return
 
-  def parametersForT(self, T, index=None):
+  def parametersForT(self, T):
+    PARAM_BETA = 0
+    PARAM_ALPHA = 1
+    PARAM_ALPHA_HAT = 2
+    PARAM_POSTERIOR_VARIANCE = 3
+    PARAM_SNR = 4
+
     T = tf.cast(T, tf.int32) + 1 # shifted by 1
+    tf.debugging.assert_greater_equal(T, 0)
+    tf.debugging.assert_less_equal(T, self._steps.shape[0] - 1)
     p = tf.gather(self._steps, T)
-    if index is None:
-      return {
-        'beta': p[..., self.PARAM_BETA, None],
-        'alpha': p[..., self.PARAM_ALPHA, None],
-        'alpha_hat': p[..., self.PARAM_ALPHA_HAT, None],
-        'posterior_variance': p[..., self.PARAM_POSTERIOR_VARIANCE, None],
-        'SNR': p[..., self.PARAM_SNR, None],
-      }
-    return[tf.reshape(p[..., i], (-1, 1)) for i in index]
+
+    res = {
+      'beta': p[..., PARAM_BETA],
+      'alpha': p[..., PARAM_ALPHA],
+      'alphaHat': p[..., PARAM_ALPHA_HAT],
+      'posteriorVariance': p[..., PARAM_POSTERIOR_VARIANCE],
+      'SNR': p[..., PARAM_SNR],
+    }
+    # reshape all to match the shape of T
+    shape = tf.shape(T)
+    res = {k: tf.reshape(v, shape) for k, v in res.items()}
+    return CFakeObject(
+      **res,
+      sigma=tf.sqrt(res['posteriorVariance']) # sigma = sqrt(variance)
+    )
   
   def debugParams(self):
     values = self._steps.numpy()

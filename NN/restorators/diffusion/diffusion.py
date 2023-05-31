@@ -33,8 +33,8 @@ class CGaussianDiffusion(IRestorationProcess):
     tf.assert_equal(tf.shape(t)[1], 1)
     tf.assert_equal(tf.shape(t), tf.shape(T))
     tf.assert_equal(tf.rank(t), 2)
-    step = self._schedule.parametersForT(t[:, 0])
-    alphaHatT = step['alpha_hat']
+    step = self._schedule.parametersForT(t)
+    alphaHatT = step.alphaHat
 
     signal_rate, noise_rate = tf.sqrt(alphaHatT), tf.sqrt(1.0 - alphaHatT)
     xT = (signal_rate * x0) + (noise_rate * noise)
@@ -45,7 +45,7 @@ class CGaussianDiffusion(IRestorationProcess):
       't': t, # discrete time
       'T': T, # continuous time
       'target': noise,
-      'SNR': step['SNR'],
+      'SNR': step.SNR,
     }
   
   def forward(self, x0):

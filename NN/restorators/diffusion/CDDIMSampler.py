@@ -1,6 +1,5 @@
 import tensorflow as tf
 from .IDiffusionSampler import IDiffusionSampler
-from .diffusion_schedulers import CDiffusionParameters
 from ..common import clipping_from_config
 from NN.utils import normVec
 from Utils.utils import CFakeObject
@@ -24,33 +23,33 @@ class CDDIMSampler(IDiffusionSampler):
       predictedNoise = model(x, t)
       # based on https://github.com/filipbasara0/simple-diffusion/blob/main/scheduler/ddim.py
       # obtain parameters for the current step and previous step
-      (alpha_prod_t, ) = schedule.parametersForT(t, [ CDiffusionParameters.PARAM_ALPHA_HAT ])
-      (alpha_prod_t_prev, ) = schedule.parametersForT(tPrev, [ CDiffusionParameters.PARAM_ALPHA_HAT ])
+      alpha_prod_t = schedule.parametersForT(t).alphaHat
+      alpha_prod_t_prev = schedule.parametersForT(tPrev).alphaHat
 
       stepVariance = schedule.varianceBetween(alpha_prod_t, alpha_prod_t_prev)
-      stochasticity_var = tf.square( eta * tf.sqrt(stepVariance) )
+      sigma = tf.sqrt(stepVariance) * eta
       #######################################
       # "predicted x_0" of formula (12) from https://arxiv.org/pdf/2010.02502.pdf
       scaled_noise = tf.sqrt(1.0 - alpha_prod_t) * predictedNoise
       pred_original_sample = (x - scaled_noise) / tf.sqrt(alpha_prod_t)
 
       # compute "direction pointing to x_t" of formula (12) from https://arxiv.org/pdf/2010.02502.pdf
-      coef2 = tf.sqrt(1.0 - alpha_prod_t_prev - stochasticity_var)
+      coef2 = tf.sqrt(1.0 - alpha_prod_t_prev - tf.square(sigma))
       
       # compute x_t without "random noise" of formula (12) from https://arxiv.org/pdf/2010.02502.pdf
       # NOTE: this is same as forward diffusion step (x0, x1, tPrev), but with "space" for noise (std_dev_t ** 2)
       coef1 = tf.sqrt(alpha_prod_t_prev)
       x_prev = (coef1 * pred_original_sample) + (coef2 * predictedNoise)
-      return CFakeObject(x_prev=x_prev, variance=stochasticity_var, x0=pred_original_sample, x1=predictedNoise)
+      return CFakeObject(x_prev=x_prev, sigma=sigma, x0=pred_original_sample, x1=predictedNoise)
     return f
   
   def _valueUpdater(self, noise_provider, projectNoise):
     if not projectNoise: # just add noise to the new value
-      return lambda step: step.x_prev + noise_provider(tf.shape(step.x_prev), step.variance)
+      return lambda step: step.x_prev + noise_provider(shape=tf.shape(step.x_prev), sigma=step.sigma)
     # with noise projection
     def f(step):
-      _, L = normVec(step.step.x_prev - step.x0)
-      value = step.x_prev + noise_provider(tf.shape(step.x_prev), step.variance)
+      _, L = normVec(step.x_prev - step.x0)
+      value = step.x_prev + noise_provider(shape=tf.shape(step.x_prev), sigma=step.sigma)
       vec, _ = normVec(value - step.x0)
       return step.x0 + L * vec # project noise back to the spherical manifold
     return f

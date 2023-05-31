@@ -1,7 +1,7 @@
 import tensorflow as tf
 from .IDiffusionSampler import IDiffusionSampler
-from .diffusion_schedulers import CDiffusionParameters
 from ..common import clipping_from_config
+from Utils.utils import CFakeObject
 
 class CDDPMSampler(IDiffusionSampler):
   def __init__(self, noise_provider, clipping):
@@ -13,22 +13,18 @@ class CDDPMSampler(IDiffusionSampler):
     def reverseStep(x, t):
       predictedNoise = model(x, t)
       # obtain parameters for the current step
-      (variance, alpha, alpha_hat) = schedule.parametersForT(t, [
-        CDiffusionParameters.PARAM_POSTERIOR_VARIANCE,
-        CDiffusionParameters.PARAM_ALPHA,
-        CDiffusionParameters.PARAM_ALPHA_HAT,
-      ])
+      currentStep = schedule.parametersForT(t)
       # scale predicted noise
       # NOTE: rollbacks only a single step of the diffusion process
-      s = (1 - alpha) / tf.sqrt(1.0 - alpha_hat)
-      d = tf.sqrt(alpha)
+      s = (1 - currentStep.alpha) / tf.sqrt(1.0 - currentStep.alphaHat)
+      d = tf.sqrt(currentStep.alpha)
       # prevent NaNs/Infs
       s = tf.where(tf.math.is_finite(s), s, 0.0)
       d = tf.where(tf.math.is_finite(d), d, 1.0)
       d = tf.where(0.0 == d, 1.0, d)
 
       x_prev = (x - s * predictedNoise) / d
-      return(x_prev, variance)
+      return CFakeObject(x_prev=x_prev, sigma=currentStep.sigma)
     return reverseStep
   
   def sample(self, value, model, schedule, **kwargs):
@@ -45,8 +41,8 @@ class CDDPMSampler(IDiffusionSampler):
     clipping = clipping_from_config(kwargs.get('clipping', self._clipping))
     value = clipping(value)
     for step in steps:
-      value, variance = reverseStep(value, step)
-      value += noise_provider(initShape, variance)
+      rev = reverseStep(value, step)
+      value = rev.x_prev + noise_provider(shape=initShape, sigma=rev.sigma)
       value = clipping(value)
       continue
     tf.assert_equal(tf.shape(value), initShape)

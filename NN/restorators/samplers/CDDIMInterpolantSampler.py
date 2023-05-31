@@ -16,23 +16,23 @@ class CDDIMSamplingAlgorithm(ISamplingAlgorithm):
     eta = kwargs.get('eta', self._stochasticity)
     
     T = steps[0][current_step]
-    alpha_hat_t = schedule.parametersForT(T)['alpha_hat']
+    alpha_hat_t = schedule.parametersForT(T).alphaHat
     prevStepInd = steps[1][current_step]
-    alpha_hat_t_prev = schedule.parametersForT(prevStepInd)['alpha_hat']
+    alpha_hat_t_prev = schedule.parametersForT(prevStepInd).alphaHat
 
     stepVariance = schedule.varianceBetween(alpha_hat_t, alpha_hat_t_prev)
-    stochasticity_var = (eta ** 2) * stepVariance # same as std_dev_t ** 2, but more numerically stable
+    sigma = tf.sqrt(stepVariance) * eta
 
     return CFakeObject(
       steps=steps,
       current_step=current_step,
       active=(0 <= current_step),
-      stochasticity_var=stochasticity_var,
+      sigma=sigma,
       #
       T=T,
       t=alpha_hat_t,
       t_prev=alpha_hat_t_prev,
-      t_prev_2=1.0 - alpha_hat_t_prev - stochasticity_var,
+      t_prev_2=1.0 - alpha_hat_t_prev - tf.square(sigma),
     )
   
   def firstStep(self, **kwargs):
@@ -77,7 +77,7 @@ class CDDIMSamplingAlgorithm(ISamplingAlgorithm):
 
     # add noise
     noise_provider = kwargs.get('noiseProvider', self._noiseProvider)
-    x_prev = x_prev + noise_provider(tf.shape(x_prev), step.stochasticity_var)
+    x_prev = x_prev + noise_provider(shape=tf.shape(x_prev), sigma=step.sigma)
 
     clipping = kwargs.get('clipping', self._clipping)
     if clipping is not None:
@@ -89,7 +89,7 @@ class CDDIMSamplingAlgorithm(ISamplingAlgorithm):
       x1=solved.x1,
       T=step.T,
       current_step=step.current_step,
-      stochasticity_var=step.stochasticity_var,
+      sigma=step.sigma,
     )
 # End of CDDIMSamplingAlgorithm
 
@@ -111,7 +111,7 @@ class CDDIMInterpolantSampler(CBasicInterpolantSampler):
   def train(self, x0, x1, T):
     T = self._schedule.to_discrete(T)
     # apply training procedure from interpolant
-    alpha_hat_t = self._schedule.parametersForT(T[:, 0])['alpha_hat']
+    alpha_hat_t = self._schedule.parametersForT(T[:, 0]).alphaHat
     trainData = self._interpolant.train(x0=x0, x1=x1, T=alpha_hat_t)
     return {
       **trainData,

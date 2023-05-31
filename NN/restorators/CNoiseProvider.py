@@ -1,21 +1,31 @@
 import tensorflow as tf
 
-# diffusion (but not only) works better with squared/zero variance, but it is incorrect implementation, so I added this configurable option
 class CNoiseProvider:
   def __init__(self, stddev_type):
-    assert (stddev_type in ['correct', 'normal', 'squared', 'zero']), f'Unknown stddev type: {stddev_type}'
-
-    self._generate_noise = lambda shape, variance: tf.random.normal(shape, stddev=tf.sqrt(variance))
-
-    if 'squared' == stddev_type:
-      self._generate_noise = lambda shape, variance: tf.random.normal(shape, stddev=variance)
-
-    if 'zero' == stddev_type:
-      self._generate_noise = lambda shape, variance: tf.zeros(shape, dtype=tf.float32)
+    mapping = {
+      'correct': self._generate_normal_noise,
+      'normal': self._generate_normal_noise,
+      'squared': self._generate_squared_noise,
+      'zero': self._generate_zero_noise
+    }
+    self._generate_noise = mapping.get(stddev_type, None)
+    assert self._generate_noise is not None, f'Unknown stddev type: {stddev_type}'
     return
   
-  def __call__(self, shape, variance):
-    return self._generate_noise(shape, variance)
+  def __call__(self, **kwargs):
+    # ensure that shape and sigma are provided as named arguments
+    shape = kwargs['shape']
+    sigma = kwargs['sigma']
+    return self._generate_noise(shape, sigma)
+  
+  def _generate_normal_noise(self, shape, sigma):
+    return tf.random.normal(shape) * sigma
+  
+  def _generate_squared_noise(self, shape, sigma):
+    return tf.random.normal(shape) * tf.square(sigma)
+  
+  def _generate_zero_noise(self, shape, sigma):
+    return tf.zeros(shape, dtype=tf.float32)
 # end of class CNoiseProvider
 
 def noise_provider_from_config(config):

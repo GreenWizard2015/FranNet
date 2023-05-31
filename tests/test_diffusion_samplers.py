@@ -43,10 +43,10 @@ def test_DDPM_eq_DDIM_steps():
     X_ddpm, var_ddpm = ddpmStepF(x=x, t=t)
     
     tf.debugging.assert_near(ddimS.x_prev, X_ddpm, atol=1e-6)
-    tf.debugging.assert_near(ddimS.variance, var_ddpm, atol=1e-6)
+    tf.debugging.assert_near(ddimS.sigma, var_ddpm, atol=1e-6)
     continue
   # last step should always have zero variance
-  tf.assert_equal(ddimS.variance, 0.0)
+  tf.assert_equal(ddimS.sigma, 0.0)
   tf.assert_equal(var_ddpm, 0.0)
   return
 
