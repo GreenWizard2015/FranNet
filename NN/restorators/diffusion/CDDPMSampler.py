@@ -16,8 +16,8 @@ class CDDPMSampler(IDiffusionSampler):
       currentStep = schedule.parametersForT(t)
       # scale predicted noise
       # NOTE: rollbacks only a single step of the diffusion process
-      s = (1 - currentStep.alpha) / tf.sqrt(1.0 - currentStep.alphaHat)
-      d = tf.sqrt(currentStep.alpha)
+      s = currentStep.beta / currentStep.sqrt_one_minus_alpha_hat
+      d = currentStep.sqrt_alpha
       # prevent NaNs/Infs
       s = tf.where(tf.math.is_finite(s), s, 0.0)
       d = tf.where(tf.math.is_finite(d), d, 1.0)

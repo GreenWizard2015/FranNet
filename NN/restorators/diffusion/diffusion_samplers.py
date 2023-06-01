@@ -18,6 +18,7 @@ def sampler_from_config(config):
       steps=config['steps skip type'],
       clipping=config.get('clipping', None),
       projectNoise=config.get('project noise', False),
+      useFloat64=config.get('use float64', False),
     )
   
   raise ValueError('Unknown sampler: %s' % config)

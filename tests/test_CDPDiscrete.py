@@ -48,3 +48,13 @@ def test_CDPDiscrete_posterior_variance(scheduler):
   for i, (v, pv) in enumerate(zip(variance, posterior_variance)):
     assert np.isclose(v, pv, atol=1e-6), f"i={i}, v={v}, pv={pv}"
   return
+
+# Test that all steps have bigger posterior variance than zero, except the first one
+@pytest.mark.parametrize("scheduler", ["linear", "cosine", "sigmoid", "quadratic"])
+def test_CDPDiscrete_posterior_variance(scheduler):
+  params = CDPDiscrete(beta_schedule=get_beta_schedule(scheduler), noise_steps=100)
+
+  T = tf.range(params.noise_steps)[..., None]
+  step = params.parametersForT(T)
+  tf.assert_greater(step.posteriorVariance[1:], 0.0)
+  return

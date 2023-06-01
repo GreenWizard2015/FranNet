@@ -4,16 +4,20 @@ from NN.utils import make_steps_sequence
 from Utils.utils import CFakeObject
 
 # schedulers
-def cosine_beta_schedule(timesteps, s=0.008):
+def cosine_beta_schedule(timesteps, S=0.008):
   # cosine schedule as proposed in https://arxiv.org/abs/2102.09672
   def f(t):
-    t = t / tf.cast(timesteps, tf.float32)
+    t = tf.cast(t, tf.float64)
+    s = tf.cast(S, t.dtype)
+    pi = tf.cast(np.pi, t.dtype)
+
+    t = t / tf.cast(timesteps, t.dtype)
     fraction = (t + s) / (1 + s)
-    alphas = tf.cos(fraction * np.pi / 2) ** 2
-    alpha0 = tf.cos((s / (1 + s)) * np.pi / 2) ** 2
+    alphas = tf.cos(fraction * pi / 2) ** 2
+    alpha0 = tf.cos((s / (1 + s)) * pi / 2) ** 2
     return alphas / alpha0
 
-  f_t = f( tf.linspace(0.0, timesteps, timesteps + 1) )
+  f_t = f( tf.linspace(0.0, timesteps, num=timesteps + 1) )
   betas = 1.0 - (f_t[1:] / f_t[:-1])
   # NOTE: default value 0.9999 is used in the official implementation, but may cause numerical issues during sampling
   #       if not clip sampled values
@@ -56,11 +60,10 @@ class CDiffusionParameters:
     raise NotImplementedError("to_discrete not implemented")
   
   # helper function to calculate posterior variance between two specified steps
-  @staticmethod
-  def varianceBetween(alpha_hat_t, alpha_hat_t_prev):
+  def varianceBetween(self, alpha_hat_t, alpha_hat_t_prev):
     beta_hat_t = 1.0 - alpha_hat_t
     beta_hat_t_prev = 1.0 - alpha_hat_t_prev
-    variance = (beta_hat_t_prev / beta_hat_t) * (1 - alpha_hat_t / alpha_hat_t_prev)
+    variance = (beta_hat_t_prev / beta_hat_t) * (1.0 - alpha_hat_t / alpha_hat_t_prev)
     return variance
 # End of CDiffusionParameters
   
@@ -71,10 +74,15 @@ class CDPDiscrete(CDiffusionParameters):
     beta = beta_schedule
     if callable(beta_schedule):
       beta = beta_schedule(self.noise_steps)
-    beta = tf.cast(beta, tf.float32)
+    beta = tf.cast(beta, tf.float64)
     tf.assert_equal(tf.shape(beta), (self.noise_steps, ))
 
-    alpha_hat = tf.math.cumprod(1. - beta)
+    parameters = {
+      'beta': beta,
+      'alpha': 1.0 - beta,
+    }
+
+    parameters['alphaHat'] = alpha_hat = tf.math.cumprod(1. - beta)
     # due to this, posterior variance of step 0 is 0.0
     alpha_hat_prev = tf.concat([[1.0], alpha_hat[:-1]], axis=-1)
     
@@ -82,47 +90,46 @@ class CDPDiscrete(CDiffusionParameters):
     # see https://calvinyluo.com/2022/08/26/diffusion-tutorial.html Eq. 54
     posterior_variance = beta * (1. - alpha_hat_prev) / (1. - alpha_hat)
     posterior_variance = tf.where(tf.math.is_finite(posterior_variance), posterior_variance, 0.0) # just in case
+    parameters['posteriorVariance'] = posterior_variance
     # see https://calvinyluo.com/2022/08/26/diffusion-tutorial.html Eq. 64
-    SNR = alpha_hat / (1. - alpha_hat)
+    parameters['SNR'] = alpha_hat / (1.0 - alpha_hat)
 
-    self._steps = tf.stack([beta, 1.0 - beta, alpha_hat, posterior_variance, SNR], axis=-1)
     # prepend "clean" step
-    data = tf.constant([[0.0, 1.0, 1.0, 0.0, float('inf')]], dtype=tf.float32)
-    self._steps = tf.concat([data, self._steps], axis=0)
+    parameters['beta'] = tf.concat([[0.0], parameters['beta']], axis=-1)
+    parameters['alpha'] = tf.concat([[1.0], parameters['alpha']], axis=-1)
+    parameters['alphaHat'] = tf.concat([[1.0], parameters['alphaHat']], axis=-1)
+    parameters['posteriorVariance'] = tf.concat([[0.0], parameters['posteriorVariance']], axis=-1)
+    parameters['SNR'] = tf.concat([[float('inf')], parameters['SNR']], axis=-1)
+    
+    # some useful parameters
+    parameters['sqrt_alpha'] = tf.sqrt(parameters['alpha'])
+    parameters['sqrt_one_minus_alpha'] = tf.sqrt(parameters['beta'])
+
+    parameters['sqrt_alpha_hat'] = tf.sqrt(parameters['alphaHat'])
+    parameters['sqrt_one_minus_alpha_hat'] = tf.sqrt(1.0 - parameters['alphaHat'])
+
+    parameters['one_minus_alpha'] = parameters['beta']
+    parameters['one_minus_alpha_hat'] = 1.0 - parameters['alphaHat']
+    
+    parameters['sigma'] = tf.sqrt(parameters['posteriorVariance'])
+
+    self._steps = parameters
     return
 
-  def parametersForT(self, T):
-    PARAM_BETA = 0
-    PARAM_ALPHA = 1
-    PARAM_ALPHA_HAT = 2
-    PARAM_POSTERIOR_VARIANCE = 3
-    PARAM_SNR = 4
+  def parametersForT(self, T, dtype=tf.float32):
+    tf.debugging.assert_less(T, self.noise_steps, "T must be less than noise_steps")
 
     T = tf.cast(T, tf.int32) + 1 # shifted by 1
-    tf.debugging.assert_greater_equal(T, 0)
-    tf.debugging.assert_less_equal(T, self._steps.shape[0] - 1)
-    p = tf.gather(self._steps, T)
+    tf.debugging.assert_greater_equal(T, 0, "T must be non-negative")
 
-    res = {
-      'beta': p[..., PARAM_BETA],
-      'alpha': p[..., PARAM_ALPHA],
-      'alphaHat': p[..., PARAM_ALPHA_HAT],
-      'posteriorVariance': p[..., PARAM_POSTERIOR_VARIANCE],
-      'SNR': p[..., PARAM_SNR],
-    }
-    # reshape all to match the shape of T
-    shape = tf.shape(T)
-    res = {k: tf.reshape(v, shape) for k, v in res.items()}
-    return CFakeObject(
-      **res,
-      sigma=tf.sqrt(res['posteriorVariance']) # sigma = sqrt(variance)
-    )
-  
-  def debugParams(self):
-    values = self._steps.numpy()
-    for i, step in enumerate(values):
-      print("{:d} | beta: {:.5f}, alpha: {:.5f}, alpha_hat: {:.5f}, posterior_variance: {:.5f}, SNR: {:.15f}".format(i, *step))
-    return
+    # Collect all parameters
+    def F(x):
+      x = tf.gather(x, T)
+      x = tf.reshape(x, tf.shape(T))
+      return tf.cast(x, dtype)
+    
+    res = {k: F(v) for k, v in self._steps.items()}
+    return CFakeObject(**res)
 
   @property
   def noise_steps(self):
@@ -151,8 +158,11 @@ class CDPDiscrete(CDiffusionParameters):
     if startStep is None: startStep = maxSteps
     if endStep is None: endStep = 0
     
-    startStep = tf.clip_by_value(startStep, 0, maxSteps)
-    endStep = tf.clip_by_value(endStep, 0, maxSteps)
+    # check bounds
+    tf.debugging.assert_greater_equal(startStep, 0)
+    tf.debugging.assert_less_equal(startStep, maxSteps)
+    tf.debugging.assert_greater_equal(endStep, 0)
+    tf.debugging.assert_less_equal(endStep, maxSteps)
     
     res = make_steps_sequence( startStep=startStep, endStep=endStep - 1, config=config )
     if reverse: res = tuple(x[::-1] for x in res)

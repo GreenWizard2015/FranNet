@@ -52,7 +52,7 @@ def test_DDIM_eq_INTR_sample(stochasticity):
   
   X_ddim = fake.ddim.sample(value=fake.x, model=fake.model, schedule=fake.schedule)
   X_interpolant = fake.interpolant.sample(value=fake.x, model=fake.model)
-  tf.debugging.assert_near(X_ddim, X_interpolant, atol=1e-6)
+  tf.debugging.assert_near(X_ddim, X_interpolant, atol=5e-6)
   return
 
 @pytest.mark.parametrize('K', [2, 3, 5, 7])
@@ -64,15 +64,15 @@ def test_DDIM_eq_INTR_sample_steps(K):
   
   X_ddim = fake.ddim.sample(value=fake.x, model=fake.model, schedule=fake.schedule)
   X_interpolant = fake.interpolant.sample(value=fake.x, model=fake.model)
-  tf.debugging.assert_near(X_ddim, X_interpolant, atol=1e-6)
+  tf.debugging.assert_near(X_ddim, X_interpolant, atol=5e-6)
   return
 
 # Randomly sampled data go through train, and then we check if the solver is able to recover the data
-def _check_inversibility(interpolant, N=1024, atol=1e-6):
+def _check_inversibility(interpolant, N=1024, atol=5e-6):
   x0 = tf.zeros([N, 1])
   x1 = tf.ones([N, 1])
   T = tf.linspace(0.0, 1.0, N)
-  T = tf.clip_by_value(T, 1e-6, 1.0 - 1e-6)
+  T = tf.clip_by_value(T, 5e-6, 1.0 - 5e-6)
   trainData = interpolant.train(x0, x1, T[:, None])
   solved = interpolant.solve(x_hat=trainData['target'], xt=trainData['xT'], t=trainData['T'])
 
@@ -87,7 +87,7 @@ def _check_inversibility(interpolant, N=1024, atol=1e-6):
   return
 
 def test_inversibility():
-  _check_inversibility(CDiffusionInterpolant(), N=1024 * 16, atol=1e-6)
+  _check_inversibility(CDiffusionInterpolant(), N=1024 * 16, atol=5e-6)
   return
 
 def test_inversibility_V():

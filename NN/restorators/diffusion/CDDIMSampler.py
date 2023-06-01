@@ -9,39 +9,76 @@ from Utils.utils import CFakeObject
 #   https://github.com/filipbasara0/simple-diffusion/blob/main/scheduler/ddim.py
 #   https://github.com/huggingface/diffusers/blob/main/src/diffusers/schedulers/scheduling_ddim.py
 class CDDIMSampler(IDiffusionSampler):
-  def __init__(self, stochasticity, noise_provider, steps, clipping, projectNoise):
+  def __init__(self, stochasticity, noise_provider, steps, clipping, projectNoise, useFloat64=False):
     assert (0.0 <= stochasticity <= 1.0), 'Stochasticity must be in [0, 1] range'
     self._eta = stochasticity
     self._stepsConfig = steps
     self._noise_provider = noise_provider
     self._clipping = clipping
     self._projectNoise = projectNoise
+    self._useFloat64 = useFloat64
     return
 
-  def _reverseStep(self, model, schedule, eta):
+  def _reverseStep_float64(self, model, schedule, eta):
+    # use float64 and some tricks to improve numerical stability
     def f(x, t, tPrev):
       predictedNoise = model(x, t)
       # based on https://github.com/filipbasara0/simple-diffusion/blob/main/scheduler/ddim.py
       # obtain parameters for the current step and previous step
-      alpha_prod_t = schedule.parametersForT(t).alphaHat
-      alpha_prod_t_prev = schedule.parametersForT(tPrev).alphaHat
+      t = schedule.parametersForT(t, dtype=tf.float64)
+      tPrev = schedule.parametersForT(tPrev, dtype=tf.float64)
 
-      stepVariance = schedule.varianceBetween(alpha_prod_t, alpha_prod_t_prev)
+      stepVariance = schedule.varianceBetween(t.alphaHat, tPrev.alphaHat)
+      sigma = tf.sqrt(stepVariance) * tf.cast(eta, dtype=stepVariance.dtype)
+      #######################################
+      noise_scale = tf.sqrt(1.0 - t.alphaHat)
+      coef2 = tf.sqrt(1.0 - tPrev.alphaHat - tf.square(sigma))
+      coef1 = tf.sqrt(tPrev.alphaHat / t.alphaHat)
+      # convert all tensors to x.dtype
+      coef1 = tf.cast(coef1, dtype=x.dtype)
+      coef2 = tf.cast(coef2, dtype=x.dtype)
+      noise_scale = tf.cast(noise_scale, dtype=x.dtype)
+      sigma = tf.cast(sigma, dtype=x.dtype)
+      
+      x_minus_noise = x - (noise_scale * predictedNoise)
+      x_prev = ( (coef1 * x_minus_noise) + (coef2 * predictedNoise) )
+      tf.assert_equal(x.dtype, x_prev.dtype)
+      x_prev = tf.ensure_shape(x_prev, x.shape)
+      x0 = x_minus_noise / tf.cast(tf.sqrt(t.alphaHat), dtype=x.dtype)
+      return CFakeObject(x_prev=x_prev, sigma=sigma, x0=x0, x1=predictedNoise)
+    return f
+  
+  def _reverseStep_float32(self, model, schedule, eta):
+    def f(x, t, tPrev):
+      predictedNoise = model(x, t)
+      isEndOfDiffusion = tf.equal(t, -1)
+      # based on https://github.com/filipbasara0/simple-diffusion/blob/main/scheduler/ddim.py
+      # obtain parameters for the current step and previous step
+      t = schedule.parametersForT(t)
+      tPrev = schedule.parametersForT(tPrev)
+
+      stepVariance = schedule.varianceBetween(t.alphaHat, tPrev.alphaHat)
       sigma = tf.sqrt(stepVariance) * eta
       #######################################
       # "predicted x_0" of formula (12) from https://arxiv.org/pdf/2010.02502.pdf
-      scaled_noise = tf.sqrt(1.0 - alpha_prod_t) * predictedNoise
-      pred_original_sample = (x - scaled_noise) / tf.sqrt(alpha_prod_t)
+      scaled_noise = t.sqrt_one_minus_alpha_hat * predictedNoise
+      pred_original_sample = (x - scaled_noise) / t.sqrt_alpha_hat
 
       # compute "direction pointing to x_t" of formula (12) from https://arxiv.org/pdf/2010.02502.pdf
-      coef2 = tf.sqrt(1.0 - alpha_prod_t_prev - tf.square(sigma))
+      coef2 = tf.sqrt(1.0 - tPrev.alphaHat - tf.square(sigma))
       
       # compute x_t without "random noise" of formula (12) from https://arxiv.org/pdf/2010.02502.pdf
       # NOTE: this is same as forward diffusion step (x0, x1, tPrev), but with "space" for noise (std_dev_t ** 2)
-      coef1 = tf.sqrt(alpha_prod_t_prev)
+      coef1 = tPrev.sqrt_alpha_hat
       x_prev = (coef1 * pred_original_sample) + (coef2 * predictedNoise)
       return CFakeObject(x_prev=x_prev, sigma=sigma, x0=pred_original_sample, x1=predictedNoise)
     return f
+  
+  def _reverseStep(self, model, schedule, eta):
+    if self._useFloat64:
+      return self._reverseStep_float64(model, schedule, eta)
+    
+    return self._reverseStep_float32(model, schedule, eta)
   
   def _valueUpdater(self, noise_provider, projectNoise):
     if not projectNoise: # just add noise to the new value
