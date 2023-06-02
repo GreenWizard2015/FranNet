@@ -1,30 +1,11 @@
 from Utils.utils import setupGPU, load_config, setGPUMemoryLimit, merge_configs, JSONHelper
 setupGPU() # call it on startup to prevent OOM errors on my machine
 
-import tensorflow as tf
-import numpy as np
-import cv2, os, argparse, shutil, re
+import os, argparse, shutil, re
 from collections import defaultdict
 from NN import model_from_config
-from Utils.visualize import generateImage, data_from_dataset, data_from_input
+from Utils.visualize import generateImage, data_from_dataset, data_from_input, makeImageProcessor
 from Utils.WandBUtils import CWBProject
-
-def makeImageProcessor(unnormalizeImg):
-  def _processImage(img):
-    img = unnormalizeImg(img)
-    # to numpy if needed
-    if tf.is_tensor(img): img = img.numpy()
-    np.clip(img, 0, 1, out=img) # clamp to 0..1 range inplace
-
-    if not(img.shape[2] == 3): # convert to RGB by duplicating the single channel
-      img = np.repeat(img, 3, axis=2)
-
-    if not(img.dtype == np.uint8): # 0..1 float -> 0..255 uint8
-      img = (img * 255.0).astype(np.uint8)
-
-    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-    return img
-  return _processImage
 
 def _processData(data, model, processImage):
   NB_BATCHES = len(data)
