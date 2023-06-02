@@ -1,4 +1,5 @@
 import tensorflow as tf
+import pytest
 from NN.restorators.diffusion.diffusion_samplers import sampler_from_config
 from NN.restorators.diffusion.diffusion_schedulers import CDPDiscrete, get_beta_schedule
 
@@ -13,13 +14,14 @@ def _fake_model(noise_steps):
     return fakeNoise + tf.cast(t + 1, tf.float32) * x
   return { 'x': x, 'fakeModel': fakeModel, 'fakeNoise': fakeNoise }
 
-def _fake_DDIM(stochasticity, K, useFloat64=False):
+def _fake_DDIM(stochasticity, K, useFloat64=False, noiseProjection=False):
   return sampler_from_config({
     'name': 'DDIM',
     'stochasticity': stochasticity,
     'noise stddev': 'zero',
     'steps skip type': { 'name': 'uniform', 'K': K },
     'use float64': useFloat64,
+    'project noise': noiseProjection,
   })
 
 # test that DDPM and DDIM return same samples, when:
@@ -106,6 +108,29 @@ def test_DDIM_float64():
 
   ddimA = _fake_DDIM(stochasticity=1.0, K=1, useFloat64=False)
   ddimB = _fake_DDIM(stochasticity=1.0, K=1, useFloat64=True)
+
+  A = ddimA.sample(value=x, model=fakeModel, schedule=schedule)
+  B = ddimB.sample(value=x, model=fakeModel, schedule=schedule)
+
+  tf.debugging.assert_near(A, B, atol=1e-6)
+  return
+
+# test that noise projection does not change if noise is zero
+@pytest.mark.parametrize(
+  'stochasticity,K',
+  [
+    (1.0, 1),
+    (0.0, 2),
+    (0.5, 3),
+  ]
+)
+def test_DDIM_noiseProjection(stochasticity, K):
+  schedule = CDPDiscrete( beta_schedule=get_beta_schedule('linear'), noise_steps=10 )
+  model = _fake_model(schedule.noise_steps)
+  x, fakeModel = model['x'], model['fakeModel']
+
+  ddimA = _fake_DDIM(stochasticity=stochasticity, K=K, noiseProjection=False)
+  ddimB = _fake_DDIM(stochasticity=stochasticity, K=K, noiseProjection=True)
 
   A = ddimA.sample(value=x, model=fakeModel, schedule=schedule)
   B = ddimB.sample(value=x, model=fakeModel, schedule=schedule)
