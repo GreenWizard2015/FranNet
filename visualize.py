@@ -146,7 +146,9 @@ def modelsFromArgs(args, config):
         model.load_weights(bestModel)
 
         outputFolder = list(parts)
-        if 1 < len(configs): outputFolder.append(f'config_{i}')
+        if 1 < len(configs):
+          folderName = modelConfigs.get('folder name', f'config_{i}')
+          outputFolder.append(folderName)
         
         outputFolder = os.path.join(*outputFolder)
         yield (model, outputFolder, modelConfigs)
