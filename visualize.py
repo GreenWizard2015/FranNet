@@ -1,4 +1,4 @@
-from Utils.utils import setupGPU, load_config, setGPUMemoryLimit, merge_configs
+from Utils.utils import setupGPU, load_config, setGPUMemoryLimit, merge_configs, JSONHelper
 setupGPU() # call it on startup to prevent OOM errors on my machine
 
 import tensorflow as tf
@@ -101,12 +101,17 @@ def _bestRuns(runs):
   # in each group select the best run
   return [min(runs, key=lambda run: run.bestLoss) for runs in byName.values()]
 
+def escape_directory_name(directory_name):
+  directory_name = directory_name.strip()
+  directory_name = re.sub(r'[\.<>:"/\\|?*]', '_', directory_name)
+  return directory_name
+
 def modelsFromArgs(args, config):
   if args.model: # load from file
     model = model_from_config(config['model'])
     model.load_weights(args.model)
     print('Model loaded successfully.')
-    return [(model, None)]
+    return [(model, None, config)]
   # otherwise from wandb project
   project = CWBProject(args.wandb_project)
 
@@ -124,27 +129,40 @@ def modelsFromArgs(args, config):
   answer = input('Continue? [y/n]: ')
   assert answer.lower() == 'y', 'Aborted by user'
 
-  def escape_directory_name(directory_name):
-    directory_name = directory_name.strip()
-    directory_name = re.sub(r'[\.<>:"/\\|?*]', '_', directory_name)
-    return directory_name
-
   byName = defaultdict(list)
   for run in acceptedRuns: byName[run.name].append(run)
   # return iterator of (model, modelArgs)
+  configs = [config] if not isinstance(config, list) else config
   for runGroup in byName.values():
     for run in runGroup:
       print(f'Loading model from {run.name} ({run.fullId})...')
-      modelConfigs = merge_configs(run.config, config) # override config with run config
       bestModel = run.bestModel.pathTo()
-      model = model_from_config(modelConfigs['model'])
-      model.load_weights(bestModel)
-      print('Model loaded successfully.')
       parts = [escape_directory_name(run.name)]
       if 1 < len(runGroup): parts.append(escape_directory_name(run.id))
-      yield (model, os.path.join(*parts))
+
+      for i, config in enumerate(configs):
+        modelConfigs = merge_configs(run.config, config) # override config with run config
+        model = model_from_config(modelConfigs['model'])
+        model.load_weights(bestModel)
+
+        outputFolder = list(parts)
+        if 1 < len(configs): outputFolder.append(f'config_{i}')
+        
+        outputFolder = os.path.join(*outputFolder)
+        yield (model, outputFolder, modelConfigs)
+      continue
     continue
   return
+
+def alterConfigFromArgs(args, config):
+  if args.alter_config is None: return config
+  # otherwise load from file set of configs and return array of configs
+  alterConfig = JSONHelper.load(args.alter_config)
+  assert isinstance(alterConfig, list), 'Alter config must be a list of configs'
+  return [
+    merge_configs(config, c) # override config with c
+    for c in alterConfig
+  ]
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='Process arguments.')
@@ -153,6 +171,8 @@ if __name__ == "__main__":
     help='Path to a single config file or a multiple config files (they will be merged in order of appearance)',
     default=[], action='append', 
   )
+  # file with a set of configs to be altered
+  parser.add_argument('--alter-config', type=str, help='Path to a config file with a set of configs to be altered (optional)')
   parser.add_argument('--model', type=str, help='Path to model weights file')
   parser.add_argument('--target-size', type=int, help='Target size (optional)')
   parser.add_argument('--input', type=str, help='Path to image file or folder (optional)', default=None)
@@ -186,11 +206,23 @@ if __name__ == "__main__":
   # should be specified input flag or config contains 'dataset' section
   assert (args.input is not None) or ('dataset' in config), 'either input or dataset section in config is required'
   
-  models = modelsFromArgs(args, config)
-  for model, savePath in models:
+  models = modelsFromArgs(
+    args=args,
+    config=alterConfigFromArgs(args, config),    
+  )
+  for model, savePath, modelConfig in models:
+    savePath = os.path.join(folder, savePath) if savePath else folder
+    # clear/create folder
+    if os.path.exists(savePath): shutil.rmtree(savePath)
+    os.makedirs(savePath)
+    
+    print('Model loaded successfully. Output folder:', savePath)
+    # save model config for future reference
+    JSONHelper.save(os.path.join(savePath, 'model.json'), modelConfig)
+
     process(
       model=model,
-      folder=os.path.join(folder, savePath) if savePath else folder,
+      folder=savePath,
       modelArgsOverride=modelArgsOverrideFromArgs(args),
       datasetProvider=datasetFrom(args, config),
       visualizationConfig=config.get('visualization', None),

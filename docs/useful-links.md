@@ -10,5 +10,6 @@
 - [Denoising Diffusion Implicit Models](https://arxiv.org/abs/2010.02502c) (arXiv)
 - [Star-Shaped Denoising Diffusion Probabilistic Models](https://arxiv.org/abs/2302.05259) (arXiv)
 - [Elucidating the Design Space of Diffusion-Based Generative Models](https://arxiv.org/abs/2206.00364) (arXiv)
+- [What Do Self-Supervised Vision Transformers Learn?](https://arxiv.org/abs/2305.00729) (arXiv)
 
 Many papers on this and other topics can be found in [my reading list](https://green-wizard.vercel.app/notes/ml-reading-list).

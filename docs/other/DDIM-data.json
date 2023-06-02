@@ -1,0 +1,4652 @@
+[
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.01749579608440399,
+    "loss_gr": 0.009163456037640572
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 2,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.04846467077732086,
+    "loss_gr": 0.033769480884075165
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 3,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.04667016863822937,
+    "loss_gr": 0.03246054798364639
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 4,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.045143913477659225,
+    "loss_gr": 0.03134172037243843
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 5,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.09562622755765915,
+    "loss_gr": 0.06786052137613297
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 6,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.04175812751054764,
+    "loss_gr": 0.028878478333353996
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 7,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.3791080713272095,
+    "loss_gr": 0.24666345119476318
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 8,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.03969883918762207,
+    "loss_gr": 0.02720574103295803
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 9,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.4219229221343994,
+    "loss_gr": 0.2680037021636963
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 10,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.3938473165035248,
+    "loss_gr": 0.24736849963665009
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.0069679697044193745,
+    "loss_gr": 0.0024030350614339113
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 2,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.008968336507678032,
+    "loss_gr": 0.00389094278216362
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 3,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.009263399057090282,
+    "loss_gr": 0.0041139088571071625
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 4,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.009573371149599552,
+    "loss_gr": 0.004350471310317516
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 5,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.01550651527941227,
+    "loss_gr": 0.008896831423044205
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 6,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.010015035048127174,
+    "loss_gr": 0.004695001058280468
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 7,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.07050321251153946,
+    "loss_gr": 0.040788013488054276
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 8,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.010639659129083157,
+    "loss_gr": 0.0051718647591769695
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 9,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.0913773700594902,
+    "loss_gr": 0.05091242864727974
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 10,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.08911753445863724,
+    "loss_gr": 0.0490163192152977
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.00635046511888504,
+    "loss_gr": 0.0019848907832056284
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 2,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006353464908897877,
+    "loss_gr": 0.0019865278154611588
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 3,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006351461634039879,
+    "loss_gr": 0.0019848558586090803
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 4,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006346724461764097,
+    "loss_gr": 0.0019840188324451447
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 5,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006353613920509815,
+    "loss_gr": 0.0019897238817065954
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 6,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.00634073605760932,
+    "loss_gr": 0.001982581103220582
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 7,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006450325716286898,
+    "loss_gr": 0.0020632133819162846
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 8,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006342098116874695,
+    "loss_gr": 0.001983712427318096
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 9,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006471031811088324,
+    "loss_gr": 0.002080827485769987
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 10,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006454530172049999,
+    "loss_gr": 0.0020676262211054564
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.01750052534043789,
+    "loss_gr": 0.009167681448161602
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 2,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.04846999794244766,
+    "loss_gr": 0.033768221735954285
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 3,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.046669505536556244,
+    "loss_gr": 0.03246406093239784
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 4,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.04514492675662041,
+    "loss_gr": 0.03133869916200638
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 5,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.09562660753726959,
+    "loss_gr": 0.06785121560096741
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 6,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.04175875708460808,
+    "loss_gr": 0.02888377010822296
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 7,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.3791177272796631,
+    "loss_gr": 0.2466830462217331
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 8,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.03970412164926529,
+    "loss_gr": 0.027213705703616142
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 9,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.4219200909137726,
+    "loss_gr": 0.26798173785209656
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 10,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.39382725954055786,
+    "loss_gr": 0.24736613035202026
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006526199635118246,
+    "loss_gr": 0.002107555279508233
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 2,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.007832766510546207,
+    "loss_gr": 0.003010107669979334
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 3,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.00818701647222042,
+    "loss_gr": 0.003254965180531144
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 4,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.008546609431505203,
+    "loss_gr": 0.0035091135650873184
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 5,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.014298951253294945,
+    "loss_gr": 0.007734267972409725
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 6,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.00911620631814003,
+    "loss_gr": 0.00392280425876379
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 7,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.06936813145875931,
+    "loss_gr": 0.03960152715444565
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 8,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.009795254096388817,
+    "loss_gr": 0.004411292262375355
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 9,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.09053885191679001,
+    "loss_gr": 0.04987052455544472
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 10,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.08849974721670151,
+    "loss_gr": 0.048154667019844055
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.0064625367522239685,
+    "loss_gr": 0.0020666178315877914
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 2,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006429517641663551,
+    "loss_gr": 0.0020389242563396692
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 3,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006413353607058525,
+    "loss_gr": 0.0020262664183974266
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 4,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006399459205567837,
+    "loss_gr": 0.0020188498310744762
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 5,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.00639125844463706,
+    "loss_gr": 0.0020136013627052307
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 6,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.0063827382400631905,
+    "loss_gr": 0.002008910523727536
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 7,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006384243257343769,
+    "loss_gr": 0.002011167583987117
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 8,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006377676967531443,
+    "loss_gr": 0.002006439957767725
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 9,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006388804875314236,
+    "loss_gr": 0.0020159357227385044
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 10,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006383984349668026,
+    "loss_gr": 0.002011544071137905
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.01749602146446705,
+    "loss_gr": 0.00916200503706932
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 2,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.048466965556144714,
+    "loss_gr": 0.03377377241849899
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 3,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.04667436704039574,
+    "loss_gr": 0.03246660530567169
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 4,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.045147523283958435,
+    "loss_gr": 0.031340405344963074
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 5,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.09562525898218155,
+    "loss_gr": 0.06785324960947037
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 6,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.041767291724681854,
+    "loss_gr": 0.02888299897313118
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 7,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.379122257232666,
+    "loss_gr": 0.24667514860630035
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 8,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.039690565317869186,
+    "loss_gr": 0.027204733341932297
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 9,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.4219626486301422,
+    "loss_gr": 0.26802870631217957
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 10,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.39383047819137573,
+    "loss_gr": 0.2473602592945099
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006952224764972925,
+    "loss_gr": 0.0023902098182588816
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 2,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.008940654806792736,
+    "loss_gr": 0.0038631425704807043
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 3,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.009231654927134514,
+    "loss_gr": 0.00408054469153285
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 4,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.009536809287965298,
+    "loss_gr": 0.004311673808842897
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 5,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.01548940408974886,
+    "loss_gr": 0.008858722634613514
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 6,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.009978494606912136,
+    "loss_gr": 0.004652340896427631
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 7,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.070563405752182,
+    "loss_gr": 0.04080452769994736
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 8,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.010603261180222034,
+    "loss_gr": 0.005124213173985481
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 9,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.09146328270435333,
+    "loss_gr": 0.050942085683345795
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 10,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.08923071622848511,
+    "loss_gr": 0.049061525613069534
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006395612843334675,
+    "loss_gr": 0.002013564808294177
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 2,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006400969345122576,
+    "loss_gr": 0.002016861457377672
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 3,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006396436132490635,
+    "loss_gr": 0.00201359111815691
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 4,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006388413719832897,
+    "loss_gr": 0.0020106963347643614
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 5,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006382581777870655,
+    "loss_gr": 0.002007825067266822
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 6,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006375870667397976,
+    "loss_gr": 0.0020046266727149487
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 7,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.00640213955193758,
+    "loss_gr": 0.002024902729317546
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 8,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006373260170221329,
+    "loss_gr": 0.002003484172746539
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 9,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006419765762984753,
+    "loss_gr": 0.0020391272846609354
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 10,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006408963352441788,
+    "loss_gr": 0.002030197996646166
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 15,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.2779085040092468,
+    "loss_gr": 0.15703438222408295
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 20,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.8795924782752991,
+    "loss_gr": 0.46428707242012024
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 25,
+    "clipping": false,
+    "project noise": true,
+    "loss": 1.2983242273330688,
+    "loss_gr": 0.4903586208820343
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 30,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.09343309700489044,
+    "loss_gr": 0.04418546333909035
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 15,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.07962770015001297,
+    "loss_gr": 0.039335791021585464
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 20,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.2790781557559967,
+    "loss_gr": 0.11538194864988327
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 25,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.5578417778015137,
+    "loss_gr": 0.1306883692741394
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 30,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.05783272534608841,
+    "loss_gr": 0.033028461039066315
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 15,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.006396083626896143,
+    "loss_gr": 0.0020311216358095407
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 20,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.06437849253416061,
+    "loss_gr": 0.006502267438918352
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 25,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.5235834717750549,
+    "loss_gr": 0.05275590345263481
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 30,
+    "clipping": false,
+    "project noise": true,
+    "loss": 0.01631925255060196,
+    "loss_gr": 0.0027185482904314995
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.006347449496388435,
+    "loss_gr": 0.001982305897399783
+  },
+  {
+    "stochasticity": 0.9,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.006346091628074646,
+    "loss_gr": 0.001981966430321336
+  },
+  {
+    "stochasticity": 0.8,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.00635032681748271,
+    "loss_gr": 0.0019850691314786673
+  },
+  {
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.006369916256517172,
+    "loss_gr": 0.0019981239456683397
+  },
+  {
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.0064314971677958965,
+    "loss_gr": 0.002039274899289012
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.006585956551134586,
+    "loss_gr": 0.002142993500456214
+  },
+  {
+    "stochasticity": 0.4,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.006896146573126316,
+    "loss_gr": 0.0023474416229873896
+  },
+  {
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.007353194057941437,
+    "loss_gr": 0.0026315548457205296
+  },
+  {
+    "stochasticity": 0.2,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.007817843928933144,
+    "loss_gr": 0.002896794117987156
+  },
+  {
+    "stochasticity": 0.1,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.008146223612129688,
+    "loss_gr": 0.0030703621450811625
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.00826041866093874,
+    "loss_gr": 0.0031285693403333426
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.009753551334142685,
+    "loss_gr": 0.00333892903290689
+  },
+  {
+    "stochasticity": 0.9,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.009707026183605194,
+    "loss_gr": 0.003340713446959853
+  },
+  {
+    "stochasticity": 0.8,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.009591706097126007,
+    "loss_gr": 0.003314382629469037
+  },
+  {
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.00940865557640791,
+    "loss_gr": 0.0032589142210781574
+  },
+  {
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.00912261288613081,
+    "loss_gr": 0.0031554577872157097
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.00871601328253746,
+    "loss_gr": 0.002986748469993472
+  },
+  {
+    "stochasticity": 0.4,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.008243022486567497,
+    "loss_gr": 0.0027848260942846537
+  },
+  {
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.007831543684005737,
+    "loss_gr": 0.0026280535385012627
+  },
+  {
+    "stochasticity": 0.2,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.007702060043811798,
+    "loss_gr": 0.0026509403251111507
+  },
+  {
+    "stochasticity": 0.1,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.007924125529825687,
+    "loss_gr": 0.0028847502544522285
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.008258265443146229,
+    "loss_gr": 0.0031275879591703415
+  },
+  {
+    "stochasticity": 1.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.006368682254105806,
+    "loss_gr": 0.001995860133320093
+  },
+  {
+    "stochasticity": 0.9,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.006368689239025116,
+    "loss_gr": 0.0019960468634963036
+  },
+  {
+    "stochasticity": 0.8,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.0063744946382939816,
+    "loss_gr": 0.0019994929898530245
+  },
+  {
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.006394595839083195,
+    "loss_gr": 0.0020116856321692467
+  },
+  {
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.006450916174799204,
+    "loss_gr": 0.002047133632004261
+  },
+  {
+    "stochasticity": 0.5,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.006589161232113838,
+    "loss_gr": 0.0021374360658228397
+  },
+  {
+    "stochasticity": 0.4,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.006873286794871092,
+    "loss_gr": 0.0023232970852404833
+  },
+  {
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.007315607275813818,
+    "loss_gr": 0.002603749046102166
+  },
+  {
+    "stochasticity": 0.2,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.0077985236421227455,
+    "loss_gr": 0.0028848254587501287
+  },
+  {
+    "stochasticity": 0.1,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.00814164150506258,
+    "loss_gr": 0.0030678510665893555
+  },
+  {
+    "stochasticity": 0.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 1,
+    "clipping": true,
+    "project noise": false,
+    "loss": 0.008262231945991516,
+    "loss_gr": 0.0031297870445996523
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.006350463721901178,
+    "loss_gr": 0.00198488961905241
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.006353464908897877,
+    "loss_gr": 0.001986535731703043
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.006351446267217398,
+    "loss_gr": 0.0019848381634801626
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.006346722133457661,
+    "loss_gr": 0.0019840174354612827
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.00635359575971961,
+    "loss_gr": 0.001989709911867976
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.006340719293802977,
+    "loss_gr": 0.001982571091502905
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.00645032525062561,
+    "loss_gr": 0.002063208492472768
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.006342058535665274,
+    "loss_gr": 0.001983681693673134
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.006470601074397564,
+    "loss_gr": 0.002080463105812669
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.006454518064856529,
+    "loss_gr": 0.0020676986314356327
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.006350770127028227,
+    "loss_gr": 0.0019855094142258167
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.006368605419993401,
+    "loss_gr": 0.001997011248022318
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.006369804963469505,
+    "loss_gr": 0.001997453160583973
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.006369360722601414,
+    "loss_gr": 0.0019992743618786335
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.006416978780180216,
+    "loss_gr": 0.0020335703156888485
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.006372134666889906,
+    "loss_gr": 0.0020033393520861864
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.0069664763286709785,
+    "loss_gr": 0.002421195851638913
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.006383499596267939,
+    "loss_gr": 0.002011623466387391
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.0072021582163870335,
+    "loss_gr": 0.0025657317601144314
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.007181793916970491,
+    "loss_gr": 0.0025440736208111048
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.006361647509038448,
+    "loss_gr": 0.001992870355024934
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.0064331660978496075,
+    "loss_gr": 0.0020419498905539513
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.006447643041610718,
+    "loss_gr": 0.0020517180673778057
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.006462967488914728,
+    "loss_gr": 0.0020645877812057734
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.006663516629487276,
+    "loss_gr": 0.002210250124335289
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.006493525579571724,
+    "loss_gr": 0.0020883025135844946
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.008714914321899414,
+    "loss_gr": 0.0035701829474419355
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.0065403166227042675,
+    "loss_gr": 0.00212201033718884
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.009770983830094337,
+    "loss_gr": 0.004132752772420645
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.009790623560547829,
+    "loss_gr": 0.0041156308725476265
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.006406526081264019,
+    "loss_gr": 0.002023136941716075
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.00665279058739543,
+    "loss_gr": 0.0021986481733620167
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.00670583127066493,
+    "loss_gr": 0.0022357329726219177
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.006763013079762459,
+    "loss_gr": 0.0022788504138588905
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.007428605575114489,
+    "loss_gr": 0.002762235701084137
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.006862042937427759,
+    "loss_gr": 0.0023515745997428894
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.014379160478711128,
+    "loss_gr": 0.007080566603690386
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.006993001326918602,
+    "loss_gr": 0.0024446381721645594
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.018353382125496864,
+    "loss_gr": 0.00897957757115364
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.01844794489443302,
+    "loss_gr": 0.008916613645851612
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.00655530858784914,
+    "loss_gr": 0.0021245628595352173
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.0072945114225149155,
+    "loss_gr": 0.002660654252395034
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.007427470292896032,
+    "loss_gr": 0.002755793510004878
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.007566585671156645,
+    "loss_gr": 0.0028573633171617985
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.009616237133741379,
+    "loss_gr": 0.004385032225400209
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.007781220134347677,
+    "loss_gr": 0.0030123782344162464
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.03175255283713341,
+    "loss_gr": 0.017414305359125137
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.008089297451078892,
+    "loss_gr": 0.003235159907490015
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.04263096675276756,
+    "loss_gr": 0.0225417148321867
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.04248177260160446,
+    "loss_gr": 0.022148972377181053
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.006967782974243164,
+    "loss_gr": 0.0024028639309108257
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.00896826945245266,
+    "loss_gr": 0.0038907218258827925
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.009263977408409119,
+    "loss_gr": 0.004114404786378145
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.00957413949072361,
+    "loss_gr": 0.004351382609456778
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.015506889671087265,
+    "loss_gr": 0.008898819796741009
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.010010809637606144,
+    "loss_gr": 0.004691482521593571
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.0704955905675888,
+    "loss_gr": 0.04078710079193115
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.010638461448252201,
+    "loss_gr": 0.005171030294150114
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.0913700982928276,
+    "loss_gr": 0.050910111516714096
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.08911707997322083,
+    "loss_gr": 0.049020927399396896
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.007929900661110878,
+    "loss_gr": 0.003040272742509842
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.01317453384399414,
+    "loss_gr": 0.007088281214237213
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.013682378455996513,
+    "loss_gr": 0.007489408366382122
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.014171704649925232,
+    "loss_gr": 0.007874412462115288
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.027938716113567352,
+    "loss_gr": 0.01820177398622036
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.014714826829731464,
+    "loss_gr": 0.008322179317474365
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.1343550682067871,
+    "loss_gr": 0.08112313598394394
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.015478852204978466,
+    "loss_gr": 0.008900956250727177
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.1651460975408554,
+    "loss_gr": 0.09661437571048737
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.15839292109012604,
+    "loss_gr": 0.09156821668148041
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.009866380132734776,
+    "loss_gr": 0.004295995458960533
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.021512964740395546,
+    "loss_gr": 0.013443771749734879
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.021908091381192207,
+    "loss_gr": 0.013770039193332195
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.022260576486587524,
+    "loss_gr": 0.014058306813240051
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.0474679134786129,
+    "loss_gr": 0.032569099217653275
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.02228737063705921,
+    "loss_gr": 0.014131337404251099
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.21553902328014374,
+    "loss_gr": 0.13464659452438354
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.02266394905745983,
+    "loss_gr": 0.014384674839675426
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.25326967239379883,
+    "loss_gr": 0.15389060974121094
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.24007463455200195,
+    "loss_gr": 0.14426717162132263
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.012931833043694496,
+    "loss_gr": 0.00626407703384757
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.03323618322610855,
+    "loss_gr": 0.0223158597946167
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.032915253192186356,
+    "loss_gr": 0.022101275622844696
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.03261473402380943,
+    "loss_gr": 0.021896902471780777
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.0701214075088501,
+    "loss_gr": 0.04916758835315704
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.031340595334768295,
+    "loss_gr": 0.021011095494031906
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.29661381244659424,
+    "loss_gr": 0.1896468698978424
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.030757980421185493,
+    "loss_gr": 0.020501617342233658
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.33801618218421936,
+    "loss_gr": 0.21070660650730133
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.31770309805870056,
+    "loss_gr": 0.19586177170276642
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.01611027680337429,
+    "loss_gr": 0.008287785574793816
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.044036615639925,
+    "loss_gr": 0.030439268797636032
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.04271930456161499,
+    "loss_gr": 0.029491206631064415
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.041569776833057404,
+    "loss_gr": 0.028654076159000397
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.08850528299808502,
+    "loss_gr": 0.06264771521091461
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.038844458758831024,
+    "loss_gr": 0.02667889930307865
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.3568167984485626,
+    "loss_gr": 0.2311779111623764
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.03722964972257614,
+    "loss_gr": 0.025360938161611557
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.39948293566703796,
+    "loss_gr": 0.2525949478149414
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.37349921464920044,
+    "loss_gr": 0.2335226833820343
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.017497358843684196,
+    "loss_gr": 0.009164811111986637
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.04846613109111786,
+    "loss_gr": 0.03377685323357582
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.046673037111759186,
+    "loss_gr": 0.032462287694215775
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.04513918608427048,
+    "loss_gr": 0.03133779019117355
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.09561324864625931,
+    "loss_gr": 0.06785042583942413
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.04175569862127304,
+    "loss_gr": 0.028877470642328262
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.37910225987434387,
+    "loss_gr": 0.24667535722255707
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.039690252393484116,
+    "loss_gr": 0.027203448116779327
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.42193374037742615,
+    "loss_gr": 0.26799020171165466
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "zero",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.3938277065753937,
+    "loss_gr": 0.24736811220645905
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.010282205417752266,
+    "loss_gr": 0.0034262060653418303
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.009835226461291313,
+    "loss_gr": 0.003274406073614955
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.009478699415922165,
+    "loss_gr": 0.0031535772141069174
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.00920878630131483,
+    "loss_gr": 0.0030598831363022327
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.008982475847005844,
+    "loss_gr": 0.0029725313652306795
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.008728334680199623,
+    "loss_gr": 0.0028915447182953358
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.00863167829811573,
+    "loss_gr": 0.0028594057075679302
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.00850825197994709,
+    "loss_gr": 0.002808002522215247
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.008422131650149822,
+    "loss_gr": 0.0027868379838764668
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.008253192529082298,
+    "loss_gr": 0.0027278228662908077
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.010353987105190754,
+    "loss_gr": 0.003451000666245818
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.009943943470716476,
+    "loss_gr": 0.0033100212458521128
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.009620101191103458,
+    "loss_gr": 0.0032023985404521227
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.00938228890299797,
+    "loss_gr": 0.0031185089610517025
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.009201251901686192,
+    "loss_gr": 0.0030565857887268066
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.008932442404329777,
+    "loss_gr": 0.002964894287288189
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.00943510141223669,
+    "loss_gr": 0.0032621179707348347
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.008740211836993694,
+    "loss_gr": 0.00288839521817863
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.009549918584525585,
+    "loss_gr": 0.0033316905610263348
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.009371418505907059,
+    "loss_gr": 0.0032589405309408903
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.010399824939668179,
+    "loss_gr": 0.0034716601949185133
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.010043803602457047,
+    "loss_gr": 0.003358548739925027
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.009766382165253162,
+    "loss_gr": 0.003267953870818019
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.009557846002280712,
+    "loss_gr": 0.0032015428878366947
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.0095768878236413,
+    "loss_gr": 0.0032636034302413464
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.009166897274553776,
+    "loss_gr": 0.003075944259762764
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.011982838623225689,
+    "loss_gr": 0.004643668886274099
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.009022166952490807,
+    "loss_gr": 0.0030338652431964874
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.013216075487434864,
+    "loss_gr": 0.005212015472352505
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.013061879202723503,
+    "loss_gr": 0.005129183176904917
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.010436620563268661,
+    "loss_gr": 0.003494257340207696
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.010290424339473248,
+    "loss_gr": 0.0035142607521265745
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.010076749138534069,
+    "loss_gr": 0.0034599422942847013
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.009937578812241554,
+    "loss_gr": 0.0034320983104407787
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.010623241774737835,
+    "loss_gr": 0.00393446022644639
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.009655999019742012,
+    "loss_gr": 0.0033775477204471827
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.01934986002743244,
+    "loss_gr": 0.008755977265536785
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.009649112820625305,
+    "loss_gr": 0.0034268584568053484
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.023635489866137505,
+    "loss_gr": 0.010719597339630127
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.023563753813505173,
+    "loss_gr": 0.010611344128847122
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.01054380089044571,
+    "loss_gr": 0.0035660606808960438
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.011030678637325764,
+    "loss_gr": 0.004020249471068382
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.010955877602100372,
+    "loss_gr": 0.004054237622767687
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.010939931496977806,
+    "loss_gr": 0.004113196860998869
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.013469553552567959,
+    "loss_gr": 0.005874440539628267
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.01084203738719225,
+    "loss_gr": 0.004188815597444773
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.03821432963013649,
+    "loss_gr": 0.01971379667520523
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.011051926761865616,
+    "loss_gr": 0.0043932353146374226
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.049078959971666336,
+    "loss_gr": 0.024848362430930138
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.048635534942150116,
+    "loss_gr": 0.024379778653383255
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.010833942331373692,
+    "loss_gr": 0.0037902251351624727
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.013003941625356674,
+    "loss_gr": 0.005433687940239906
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.013126159086823463,
+    "loss_gr": 0.0056146979331970215
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.013296699151396751,
+    "loss_gr": 0.005816553719341755
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.020101375877857208,
+    "loss_gr": 0.010652557015419006
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.013411903753876686,
+    "loss_gr": 0.006072363816201687
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.07732661813497543,
+    "loss_gr": 0.043468914926052094
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.013875494711101055,
+    "loss_gr": 0.006473422050476074
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.09776905924081802,
+    "loss_gr": 0.053454767912626266
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.09524217993021011,
+    "loss_gr": 0.05147653818130493
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.011573173105716705,
+    "loss_gr": 0.004354029893875122
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.017398487776517868,
+    "loss_gr": 0.008756780996918678
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.017692366614937782,
+    "loss_gr": 0.009087475016713142
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.017987193539738655,
+    "loss_gr": 0.0093974145129323
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.03265214338898659,
+    "loss_gr": 0.019973063841462135
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.01813260279595852,
+    "loss_gr": 0.009711174294352531
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.14018845558166504,
+    "loss_gr": 0.08358623087406158
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.018642771989107132,
+    "loss_gr": 0.010157259181141853
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.170379638671875,
+    "loss_gr": 0.09884818643331528
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.1633492410182953,
+    "loss_gr": 0.09365755319595337
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.012950249016284943,
+    "loss_gr": 0.005437992513179779
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.02521342784166336,
+    "loss_gr": 0.014904525130987167
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.025350967422127724,
+    "loss_gr": 0.015133562497794628
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.025473996996879578,
+    "loss_gr": 0.015332682989537716
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.05122968554496765,
+    "loss_gr": 0.03399423882365227
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.025084085762500763,
+    "loss_gr": 0.01525306235998869
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.21964173018932343,
+    "loss_gr": 0.1364745944738388
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.025161344558000565,
+    "loss_gr": 0.01535247452557087
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.25693121552467346,
+    "loss_gr": 0.15553860366344452
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.2434828281402588,
+    "loss_gr": 0.14575885236263275
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.014878563582897186,
+    "loss_gr": 0.006995010189712048
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.03552787005901337,
+    "loss_gr": 0.02320481650531292
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.03500492870807648,
+    "loss_gr": 0.022929299622774124
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.03453619033098221,
+    "loss_gr": 0.022657714784145355
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.0722586065530777,
+    "loss_gr": 0.05001010000705719
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.03295037895441055,
+    "loss_gr": 0.02164413593709469
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.29880815744400024,
+    "loss_gr": 0.19064481556415558
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.03216670826077461,
+    "loss_gr": 0.021039284765720367
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.3399377465248108,
+    "loss_gr": 0.21156863868236542
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.3194204568862915,
+    "loss_gr": 0.1966458261013031
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.01672367937862873,
+    "loss_gr": 0.008512994274497032
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.04473591223359108,
+    "loss_gr": 0.030717849731445312
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.043341994285583496,
+    "loss_gr": 0.02973514422774315
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.04214143380522728,
+    "loss_gr": 0.028880901634693146
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.08913851529359818,
+    "loss_gr": 0.062899649143219
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.039306893944740295,
+    "loss_gr": 0.026860734447836876
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.35746854543685913,
+    "loss_gr": 0.23146571218967438
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.03762447088956833,
+    "loss_gr": 0.02551024965941906
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.3999970853328705,
+    "loss_gr": 0.2528257966041565
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.3739878833293915,
+    "loss_gr": 0.2337685525417328
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.01749994046986103,
+    "loss_gr": 0.009166008792817593
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.04846604913473129,
+    "loss_gr": 0.0337703600525856
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.04665817692875862,
+    "loss_gr": 0.03245292603969574
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.04514488950371742,
+    "loss_gr": 0.031341198831796646
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.09563124924898148,
+    "loss_gr": 0.06785555183887482
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.041766829788684845,
+    "loss_gr": 0.028885504230856895
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.3790907561779022,
+    "loss_gr": 0.24666593968868256
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.03968723863363266,
+    "loss_gr": 0.02720632590353489
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.4219679534435272,
+    "loss_gr": 0.2680183947086334
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "normal",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.3938310742378235,
+    "loss_gr": 0.24736003577709198
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.00637353491038084,
+    "loss_gr": 0.0019995742477476597
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.0063932654447853565,
+    "loss_gr": 0.0020116763189435005
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.006404831539839506,
+    "loss_gr": 0.0020186789333820343
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.006412147544324398,
+    "loss_gr": 0.0020245106425136328
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.006427402142435312,
+    "loss_gr": 0.0020341572817415
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.00642097182571888,
+    "loss_gr": 0.002031839219853282
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.006532477214932442,
+    "loss_gr": 0.002107787411659956
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.006435080897063017,
+    "loss_gr": 0.002040183637291193
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.006560696754604578,
+    "loss_gr": 0.0021265060640871525
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 1.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.006543383467942476,
+    "loss_gr": 0.0021138235460966825
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.006377013400197029,
+    "loss_gr": 0.002001967979595065
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.00641499413177371,
+    "loss_gr": 0.0020252063404768705
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.006432429421693087,
+    "loss_gr": 0.0020353994332253933
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.006447447929531336,
+    "loss_gr": 0.002044718712568283
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.006507024168968201,
+    "loss_gr": 0.0020843043457716703
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.006472080945968628,
+    "loss_gr": 0.002061046427115798
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.007072914391756058,
+    "loss_gr": 0.002467012032866478
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.006503123790025711,
+    "loss_gr": 0.0020783988293260336
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.007331238593906164,
+    "loss_gr": 0.002615079516544938
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.9,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.007314932066947222,
+    "loss_gr": 0.002593702869489789
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.006393406540155411,
+    "loss_gr": 0.0020120928529649973
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.006489294581115246,
+    "loss_gr": 0.0020747168455272913
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.0065234508365392685,
+    "loss_gr": 0.002094741677865386
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.006556724198162556,
+    "loss_gr": 0.0021157509181648493
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.006775927264243364,
+    "loss_gr": 0.002267855452373624
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.00661561219021678,
+    "loss_gr": 0.0021536832209676504
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.008891379460692406,
+    "loss_gr": 0.003620319999754429
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.00668763555586338,
+    "loss_gr": 0.0021978123113512993
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.010036786086857319,
+    "loss_gr": 0.004197855480015278
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.8,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.010065439157187939,
+    "loss_gr": 0.004181378986686468
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.006448062136769295,
+    "loss_gr": 0.002046779962256551
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.006721673533320427,
+    "loss_gr": 0.0022355346009135246
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.006797416135668755,
+    "loss_gr": 0.002283764537423849
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.00687680346891284,
+    "loss_gr": 0.002335452474653721
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.007568981032818556,
+    "loss_gr": 0.002826679963618517
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.00700319092720747,
+    "loss_gr": 0.002419533208012581
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.01473306305706501,
+    "loss_gr": 0.007164346054196358
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.007166734896600246,
+    "loss_gr": 0.0025257200468331575
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.018821369856595993,
+    "loss_gr": 0.009095381014049053
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.7000000000000001,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.018944358453154564,
+    "loss_gr": 0.00904454942792654
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.006608523894101381,
+    "loss_gr": 0.002152504399418831
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.007376430090516806,
+    "loss_gr": 0.002699707169085741
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.007535140961408615,
+    "loss_gr": 0.0028068076353520155
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.0077017745934426785,
+    "loss_gr": 0.002921514678746462
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.009808267466723919,
+    "loss_gr": 0.004468023311346769
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.007949002087116241,
+    "loss_gr": 0.003092190483585
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.032186344265937805,
+    "loss_gr": 0.017536336556077003
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.00829885620623827,
+    "loss_gr": 0.0033336312044411898
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.04314044490456581,
+    "loss_gr": 0.022689927369356155
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.6000000000000001,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.04300579056143761,
+    "loss_gr": 0.022310124710202217
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.007028825581073761,
+    "loss_gr": 0.0024325307458639145
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.009072504937648773,
+    "loss_gr": 0.003939009737223387
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.009397706016898155,
+    "loss_gr": 0.004175196401774883
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.009732844308018684,
+    "loss_gr": 0.004423726815730333
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.015745636075735092,
+    "loss_gr": 0.008979461155831814
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.010207237675786018,
+    "loss_gr": 0.004782812669873238
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.0708971917629242,
+    "loss_gr": 0.04092423617839813
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.010858443565666676,
+    "loss_gr": 0.005266824271529913
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.09179575741291046,
+    "loss_gr": 0.05106780305504799
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.5,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.08953971415758133,
+    "loss_gr": 0.04918438941240311
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.007987987250089645,
+    "loss_gr": 0.0030664631631225348
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.013286460191011429,
+    "loss_gr": 0.007135720923542976
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.013812289573252201,
+    "loss_gr": 0.007541548926383257
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.0143201919272542,
+    "loss_gr": 0.007934240624308586
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.028134724125266075,
+    "loss_gr": 0.018260594457387924
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.014878234826028347,
+    "loss_gr": 0.008389020338654518
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.13461197912693024,
+    "loss_gr": 0.08122748881578445
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.015659691765904427,
+    "loss_gr": 0.008970825001597404
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.16539272665977478,
+    "loss_gr": 0.09670992940664291
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.4,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.1586126983165741,
+    "loss_gr": 0.09165868163108826
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.009910707361996174,
+    "loss_gr": 0.004314830061048269
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.021586382761597633,
+    "loss_gr": 0.013469935394823551
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.02199592813849449,
+    "loss_gr": 0.013806050643324852
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.022348085418343544,
+    "loss_gr": 0.014087673276662827
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.04756424203515053,
+    "loss_gr": 0.032598212361335754
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.022381195798516273,
+    "loss_gr": 0.014170828275382519
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.215614452958107,
+    "loss_gr": 0.1346665322780609
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.022758619859814644,
+    "loss_gr": 0.014420212246477604
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.2533607482910156,
+    "loss_gr": 0.15391600131988525
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.30000000000000004,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.24016179144382477,
+    "loss_gr": 0.1443156599998474
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.012947842478752136,
+    "loss_gr": 0.006268789060413837
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.03326341137290001,
+    "loss_gr": 0.022325750440359116
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.032937392592430115,
+    "loss_gr": 0.022111274302005768
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.032631274312734604,
+    "loss_gr": 0.02190442383289337
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.07014244049787521,
+    "loss_gr": 0.04917527735233307
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.031365767121315,
+    "loss_gr": 0.021020738407969475
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.29665419459342957,
+    "loss_gr": 0.1896665394306183
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.030783912166953087,
+    "loss_gr": 0.020513711497187614
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.3380283713340759,
+    "loss_gr": 0.21069534122943878
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.2,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.3177044987678528,
+    "loss_gr": 0.19587956368923187
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.016100503504276276,
+    "loss_gr": 0.008280226029455662
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.04403959587216377,
+    "loss_gr": 0.030445188283920288
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.0427187941968441,
+    "loss_gr": 0.029490921646356583
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.041576214134693146,
+    "loss_gr": 0.02865695022046566
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.0885142907500267,
+    "loss_gr": 0.06264876574277878
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.03884031996130943,
+    "loss_gr": 0.026677628979086876
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.35684072971343994,
+    "loss_gr": 0.23117698729038239
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.03722758591175079,
+    "loss_gr": 0.02535558119416237
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.3994591534137726,
+    "loss_gr": 0.2525855302810669
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.1,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.37349560856819153,
+    "loss_gr": 0.23353275656700134
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 1,
+    "loss": 0.01749434322118759,
+    "loss_gr": 0.009161736816167831
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 2,
+    "loss": 0.04847584292292595,
+    "loss_gr": 0.033775221556425095
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 3,
+    "loss": 0.04667281359434128,
+    "loss_gr": 0.032464876770973206
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 4,
+    "loss": 0.0451446957886219,
+    "loss_gr": 0.03133923560380936
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 5,
+    "loss": 0.09563447535037994,
+    "loss_gr": 0.06785102933645248
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 6,
+    "loss": 0.04176808148622513,
+    "loss_gr": 0.028882015496492386
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 7,
+    "loss": 0.37909966707229614,
+    "loss_gr": 0.2466888427734375
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 8,
+    "loss": 0.03970041498541832,
+    "loss_gr": 0.027209023013710976
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 9,
+    "loss": 0.42194664478302,
+    "loss_gr": 0.268017441034317
+  },
+  {
+    "project noise": false,
+    "clipping": false,
+    "stochasticity": 0.0,
+    "noise stddev": "squared",
+    "steps skip type": "uniform",
+    "K": 10,
+    "loss": 0.39382708072662354,
+    "loss_gr": 0.24734842777252197
+  }
+]

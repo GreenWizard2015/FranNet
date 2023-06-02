@@ -167,3 +167,19 @@ def CFakeObject(**kwargs):
   # create a namedtuple with the given kwargs
   from collections import namedtuple
   return namedtuple('CFakeObject', kwargs.keys())(**kwargs)
+
+# Ugly static class to load/save json
+class JSONHelper:
+  @staticmethod
+  def load(path):
+    assert os.path.exists(path), 'File not found: %s' % path
+    with open(path, 'r') as f:
+      return json.load(f)
+    return
+  
+  @staticmethod
+  def save(path, data):
+    with open(path, 'w') as f:
+      json.dump(data, f, indent=2)
+    return
+  
