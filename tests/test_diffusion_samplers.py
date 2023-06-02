@@ -137,3 +137,18 @@ def test_DDIM_noiseProjection(stochasticity, K):
 
   tf.debugging.assert_near(A, B, atol=1e-6)
   return
+
+# verify that stochasticity has an effect even if noise is zero
+def test_DDIM_stochasticity_effect():
+  schedule = CDPDiscrete( beta_schedule=get_beta_schedule('linear'), noise_steps=10 )
+  model = _fake_model(schedule.noise_steps)
+  x, fakeModel = model['x'], model['fakeModel']
+
+  ddimA = _fake_DDIM(stochasticity=0.0, K=1)
+  ddimB = _fake_DDIM(stochasticity=1.0, K=1)
+
+  A = ddimA.sample(value=x, model=fakeModel, schedule=schedule)
+  B = ddimB.sample(value=x, model=fakeModel, schedule=schedule)
+
+  tf.debugging.assert_greater(tf.reduce_mean(tf.abs(A - B)), 1e-3)
+  return
