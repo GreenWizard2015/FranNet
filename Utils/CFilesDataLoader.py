@@ -7,7 +7,8 @@ class CFilesDataLoader:
   def __init__(self, files, targetSize, srcSize, batch_size=1, isRGB=False, normalize=True):
     self._isRGB = isRGB
     self._normalize = normalize
-    self._files = files
+    # sort files alphabetically to ensure consistent order
+    self._files = sorted(files)
     self._targetSize = targetSize
     self._srcSize = srcSize
     self._batch_size = batch_size
