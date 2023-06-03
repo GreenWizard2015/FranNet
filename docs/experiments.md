@@ -1,8 +1,8 @@
 # Experiments
 
-In the [README.md](../README.md) file, you can find a brief overview of the current setup, dataset description, and baselines.
+In [this note](current-setup.md) you can find a brief overview of the current setup and dataset description.
 
-> **DISCLAIMER/WARNING: The purpose of this project is primarily exploratory, and it is not feasible to achieve any form of photorealism due to severe resource limitations. As a result, the practical applicability of the project is currently limited. The neural network utilized in this project has been designed with fewer than 600,000 parameters, leading to a reduction in overall quality. It is important to note that all experiments were constrained to 15 training epochs (2-3 hours on Google Colab using Tesla T4 GPU).**
+While working on the project, I encountered various aspects, including the ease of conducting experiments. All parts of the neural network are implemented in a highly flexible manner and configured through JSON. Integration with [Weights&Biases](https://wandb.ai/green_wizard/FranNet) is also implemented.
 
 The [configs/experiments](../configs/experiments) folder contains the configuration files for the experiments, along with some optional customizations for them. You can start the training process for an experiment using the following command:
 ```
@@ -46,7 +46,7 @@ Models to be trained:
   - [ ] With complex encoder
 - [ ] Diffusion restorator
   - [ ] DDPM sampler (save each epoch to cherry-pick the best one later for DDIM sampler)
-    - [ ] Basic
+    - [x] Basic
     - [ ] With halton quasi-random noise
     - [ ] With loss weighting
   - [ ] DDIM sampler
@@ -59,12 +59,13 @@ Studies to be conducted:
 
 - [x] [Compare with and without masking](masking-ablation.md)
 - [ ] Compare with and without complex encoder
-- [ ] Compare different parameters for DDIM sampler, compare with DDPM
+- [x] [Compare different parameters for DDIM sampler, compare with DDPM](diffusion-restorator.md)
 - [ ] Compare different parameters for autoregressive "direction" restorator sampler
 - [ ] Show that ordinary DDIM and autoregressive DDIM are the same, in terms of inference and training
 - [ ] Visualize the trajectories of the color values during the sampling process
 - [ ] Compare different model sizes (**600k**, x4, x16?)
 - [ ] Compare different noise sampling methods (**normal**, halton, resampled)
 - [ ] Try to use quasi-random generator to sample points for training (**uniform**, halton)
-- [ ] Try incorporating additional information into the input image (e.g., applying edge detection and adding the result as an additional channel).
-- [ ] Compare inference time for different models
+- [ ] Investigation of incorporating additional information into the input image, such as edge detection and adding it as an extra channel
+- [ ] Comparison of inference times for different models
+- [ ] Utilization of masks with sizes based on prime numbers

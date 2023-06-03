@@ -140,7 +140,25 @@ def withText(
   cv2.putText(img, text, pos, font, scale, color, thickness)
   return img
 
-def makeGrid(images, columns):
+def withPadding(img, padding, color=(255, 255, 255)):
+  assert len(img.shape) == 3 and img.shape[2] == 3, 'Image must be 3-channel RGB'
+  assert len(color) == 3, 'Color must be 3-channel RGB'
+  # padding is a tuple of (top, bottom, left, right), a tuple of 2 values is interpreted as (top/bottom, left/right)
+  # or a single value
+  paddings = None
+  if isinstance(padding, tuple):
+    if len(padding) == 2:
+      paddings = (padding[0], padding[0], padding[1], padding[1])
+    elif len(padding) == 4:
+      paddings = padding
+  else:
+    paddings = (padding, padding, padding, padding)
+
+  assert paddings is not None, 'Unknown padding: %s' % padding
+  assert len(paddings) == 4, 'Padding must be a tuple of 2 or 4 values'
+  return cv2.copyMakeBorder(img, paddings[0], paddings[1], paddings[2], paddings[3], cv2.BORDER_CONSTANT, value=color)
+
+def makeRows(images, columns, sameSize=False):
   rows = (len(images) + columns - 1) // columns
   gridRows = []
   for i in range(rows):
@@ -148,13 +166,18 @@ def makeGrid(images, columns):
     row = np.concatenate(chunk, axis=1)
     gridRows.append(row)
     continue
+
   # pad last row to make it the same size as others
-  if len(gridRows) > 1:
+  if sameSize and (1 < len(gridRows)):
     lastRow, firstRow = gridRows[-1], gridRows[0]
     if not (lastRow.shape == firstRow.shape):
       padding = np.subtract(firstRow.shape, lastRow.shape)
       padding = tuple([(0, x) for x in padding])
       gridRows[-1] = np.pad(lastRow, padding, mode='constant', constant_values=255)
+  return gridRows
+
+def makeGrid(images, columns):
+  gridRows = makeRows(images, columns, sameSize=True)
   # concatenate rows into a grid
   grid = np.concatenate(gridRows, axis=0)
   return grid

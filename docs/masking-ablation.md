@@ -1,5 +1,7 @@
 # Comparison study of training of single-pass restorator with masking
 
+Before proceeding, it is recommended that you read [this note on masking strategy](masking-note.md) to better understand the following.
+
 In this comparison study, we explore the effectiveness of incorporating masking techniques with different grid sizes (32x32, 16x16, 8x8, and 4x4) during the training process.
 
 ![Single-pass restorator with masking](img/masking-ablation-1.png)

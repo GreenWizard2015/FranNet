@@ -2,7 +2,7 @@ import argparse, os, sys, glob, cv2, numpy as np
 # add the root folder of the project to the path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from Utils.visualize import withText, makeGrid
+from Utils.visualize import withText, makeGrid, makeRows
 
 def imagePreprocessor(args):
   P = args.padding
@@ -17,12 +17,16 @@ def imagePreprocessor(args):
     return img
   return f
 
+def isImage(filename):
+  filename = os.path.basename(filename).lower()
+  if not filename.endswith(('.png', '.jpg')): return False
+  if filename.startswith('panorama'): return False
+  if 'grid.jpg' == filename: return False
+  return True
+
 def process(folder, args):
   # collect images (png or jpg), sort them by name
-  files = [
-    f for f in glob.glob(os.path.join(folder, '*.*')) 
-    if f.lower().endswith(('.png', '.jpg')) and not f.lower().endswith(('grid.jpg', 'panorama.jpg'))
-  ]
+  files = [f for f in glob.glob(os.path.join(folder, '*.*')) if isImage(f)]
   files.sort()
   # load images
   preprocessor = imagePreprocessor(args)
@@ -66,8 +70,14 @@ def main(args):
     continue
 
   if args.panorama:
-    panorama = makeGrid(panorama, columns=min(args.panoramaColumns or args.columns, len(panorama)))
-    cv2.imwrite(os.path.join(folder, 'panorama.jpg'), panorama)
+    panoramaColumns = min(args.panoramaColumns or args.columns, len(panorama))
+    if args.panoramaSplitRows:
+      panoramaRows = makeRows(panorama, columns=panoramaColumns)
+      for i, rowImage in enumerate(panoramaRows):
+        cv2.imwrite(os.path.join(folder, f'panorama-{i}.jpg'), rowImage)
+    else:
+      panorama = makeGrid(panorama, columns=panoramaColumns)
+      cv2.imwrite(os.path.join(folder, 'panorama.jpg'), panorama)
   return
 
 if '__main__' == __name__:
@@ -79,6 +89,7 @@ if '__main__' == __name__:
   parser.add_argument('--text', type=str, help='text to display at the top of the grid (optional)')
   parser.add_argument('--panorama', action='store_true', help='create a panorama instead of a grid')
   parser.add_argument('--panoramaColumns', type=int, default=50, help='number of columns in the panorama')
+  parser.add_argument('--panoramaSplitRows', action='store_true', help='split panorama into rows')
 
   args = parser.parse_args()
   # used for creating an illustrations
