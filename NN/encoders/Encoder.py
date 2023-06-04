@@ -10,10 +10,7 @@ def createEncoderHead(
   localContext, globalContext,
   name
 ):
-  assert(
-    isinstance(downsampleSteps, list) and (0 < len(downsampleSteps)),
-    'downsampleSteps must be a list of integers'
-  )
+  assert isinstance(downsampleSteps, list) and (0 < len(downsampleSteps)), 'downsampleSteps must be a list of integers'
   data = L.Input(shape=(imgWidth, imgWidth, channels))
   
   res = data
