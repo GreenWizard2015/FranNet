@@ -90,4 +90,19 @@ class CWBProject:
   def runs(self, filters=None):
     runs = self._api.runs(self._projectId, filters=filters)
     return [CWBRun(self._projectId + '/' + run.id, self._api, self._tmpFolder) for run in runs]
+  
+  def groups(self, onlyBest=False):
+    runs = self.runs()
+    # group runs by name
+    groups = {}
+    for run in runs:
+      name = run.name
+      if name not in groups: groups[name] = []
+      groups[name].append(run)
+      continue
+
+    if onlyBest: # select only best runs
+      groups = {k: min(v, key=lambda x: x.bestLoss) for k, v in groups.items()}
+      
+    return groups
 # End of CWBProject
