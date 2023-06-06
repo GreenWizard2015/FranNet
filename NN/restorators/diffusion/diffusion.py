@@ -23,10 +23,17 @@ class CGaussianDiffusion(IRestorationProcess):
     return
   
   def _extractTime(self, kwargs):
-    if 'T' in kwargs:
-      return self._schedule.to_discrete(kwargs['T']), kwargs['T']
-    
-    return self._schedule.to_discrete(kwargs['t']), kwargs['t']
+    continuousT = kwargs.get('T', None)
+    discreteT = kwargs.get('t', None)
+    if continuousT is None:
+      assert discreteT is not None, 'Either T or t must be provided'
+      continuousT = self._schedule.to_continuous(discreteT)
+      
+    if discreteT is None:
+      assert continuousT is not None, 'Either T or t must be provided'
+      discreteT = self._schedule.to_discrete(continuousT)
+
+    return discreteT, continuousT
   
   def _forwardStep(self, x0, noise, **kwargs):
     t, T = self._extractTime(kwargs)
