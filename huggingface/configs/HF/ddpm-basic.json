@@ -1,0 +1,30 @@
+{
+  "inherit": "configs/basic.json",
+  "huggingface": {
+    "name": "Basic diffusion model (Best loss: 0.00637)",
+    "wandb": "green_wizard/FranNet/2ambitvn",
+    "description": "FranNet trained on 2ambitvn",
+    "kind": "diffusion"
+  },
+  "model": {
+    "restorator": {
+      "inherit": "configs/models/restorator/ddpm.json",
+      "sampler": {
+        "name": "DDIM",
+        "noise stddev": "normal",
+        "clipping": null,
+        "project noise": false,
+        "steps skip type": {
+          "name": "uniform",
+          "K": 1
+        },
+        "stochasticity": 1.0
+      },
+      "schedule": {
+        "name": "discrete",
+        "beta schedule": "cosine",
+        "timesteps": 100
+      }
+    }
+  }
+}

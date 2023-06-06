@@ -45,11 +45,10 @@ Models to be trained:
     - [x] Other grid sizes
   - [ ] With complex encoder
 - [ ] Diffusion restorator
-  - [ ] DDPM sampler (save each epoch to cherry-pick the best one later for DDIM sampler)
+  - [ ] DDPM sampler (save each epoch to cherry-pick the best one later for each parameters set of the DDIM sampler)
     - [x] Basic
     - [ ] With halton quasi-random noise
     - [ ] With loss weighting
-  - [ ] DDIM sampler
 - [ ] Autoregressive restorator
   - [ ] Direction
   - [ ] DDIM extended
@@ -69,3 +68,9 @@ Studies to be conducted:
 - [ ] Investigation of incorporating additional information into the input image, such as edge detection and adding it as an extra channel
 - [ ] Comparison of inference times for different models
 - [ ] Utilization of masks with sizes based on prime numbers
+- [ ] Compare learnable time encoding with cosine time encoding
+- [ ] Study the impact of encoder architecture (complex encoder, attention, transformers, MLP mixers, backbone networks)
+- [ ] Study the impact of decoder architecture (shared/autoregressive blocks, single MLP block)
+- [ ] Training on CelebA-HQ dataset (input size 64x64, but the supervised loss is calculated on 1024x1024, instead of 178x178)
+- [ ] Stronger augmentations (shifts, scaling, blurring)
+- [ ] Train diffusion restorator until convergence (instead of 15 epochs) and check the influence of the `noise projection` parameter
