@@ -40,10 +40,11 @@ class CARSamplingAlgorithm(ISamplingAlgorithm):
   
   def _makeStep(self, current_step, xt, **kwargs):
     noise_provider = kwargs.get('noiseProvider', self._noiseProvider)
-    stepV = self._steps.at(current_step, **kwargs)
+    steps = kwargs.get('steps', self._steps)
+    stepV = steps.at(current_step, **kwargs)
     noise = noise_provider(shape=tf.shape(xt), sigma=tf.sqrt(stepV.variance))
 
-    active = current_step < self._steps.limit
+    active = current_step < steps.limit
     args = {}
     threshold = kwargs.get('threshold', self._threshold)
     if not(threshold is None):
@@ -78,14 +79,16 @@ class CARSamplingAlgorithm(ISamplingAlgorithm):
     )
 
   def inference(self, model, step, interpolant, **kwargs):
+    steps = kwargs.get('steps', self._steps)
     threshold = kwargs.get('threshold', self._threshold)
     mask = None if threshold is None else step.mask
-    stepV = self._steps.at(step.current_step, **kwargs)
+    stepV = steps.at(step.current_step, **kwargs)
     inference = interpolant.inference(xT=step.xt, T=stepV.T)
     return model(x=inference['xT'], t=inference['T'], mask=mask, **kwargs)
   
   def solve(self, x_hat, step, value, interpolant, **kwargs):
-    stepV = self._steps.at(step.current_step, **kwargs)
+    steps = kwargs.get('steps', self._steps)
+    stepV = steps.at(step.current_step, **kwargs)
     xt = step.xt
     threshold = kwargs.get('threshold', self._threshold)
     if not(threshold is None):
