@@ -12,4 +12,6 @@
 - [Elucidating the Design Space of Diffusion-Based Generative Models](https://arxiv.org/abs/2206.00364) (arXiv)
 - [What Do Self-Supervised Vision Transformers Learn?](https://arxiv.org/abs/2305.00729) (arXiv)
 
+- [Gradio tutorial (Build machine learning applications)](https://www.machinelearningnuggets.com/gradio-tutorial/)
+
 Many papers on this and other topics can be found in [my reading list](https://green-wizard.vercel.app/notes/ml-reading-list).

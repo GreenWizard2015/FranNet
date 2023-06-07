@@ -41,7 +41,7 @@ class CARSamplingAlgorithm(ISamplingAlgorithm):
   def _makeStep(self, current_step, xt, **kwargs):
     noise_provider = kwargs.get('noiseProvider', self._noiseProvider)
     stepV = self._steps.at(current_step, **kwargs)
-    noise = noise_provider(tf.shape(xt), stepV.variance)
+    noise = noise_provider(shape=tf.shape(xt), sigma=tf.sqrt(stepV.variance))
 
     active = current_step < self._steps.limit
     args = {}
