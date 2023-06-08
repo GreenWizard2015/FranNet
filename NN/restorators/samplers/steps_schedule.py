@@ -17,7 +17,7 @@ class CProcessStepsDecayed:
   
   def at(self, step, **kwargs):
     current = self._at(step, **kwargs)
-    prevT = self._at(step - 1, **kwargs)
+    prevT = self._at(step + 1, **kwargs)
     return CFakeObject(
       T=current,
       prevT=prevT,
