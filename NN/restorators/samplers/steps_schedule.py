@@ -19,7 +19,6 @@ class CProcessStepsDecayed:
     current = self._at(step, **kwargs)
     prevT = self._at(step - 1, **kwargs)
     return CFakeObject(
-      variance=prevT,
       T=current,
       prevT=prevT,
     )

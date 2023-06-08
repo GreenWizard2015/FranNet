@@ -1,15 +1,15 @@
 import tensorflow as tf
 from Utils.utils import CFakeObject
+import NN.utils as NNU
 from .CBasicInterpolantSampler import CBasicInterpolantSampler, ISamplingAlgorithm
 from NN.restorators.samplers.steps_schedule import CProcessStepsDecayed
 
-# TODO: adjust variance based on the "distance" between steps prevT and prevT - 1
 class CARSamplingAlgorithm(ISamplingAlgorithm):
-  def __init__(self, noiseProvider, steps, threshold):
+  def __init__(self, noiseProvider, steps, threshold, convergeThreshold):
     self._noiseProvider = noiseProvider
     self._steps = steps
-    threshold = float(threshold)
     self._threshold = threshold if 0.0 < threshold else None
+    self._convergeThreshold = convergeThreshold if 0.0 < convergeThreshold else None
     return
   
   # crate a closure that will be used to update the state of the algorithm
@@ -48,10 +48,32 @@ class CARSamplingAlgorithm(ISamplingAlgorithm):
       return tf.boolean_mask(step.xt, step.mask, axis=0)
     return currentValueF
   
-  def _makeStep(self, current_step, xt, params, **kwargs):
+  # crate a closure that will be used to postprocess the value
+  @staticmethod
+  def _postprocessHandler(convergeThreshold):
+    if convergeThreshold is None: # disabled
+      def F(x_prev, goalDist, deltaDist, **kwargs):
+        return CFakeObject(
+          x_prev=x_prev,
+          goalDist=goalDist,
+          deltaDist=deltaDist,
+        )
+      return F
+    
+    # converge if the distance to the goal is less than the threshold
+    def postprocessF(x_prev, solved, goalDist, deltaDist, **kwargs):
+      mask = goalDist < convergeThreshold
+      return CFakeObject(
+        x_prev=tf.where(mask, solved.x0, x_prev),
+        # mark as converged
+        goalDist=tf.where(mask, 0.0, goalDist),
+        deltaDist=tf.where(mask, 0.0, deltaDist),
+      )
+    return postprocessF
+  
+  def _makeStep(self, current_step, xt, params, sigma, **kwargs):
     params = CFakeObject(**params)
-    stepV = params.steps.at(current_step, **kwargs)
-    noise = params.noise_provider(shape=tf.shape(xt), sigma=tf.sqrt(stepV.variance))
+    noise = params.noise_provider(shape=tf.shape(xt), sigma=sigma)
 
     state = params.state(current_step=current_step, xt=xt, **kwargs)
     return CFakeObject(
@@ -68,6 +90,10 @@ class CARSamplingAlgorithm(ISamplingAlgorithm):
     noise_provider = kwargs.get('noiseProvider', self._noiseProvider)
     steps = kwargs.get('steps', self._steps)
     threshold = kwargs.get('threshold', self._threshold)
+    if not(threshold is None): threshold = tf.cast(threshold, tf.float32)
+
+    convergeThreshold = kwargs.get('convergeThreshold', self._convergeThreshold)
+    if not(convergeThreshold is None): convergeThreshold = tf.cast(convergeThreshold, tf.float32)
 
     kwargs = dict(
       **kwargs,
@@ -78,24 +104,36 @@ class CARSamplingAlgorithm(ISamplingAlgorithm):
         state=self._stateHandler(steps=steps, threshold=threshold),
         updateValue=self._updateValueHandler(threshold=threshold),
         currentValue=self._currentValueHandler(threshold=threshold),
+        postprocess=self._postprocessHandler(convergeThreshold),
       )
     )
-    return self._makeStep(current_step=0, mask=mask, xt=value, **kwargs), kwargs
+    return(
+      self._makeStep(
+        current_step=0, mask=mask, xt=value, 
+        sigma=tf.zeros((B, 1)), # no noise at the first step, because value is already noisy
+        **kwargs
+      ), 
+      kwargs
+    )
   
   def nextStep(self, step, value, solution, params, **kwargs):
     paramsRaw = params
     params = CFakeObject(**paramsRaw)
+    maskedIndices = tf.where(step.mask)
     # mask out the values that are already converged
     if not(params.threshold is None):
-      diff = tf.abs(value - solution.value)
-      kwargs = dict(
-        **kwargs,
-        mask=tf.reduce_any(params.threshold < diff, axis=-1)
-      )
+      submask = params.threshold < tf.reshape(solution.deltaDist, (-1, ))
+      mask = tf.tensor_scatter_nd_update(step.mask, maskedIndices, submask)
+      kwargs = dict(**kwargs, mask=mask)
 
+    B = tf.shape(value)[0]
+    sigma = solution.deltaDist / 4.0
+    # expand sigma shape to match the batch size
+    sigma = tf.tensor_scatter_nd_update(tf.zeros((B, 1)), maskedIndices, sigma)
     return self._makeStep(
       current_step=step.current_step + 1,
       xt=solution.value,
+      sigma=sigma,
       params=paramsRaw,
       **kwargs
     )
@@ -117,23 +155,37 @@ class CARSamplingAlgorithm(ISamplingAlgorithm):
     x_prev = interpolant.interpolate(x0=solved.x0, x1=solved.x1, t=stepV.prevT)
     tf.assert_equal(tf.shape(x_prev), tf.shape(x_hat))
 
+    _, deltaDist = NNU.normVec(xt - x_prev)
+    _, goalDist = NNU.normVec(x_prev - solved.x0)
+
+    postprocessed = params.postprocess(
+      x_prev=x_prev, value=value, step=step,
+      deltaDist=deltaDist, goalDist=goalDist, solved=solved,
+      **kwargs
+    )
+    x_prev = postprocessed.x_prev
+    deltaDist = postprocessed.deltaDist
+    goalDist = postprocessed.goalDist
     # return solution and additional information for debugging
     return CFakeObject(
       value=params.updateValue(x_prev=x_prev, value=value, step=step),
       x0=solved.x0,
       x1=solved.x1,
       current_step=step.current_step,
+      deltaDist=deltaDist,
+      goalDist=goalDist,
     )
 # End of CARSamplingAlgorithm
 
 class CARSampler(CBasicInterpolantSampler):
-  def __init__(self, interpolant, noiseProvider, steps, threshold):
+  def __init__(self, interpolant, noiseProvider, steps, threshold, convergeThreshold):
     super().__init__(
       interpolant=interpolant,
       algorithm=CARSamplingAlgorithm(
         noiseProvider=noiseProvider,
         steps=steps,
         threshold=threshold,
+        convergeThreshold=convergeThreshold,
       )
     )
     return
@@ -153,6 +205,7 @@ def autoregressive_sampler_from_config(config):
     interpolant=interpolant_from_config(config['interpolant']),
     noiseProvider=noise_provider_from_config(config['noise provider']),
     threshold=config['threshold'],
+    convergeThreshold=config.get('converge threshold', 0.0),
     steps=CProcessStepsDecayed(
       start=steps['start'],
       end=steps['end'],
