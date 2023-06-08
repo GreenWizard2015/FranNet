@@ -11,7 +11,8 @@ class CDirectionInterpolant(IInterpolant):
     return x0 + (x1 - x0) * t
   
   def solve(self, x_hat, xt, t, **kwargs):
-    return CFakeObject(x0=xt + x_hat, x1=x_hat)
+    # x_hat is the direction towards x0
+    return CFakeObject(x0=xt + x_hat, x1=xt)
   
   def train(self, x0, x1, T):
     xt = x1
