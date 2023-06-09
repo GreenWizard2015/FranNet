@@ -75,19 +75,13 @@ class CNerf2D(CBaseModel):
     return (pos * scale) + shift
 
   @tf.function
-  def call(self, 
-    src,
-    size=32, scale=1.0, shift=0.0, batchSize=None,
-    reverseArgs=None
-  ):
+  def inference(self, src, pos, batchSize=None, reverseArgs=None):
+    N = tf.shape(pos)[0]
+    tf.assert_equal(tf.shape(pos), (N, 2), "pos must be a 2D tensor of shape (N, 2)")
+
     src = ensure4d(src)
     B = tf.shape(src)[0]
     encoded = self._encoder(src, training=False)
-
-    pos = self._prepareGrid(size, scale, shift)
-    N = tf.shape(pos)[0]
-    tf.assert_equal(N, size * size) # just in case
-    tf.assert_equal(tf.shape(pos), (N, 2))
 
     def getChunk(ind, sz):
       posC = pos[ind:ind+sz]
@@ -105,12 +99,31 @@ class CNerf2D(CBaseModel):
       tf.assert_equal(tf.shape(latents)[:1], (B * sz,))
       return(latents, posC, reverseArgs)
 
-    probes = self._renderer.batched(
+    return self._renderer.batched(
       ittr=getChunk,
       B=B, N=N,
       batchSize=batchSize,
       training=False
     )
+  
+  @tf.function
+  def call(self, 
+    src,
+    size=32, scale=1.0, shift=0.0, # required be a default arguments for building the model
+    pos=None,
+    batchSize=None, # renderers batch size
+    reverseArgs=None,
+  ):
+    if pos is None:
+      pos = self._prepareGrid(size, scale, shift)
+      tf.assert_equal(tf.shape(pos), (size * size, 2)) # just in case
+    
+    probes = self.inference(
+      src=src, pos=pos,
+      batchSize=batchSize,
+      reverseArgs=reverseArgs
+    )
+    B = tf.shape(src)[0]
     C = tf.shape(probes)[-1]
     return tf.reshape(probes, (B, size, size, C))
   
