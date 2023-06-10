@@ -76,12 +76,15 @@ class CNerf2D(CBaseModel):
 
   @tf.function
   def inference(self, src, pos, batchSize=None, reverseArgs=None):
+    if reverseArgs is None: reverseArgs = {}
+    encoderParams = reverseArgs.get("encoder", {})
+
     N = tf.shape(pos)[0]
     tf.assert_equal(tf.shape(pos), (N, 2), "pos must be a 2D tensor of shape (N, 2)")
 
     src = ensure4d(src)
     B = tf.shape(src)[0]
-    encoded = self._encoder(src, training=False)
+    encoded = self._encoder(src, training=False, params=encoderParams)
 
     def getChunk(ind, sz):
       posC = pos[ind:ind+sz]
@@ -94,7 +97,7 @@ class CNerf2D(CBaseModel):
       latents = self._encoder.latentAt(
         encoded=encoded,
         pos=tf.reshape(posC, (B, sz, 2)),
-        training=False
+        training=False, params=encoderParams
       )
       tf.assert_equal(tf.shape(latents)[:1], (B * sz,))
       return(latents, posC, reverseArgs)
