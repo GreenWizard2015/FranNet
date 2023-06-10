@@ -66,7 +66,10 @@ class CEncoder(tf.keras.Model):
   def call(self, src, training=None):
     return self._encoderHead(src, training=training)
 
-  def latentAt(self, encoded, pos, training=None):
+  def latentAt(self,
+    encoded, pos, training=None,
+    decoder=None # parameters for ablation study
+  ):
     B = tf.shape(pos)[0]
     N = tf.shape(pos)[1]
     tf.assert_equal(tf.shape(pos), (B, N, 2))
@@ -81,6 +84,18 @@ class CEncoder(tf.keras.Model):
     if not(self._contextDropout is None):
       context = self._contextDropout(context[None], training=training)[0]
       localCtx = self._contextDropout(localCtx[None], training=training)[0]
+
+    # ablation study
+    if not(decoder is None):
+      noLocalCtx = decoder.get('no local context', False)
+      noGlobalCtx = decoder.get('no global context', False)
+      if noLocalCtx:
+        localCtx = tf.zeros_like(localCtx)
+
+      if noGlobalCtx:
+        context = tf.zeros_like(context)
+      pass
+
     return self._combine(
       context=context, localCtx=localCtx,
       B=B, N=N, M=M

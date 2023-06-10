@@ -21,14 +21,19 @@ class Renderer(tf.keras.Model):
     self._timeEncoder = timeEncoder
     return
 
+  # only for training and building, during inference use 'batched' method
   def call(self, latents, pos, T, V):
     pos = self._posEncoder(pos)
     T = self._timeEncoder(T)
     res = self._decoder(latents, pos, T, V)
     return res
 
-  def _invD(self, latents, pos, reverseArgs=None, training=False):
-    B = tf.shape(pos)[0]
+  def _invD(self, latents, pos, reverseArgs, training):
+    decoderArgs = reverseArgs.get('decoder', {})
+    # for ablation study of the decoder, randomize positions BEFORE encoding
+    if decoderArgs.get('randomize positions', False):
+      pos = tf.random.uniform(tf.shape(pos), minval=0.0, maxval=1.0)
+
     EPos = self._posEncoder(pos, training=training)
 
     def denoiser(x, t, mask=None):
@@ -40,11 +45,11 @@ class Renderer(tf.keras.Model):
           tf.boolean_mask(t, mask),
           tf.boolean_mask(x, mask)
         )
-      return self._decoder(*args, training=training)
+
+      return self._decoder(*args, training=training, **decoderArgs)
     
-    reverseArgs = {} if reverseArgs is None else reverseArgs
     return self._restorator.reverse(
-      value=(B, ),
+      value=(tf.shape(pos)[0], ),
       denoiser=denoiser,
       modelT=lambda t: self._timeEncoder(t, training=training),
       **reverseArgs
