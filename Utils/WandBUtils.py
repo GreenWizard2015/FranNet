@@ -43,7 +43,11 @@ class CWBRun:
   @property
   @lru_cache(maxsize=1)
   def bestLoss(self):
-    return min([x['val_loss'] for x in self.history()])
+    try:
+      return min([x['val_loss'] for x in self.history()])
+    except:
+      return float('inf') # no history
+    return
   
   @lru_cache(maxsize=1)
   def history(self):
