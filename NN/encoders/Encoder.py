@@ -68,7 +68,7 @@ class CEncoder(tf.keras.Model):
 
   def latentAt(self,
     encoded, pos, training=None,
-    decoder=None # parameters for ablation study
+    encoderSettings=None # parameters for ablation study
   ):
     B = tf.shape(pos)[0]
     N = tf.shape(pos)[1]
@@ -86,14 +86,13 @@ class CEncoder(tf.keras.Model):
       localCtx = self._contextDropout(localCtx[None], training=training)[0]
 
     # ablation study
-    if not(decoder is None):
-      noLocalCtx = decoder.get('no local context', False)
-      noGlobalCtx = decoder.get('no global context', False)
-      if noLocalCtx:
-        localCtx = tf.zeros_like(localCtx)
+    if not(encoderSettings is None):
+      noLocalCtx = encoderSettings.get('no local context', False)
+      noGlobalCtx = encoderSettings.get('no global context', False)
+      assert not(noLocalCtx and noGlobalCtx), 'can\'t drop both local and global context at the same time'
 
-      if noGlobalCtx:
-        context = tf.zeros_like(context)
+      if noLocalCtx: localCtx = tf.zeros_like(localCtx)
+      if noGlobalCtx: context = tf.zeros_like(context)
       pass
 
     return self._combine(

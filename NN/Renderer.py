@@ -47,7 +47,7 @@ class Renderer(tf.keras.Model):
           tf.boolean_mask(x, mask)
         )
 
-      return self._decoder(*args, training=training, **decoderArgs)
+      return self._decoder(*args, training=training, encoderSettings=reverseArgs.get('decoder', {}))
     
     return self._restorator.reverse(
       value=(tf.shape(pos)[0], ),
