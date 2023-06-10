@@ -29,6 +29,7 @@ class Renderer(tf.keras.Model):
     return res
 
   def _invD(self, latents, pos, reverseArgs, training):
+    reverseArgs = {} if reverseArgs is None else reverseArgs
     decoderArgs = reverseArgs.get('decoder', {})
     # for ablation study of the decoder, randomize positions BEFORE encoding
     if decoderArgs.get('randomize positions', False):
@@ -73,7 +74,7 @@ class Renderer(tf.keras.Model):
     index = NBatches * stepBy
 
     data = ittr(index, N - index)
-    V = self._invD(*data)
+    V = self._invD(*data, training=training)
     C = tf.shape(V)[-1]
 
     w = N - index
