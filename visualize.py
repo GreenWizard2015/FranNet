@@ -92,7 +92,8 @@ def modelsFromArgs(args, config):
     model = model_from_config(config['model'])
     model.load_weights(args.model)
     print('Model loaded successfully.')
-    return [(model, None, config)]
+    yield (model, None, config)
+    return
   # otherwise from wandb project
   project = CWBProject(args.wandb_project)
 
