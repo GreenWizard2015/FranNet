@@ -20,8 +20,6 @@
       "name": "interpolate",
       "mlp": [256],
       "final activation": "relu"
-    },
-    "combine method": "concat",
-    "context dropout": 0.0
+    }
   }
 }

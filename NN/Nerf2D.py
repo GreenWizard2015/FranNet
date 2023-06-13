@@ -10,40 +10,59 @@ class CNerf2D(CBaseModel):
     self._restorator = restorator
     self.samplesN = samplesN
     return
+
+  def _trainingData(self, encodedSrc, dest):
+    B = tf.shape(dest)[0]
+    C = tf.shape(dest)[-1]
+    N = self.samplesN # number of points sampled from each image
+    
+    # by default, source and target positions are the same
+    srcPos = targetPos = tf.random.uniform((B, N, 2), dtype=tf.float32)
+
+    mainFraction = 10.5
+    if mainFraction < 1.0:
+      NMain = tf.floor(tf.cast(N, tf.float32) * tf.cast(mainFraction, tf.float32))
+      NMain = tf.cast(NMain, tf.int32)
+      # for second part of the points srcPos stays the same, but targetPos is shifted
+      shifts = tf.random.normal((B, N, 2), stddev=1.0 / 3.0)
+      targetPos = tf.concat([
+        srcPos[:, :NMain],
+        srcPos[:, NMain:] + shifts[:, NMain:]
+      ], 1)
+      pass
+
+    tf.assert_equal(tf.shape(targetPos), (B, N, 2))
+    tf.assert_equal(tf.shape(srcPos), (B, N, 2))
+
+    x0 = extractInterpolated(dest, targetPos)
+    # obtain latent vector for each sampled position
+    latents = self._encoder.latentAt(encoded=encodedSrc, pos=srcPos, training=True)
+
+    tf.assert_equal(tf.shape(latents)[:1], (B * N,))
+    tf.assert_equal(tf.shape(targetPos), (B, N, 2))
+    tf.assert_equal(tf.shape(x0), (B, N, C))
+    x0 = tf.reshape(x0, (B * N, C))
+    targetPos = tf.reshape(targetPos, (B * N, 2))
+    latents = tf.reshape(latents, (B * N, -1))
+    return(x0, targetPos, latents)
   
   def train_step(self, data):
     (src, dest) = data
     src = ensure4d(src)
     dest = ensure4d(dest)
     
-    B = tf.shape(src)[0]
-    C = tf.shape(dest)[-1]
-    N = self.samplesN # number of points sampled from each image
     with tf.GradientTape() as tape:
-      pos = tf.random.uniform((B, N, 2), dtype=tf.float32)
-      x0 = extractInterpolated(dest, pos)
-      # obtain latent vector for each sampled position
-      latents = self._encoder.latentAt(
-        encoded=self._encoder(src=src, training=True),
-        pos=pos,
-        training=True
-      )
-      tf.assert_equal(tf.shape(latents)[:1], (B * N,))
-      tf.assert_equal(tf.shape(pos), (B, N, 2))
-      tf.assert_equal(tf.shape(x0), (B, N, C))
-      # flatten the batch dimension
-      pos = tf.reshape(pos, (B * N, 2))
-      latents = tf.reshape(latents, (B * N, -1))
-
+      encodedSrc = self._encoder(src=src, training=True)
+      x0, pos, latents = self._trainingData(encodedSrc, dest)
       loss = self._restorator.train_step(
-        x0=tf.reshape(x0, (B * N, C)),
+        x0=x0,
         model=lambda T, V: self._renderer(
           latents=latents, pos=pos,
           T=T, V=V,
           training=True
         ),
       )
-    
+      
     self.optimizer.minimize(loss, self.trainable_variables, tape=tape)
     self._loss.update_state(loss)
     return self.metrics_to_dict(self._loss)

@@ -27,7 +27,11 @@ class MLPDecoder(tf.keras.Model):
     for block in self._blocks:
       state = tf.concat([initState, res], axis=-1)
       curValue = block(state)
-      res = res + curValue if self._residual else curValue
+
+      if self._residual:
+        res = res + curValue
+      else:
+        res = curValue
       continue
     
     tf.assert_equal(tf.shape(res)[1:], (self._channels, ))

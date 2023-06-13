@@ -1,21 +1,5 @@
 from .Encoder import CEncoder, createEncoderHead
 from .extractors import extractor_from_config
-import tensorflow as tf
-
-def _getCombineMethod(method):
-  def _combine_method_add(context, localCtx, B, N, M):
-    localCtx = tf.reshape(localCtx, (B, N, M))
-    res = context[:, None] + localCtx
-    return tf.reshape(res, (B * N, M))
-  
-  def _combine_method_concat(context, localCtx, B, N, M):
-    context = tf.repeat(context, N, axis=0)
-    res = tf.concat([context, localCtx], axis=-1)
-    return tf.reshape(res, (B * N, 2 * M))
-  
-  if method == 'add': return _combine_method_add
-  if method == 'concat': return _combine_method_concat
-  raise ValueError(f'Unknown combine method: {method}')
 
 def encoder_from_config(config):
   if 'basic' == config['name']:
@@ -37,9 +21,7 @@ def encoder_from_config(config):
       imgWidth=imgWidth,
       channels=config['channels'],
       head=head,
-      extractor=extractor_from_config(mixer['extractor'], latentDim),
-      combiner=_getCombineMethod(mixer['combine method']),
-      contextDropout=mixer['context dropout'],
+      extractor=extractor_from_config(mixer['extractor'], latentDim)
     )
   
   raise ValueError(f"Unknown encoder name: {config['name']}")

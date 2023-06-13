@@ -33,38 +33,52 @@ def createEncoderHead(
     res = L.Conv2D(sz, 3, padding='same', activation='relu')(res)
     continue
 
-  # global context
-  res = L.Conv2D(globalContext['channels'], globalContext['kernel size'], padding='same', activation='relu')(res)
-  latent = L.Flatten()(res)
-  context = sMLP(sizes=globalContext['mlp'], activation='relu', name=name + '/globalMixer')(latent)
-  context = L.Dense(latentDim, activation=globalContext['final activation'])(context)
+  outputs = { 'intermediate': intermediate }
 
-  return tf.keras.Model(
-    inputs=[data], 
-    outputs={
-      'context': context,
-      'intermediate': intermediate
-    },
-    name=name
-  )
+  if not(globalContext is None): # global context
+    res = L.Conv2D(globalContext['channels'], globalContext['kernel size'], padding='same', activation='relu')(res)
+
+    latent = L.Flatten()(res)
+    context = sMLP(sizes=globalContext['mlp'], activation='relu', name=name + '/globalMixer')(latent)
+    context = L.Dense(
+      globalContext.get('latent dimension', latentDim),
+      activation=globalContext['final activation']
+    )(context)
+    outputs['context'] = context # Add context to outputs
+  else: # no global context
+    # return dummy context to keep the interface consistent
+    outputs['context'] = L.Lambda(
+      lambda x: tf.zeros((tf.shape(x)[0], 1), dtype=res.dtype)
+    )(res)
+
+  return tf.keras.Model(inputs=[data], outputs=outputs, name=name)
 
 class CEncoder(tf.keras.Model):
-  def __init__(self, imgWidth, channels, head, extractor, combiner, contextDropout, **kwargs):
+  def __init__(self, imgWidth, channels, head, extractor, **kwargs):
     super().__init__(**kwargs)
     self._imgWidth = imgWidth
     self._channels = channels
 
     self._encoderHead = head(self.name + '/EncoderHead')
     self._extractor = extractor(self.name + '/Extractor')
-    self._combine = combiner
-
-    self._contextDropout = None
-    if 0.0 < contextDropout:
-      self._contextDropout = L.SpatialDropout1D(contextDropout, name=self.name + '/ContextDropout')
     return
 
   def call(self, src, training=None, params=None):
-    return self._encoderHead(src, training=training)
+    res = self._encoderHead(src, training=training)
+    # ablation study of intermediate representations
+    if not(params is None):
+      def applyIntermediateMask(i, x):
+        if params.get('no intermediate {}'.format(i + 1), False): return tf.zeros_like(x)
+        return x
+      
+      intermediate = res['intermediate']
+      res = dict(
+        **res,
+        intermediate=[applyIntermediateMask(i, x) for i, x in enumerate(intermediate)]
+      )
+      pass
+
+    return res
 
   def latentAt(self,
     encoded, pos, training=None,
@@ -75,15 +89,10 @@ class CEncoder(tf.keras.Model):
     tf.assert_equal(tf.shape(pos), (B, N, 2))
     
     localCtx = self._extractor(encoded['intermediate'], pos, training=training)
-    M = localCtx.shape[-1]
     context = encoded['context']
-    tf.assert_equal(tf.shape(context), (B, M))
-    tf.assert_equal(tf.shape(localCtx), (B * N, M))
-    
-    # apply spatial dropout to each context separately
-    if not(self._contextDropout is None):
-      context = self._contextDropout(context[None], training=training)[0]
-      localCtx = self._contextDropout(localCtx[None], training=training)[0]
+    context = tf.repeat(context, N, axis=0)
+    tf.assert_equal(tf.shape(context)[:-1], (B * N,))
+    tf.assert_equal(tf.shape(localCtx)[:-1], (B * N,))
 
     # ablation study
     if not(params is None):
@@ -95,10 +104,13 @@ class CEncoder(tf.keras.Model):
       if noGlobalCtx: context = tf.zeros_like(context)
       pass
 
-    return self._combine(
-      context=context, localCtx=localCtx,
-      B=B, N=N, M=M
-    )
+    tf.assert_equal(tf.shape(context)[:-1], tf.shape(localCtx)[:-1])
+
+    res = tf.concat([context, localCtx], axis=-1)
+    tf.assert_equal(tf.shape(res)[:-1], (B * N,))
+    # just to make sure that the shape is correctly inferred
+    res = tf.ensure_shape(res, (None, context.shape[-1] + localCtx.shape[-1]))
+    return res
   
   def get_input_shape(self):
     return (None, self._imgWidth, self._imgWidth, self._channels)
