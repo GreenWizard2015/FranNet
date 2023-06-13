@@ -71,11 +71,7 @@ class CEncoder(tf.keras.Model):
         if params.get('no intermediate {}'.format(i + 1), False): return tf.zeros_like(x)
         return x
       
-      intermediate = res['intermediate']
-      res = dict(
-        **res,
-        intermediate=[applyIntermediateMask(i, x) for i, x in enumerate(intermediate)]
-      )
+      res['intermediate'] = [applyIntermediateMask(i, x) for i, x in enumerate(res['intermediate'])]
       pass
 
     return res
