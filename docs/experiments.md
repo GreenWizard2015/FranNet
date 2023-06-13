@@ -69,7 +69,13 @@ Studies to be conducted:
 - [ ] Comparison of inference times for different models
 - [ ] Utilization of masks with sizes based on prime numbers
 - [ ] Compare learnable time encoding with cosine time encoding
-- [ ] Study the impact of encoder architecture (complex encoder, attention, transformers, MLP mixers, backbone networks)
+- [ ] Study the impact of encoder architecture
+  - [ ] complex encoder
+  - [ ] attention
+  - [ ] transformers
+  - [ ] MLP mixers
+  - [ ] backbone networks
+  - [ ] batch/group normalization
 - [ ] Study the impact of decoder architecture (shared/autoregressive blocks, single MLP block)
 - [ ] Training on CelebA-HQ dataset (input size 64x64, but the supervised loss is calculated on 1024x1024, instead of 178x178)
 - [ ] Stronger augmentations (shifts, scaling, blurring)
