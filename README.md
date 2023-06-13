@@ -1,6 +1,7 @@
 # Frankenstein Network (FranNet)
 
 > There is a live demo of the project available [here](https://huggingface.co/spaces/GreenWizard2015/FranNet), which allows you to upload your own images and see the results of the network. However, I highly recommend reading the documentation first to understand the limitations of the project.
+> Also, hit "Restart" in case the demo is was stopped due to inactivity.
 
 FranNet is a neural network architecture that combines a CNN encoder with a NeRF-like decoder to perform upscaling, denoising, and colorization of input images. The purpose of this project is to explore the capabilities and limitations of this approach and implement it as a proof of concept. A bit more detailed description of the network can be found in the [overview](docs/overview.md).
 
