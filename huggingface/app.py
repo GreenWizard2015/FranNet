@@ -5,7 +5,7 @@ import numpy as np
 from Utils.CImageProcessor import CImageProcessor
 from HF.UI import AppUI
 from HF.Utils import toPILImage
-from HF.NNHelper import modelsFrom, CNNModel
+from HF.NNHelper import modelsFrom, inference_from_config
 from Utils.WandBUtils import CWBProject
 
 def preprocessImage(image_processor):
@@ -21,10 +21,7 @@ def preprocessImage(image_processor):
   return _preprocessImage
 
 def infer(models, image_processor):
-  def _processImage(modelName, inputImage, targetResolution, **kwargs):
-    targetResolution = int(targetResolution)
-    assert 128 <= targetResolution <= 1024, f'Invalid target resolution: {targetResolution}'
-
+  def _processImage(modelName, inputImage, **kwargs):
     assert isinstance(inputImage, np.ndarray), f'Invalid image type: {type(inputImage)}'
     assert 3 == len(inputImage.shape), f'Invalid image shape: {inputImage.shape}'
     assert np.uint8 == inputImage.dtype, f'Invalid image dtype: {inputImage.dtype}'
@@ -37,7 +34,7 @@ def infer(models, image_processor):
     model = models.get(modelName, None)
     assert model is not None, f'Invalid model name: {modelName}'
 
-    upscaled = model(input, size=targetResolution, **kwargs)
+    upscaled = model(images=input, **kwargs)
     upscaled = image_processor.unnormalizeImg(upscaled).numpy()[0]
     assert 3 == upscaled.shape[-1], f'Invalid image channels: {upscaled.shape[-1]}'
     assert 3 == len(upscaled.shape), f'Invalid image shape: {upscaled.shape}'
@@ -46,33 +43,32 @@ def infer(models, image_processor):
     }
   return _processImage
 
-def SPModels():
-  project = CWBProject('green_wizard/FranNet')
+def run2inference(run, runName=None):
+  if runName is None: runName = run.name
+  runConfig = run.config
+  runName = "%s (%s, loss: %.5f)" % (runName, run.id, run.bestLoss)
+  # add corresponding HF info
+  runConfig['huggingface'] = { "name": runName, "wandb": run.fullId }
+  return inference_from_config(runConfig)
 
+def SPModels(project):
   bestPerGroup = project.groups(onlyBest=True)
-  bestPerGroup = {k: v for k, v in bestPerGroup.items() if 'single-pass' in k.lower()}
-  # convert to models
-  models = {}
-  for runName, run in bestPerGroup.items():
-    runConfig = run.config
-    runName = "%s (%s, loss: %.5f)" % (runName, run.id, run.bestLoss)
-    # add corresponding HF info
-    runConfig['huggingface'] = {
-      "name": runName,
-      "wandb": run.fullId,
-      "kind": "single-pass",
-    }
-    # add to models
-    models[runName] = CNNModel(runConfig)
-    continue
-  return models
+  bestPerGroup = {k: v for k, v in bestPerGroup.items() if k.startswith('Single-pass | ')}
+  for run in bestPerGroup.values():
+    yield run2inference(run)
+  return
 
 def main(args):
+  WBProject = CWBProject('green_wizard/FranNet')
   folder = os.path.dirname(os.path.abspath(__file__))
   # load list of models from the folder "configs"
   models = modelsFrom(os.path.join(folder, 'configs'))
   # add some models from W&B
-  models.update( SPModels() )
+  models.extend( list(SPModels(WBProject)) )
+  models.append( run2inference(WBProject.groups(onlyBest=True)['AR | direction']) )
+
+  # convert to dict
+  models = {model.name: model for model in models}
 
   # Processor used for CelebA
   image_processor = CImageProcessor(

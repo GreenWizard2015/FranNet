@@ -2,7 +2,9 @@ import gradio as gr
 from .commonSettings import commonSettings
 from .singlePassModels import singlePassModels
 from .diffusionModels import diffusionModels
-from .common import markdownFrom
+from .autoregressiveModels import autoregressiveModels
+from .common import markdownFrom, bindClick
+from .ablationArea import ablationArea
 import os
 
 def resultsCollector():
@@ -24,18 +26,48 @@ def resultsCollector():
   
   return onResult, onFinish
 
+def submitsCollector():
+  submitsAreas = []
+
+  def onSubmit(**kwargs):
+    submit = gr.Button(value='Submit')
+    submitsAreas.append((submit, kwargs))
+    return submit
+  
+  def onFinish(settings, upscaledImage, handler):
+    for submit, kwargs in submitsAreas:
+      outputs = kwargs.pop('outputs', {})
+      bindClick(
+        submit, handler,
+        inputs=dict(kwargs, **settings),
+        outputs={'upscaled': upscaledImage, **outputs}
+      )
+      continue
+    return
+  
+  return onSubmit, onFinish
+
 def AppUI(preprocessImage, processImage, models):
-  resultActions, onFinish = resultsCollector()
+  resultActions, onFinishResults = resultsCollector()
+  submitAction, onFinishSubmits = submitsCollector()
   with gr.Blocks() as app:
     markdownFrom(os.path.join(os.path.dirname(__file__), 'markdown', 'about.md'))
     # common settings for all models
     settings = commonSettings(preprocessImage, resultActions)
+    # ablation study area
+    ablationFlags = ablationArea()
     # tabs for each model kind
     gr.Markdown('# Models')
-    modelsKinds = [ singlePassModels, diffusionModels ]
-    for tabFor in modelsKinds:
-      tabFor(processImage, models, commonSettings=settings, resultActions=resultActions)
-      continue
+    with gr.Row():
+      with gr.Column():
+        modelsKinds = [ singlePassModels, diffusionModels, autoregressiveModels ]
+        for tabFor in modelsKinds:
+          tabFor(models, submit=submitAction)
+          continue
+      
+      with gr.Column():
+        upscaledImage = gr.Image(type='pil', label='Upscaled and colorized image', interactive=False)
+        resultActions(upscaledImage)
 
     # results comparison
     # TODO: show from which model each image is
@@ -46,6 +78,11 @@ def AppUI(preprocessImage, processImage, models):
 
       with gr.Column():
         rightImage = gr.Image(type='pil', show_label=False, label='Right image')
-      onFinish(leftImage, rightImage)
+
+      onFinishResults(leftImage, rightImage)
+      onFinishSubmits(
+        dict(**settings, **ablationFlags),
+        upscaledImage, processImage
+      )
       pass
   return app

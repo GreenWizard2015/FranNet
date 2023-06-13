@@ -40,3 +40,10 @@ def markdownFrom(path):
   with open(path, 'r') as f:
     text = f.read()
   return gr.Markdown(text)
+
+def noiseProviderStddev(value=None):
+  if value is None: value = 'normal'
+  return gr.Radio(
+    ['normal', 'squared', 'zero'], label='Noise stddev', interactive=True,
+    value=value
+  )

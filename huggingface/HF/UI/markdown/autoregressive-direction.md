@@ -1,0 +1,1 @@
+This type of model attempts to predict the vector from the current estimated color of a point to the final color. By taking many small steps and iteratively refining the answer, it gradually reaches the final outcome.

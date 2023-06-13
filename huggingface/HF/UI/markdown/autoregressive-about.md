@@ -1,0 +1,1 @@
+Autoregressive models are a vast family of models. They are characterized by iteratively refining their output. By changing the number of steps, the process logic, and other parameters, one can obtain single-pass models, diffusion models, and many other interesting variations.
