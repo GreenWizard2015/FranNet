@@ -1,15 +1,49 @@
 import tensorflow as tf
 from .utils import extractInterpolated, ensure4d, flatCoordsGridTF
 from .CBaseModel import CBaseModel
+from .utils import sample_halton_sequence
 
 class CNerf2D(CBaseModel):
-  def __init__(self, encoder, renderer, restorator, samplesN=256, **kwargs):
+  def __init__(self, 
+    encoder, renderer, restorator,
+    samplesN=256, trainingSampler='uniform',
+    shiftedSamples=None,
+    **kwargs
+  ):
     super().__init__(**kwargs)
     self._encoder = encoder
     self._renderer = renderer
     self._restorator = restorator
     self.samplesN = samplesN
+    self._shiftedSamples = shiftedSamples
+
+    samplers = {
+      'uniform': tf.random.uniform,
+      'halton': lambda shape: sample_halton_sequence(shape[:-1], shape[-1])
+    }
+    assert trainingSampler in samplers, f'Unknown training sampler ({sample_halton_sequence})'
+    self._trainingSampler = samplers[trainingSampler]
     return
+
+  def _getTrainingTargets(self, srcPos, B, N):
+    # TODO: clarify this, make investigation
+    if self._shiftedSamples:
+      mainFraction = 1.0 - self._shiftedSamples['fraction']
+      NMain = tf.floor(tf.cast(N, tf.float32) * tf.cast(mainFraction, tf.float32))
+      NMain = tf.cast(NMain, tf.int32)
+      # for second part of the points srcPos stays the same, but targetPos is shifted
+      shifts = None
+      if 'normal' == self._shiftedSamples['kind']:
+        shifts = tf.random.normal((B, N, 2), stddev=self._shiftedSamples['stddev'])
+      if 'uniform' == self._shiftedSamples['kind']:
+        shifts = tf.random.uniform((B, N, 2)) - srcPos
+
+      return tf.concat([
+        srcPos[:, :NMain], # predict sampled points
+        srcPos[:, NMain:] + shifts[:, NMain:] # predict nearby points
+      ], 1)
+    # predict sampled points
+    return srcPos
 
   def _trainingData(self, encodedSrc, dest):
     B = tf.shape(dest)[0]
@@ -17,19 +51,8 @@ class CNerf2D(CBaseModel):
     N = self.samplesN # number of points sampled from each image
     
     # by default, source and target positions are the same
-    srcPos = targetPos = tf.random.uniform((B, N, 2), dtype=tf.float32)
-
-    mainFraction = 10.5
-    if mainFraction < 1.0:
-      NMain = tf.floor(tf.cast(N, tf.float32) * tf.cast(mainFraction, tf.float32))
-      NMain = tf.cast(NMain, tf.int32)
-      # for second part of the points srcPos stays the same, but targetPos is shifted
-      shifts = tf.random.normal((B, N, 2), stddev=1.0 / 3.0)
-      targetPos = tf.concat([
-        srcPos[:, :NMain],
-        srcPos[:, NMain:] + shifts[:, NMain:]
-      ], 1)
-      pass
+    srcPos = self._trainingSampler((B, N, 2))
+    targetPos = self._getTrainingTargets(srcPos, B, N)
 
     tf.assert_equal(tf.shape(targetPos), (B, N, 2))
     tf.assert_equal(tf.shape(srcPos), (B, N, 2))

@@ -23,7 +23,8 @@ def _nerf_from_config(config):
       encoder=encoder,
       renderer=renderer,
       restorator=restorator,
-      samplesN=config['samplesN']
+      samplesN=config['samplesN'],
+      trainingSampler=config.get('training sampler', 'uniform')
     )
   
   raise ValueError(f"Unknown nerf name: {config['name']}")
