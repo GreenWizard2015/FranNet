@@ -16,6 +16,14 @@ class CNerf2D(CBaseModel):
     self._restorator = restorator
     self.samplesN = samplesN
     self._shiftedSamples = shiftedSamples
+    # validate shifted samples config structure if it is present
+    if shiftedSamples is not None:
+      assert isinstance(shiftedSamples, dict), "shifted samples must be a dict"
+      assert 'kind' in shiftedSamples, "shifted samples must have 'kind' key"
+      assert shiftedSamples['kind'] in ['normal', 'uniform'], "shifted samples kind must be 'normal' or 'uniform'"
+      assert 'fraction' in shiftedSamples, "shifted samples must have 'fraction' key"
+      assert (0.0 <= shiftedSamples['fraction']) and (shiftedSamples['fraction'] <= 1.0), "shifted samples fraction must be in [0, 1]"
+      pass
 
     samplers = {
       'uniform': tf.random.uniform,
