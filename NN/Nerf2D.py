@@ -167,18 +167,26 @@ class CNerf2D(CBaseModel):
     batchSize=None, # renderers batch size
     reverseArgs=None,
   ):
+    B = tf.shape(src)[0]
     if pos is None:
       pos = self._prepareGrid(size, scale, shift)
       tf.assert_equal(tf.shape(pos), (size * size, 2)) # just in case
-    
+      
+      probes = self.inference(
+        src=src, pos=pos,
+        batchSize=batchSize,
+        reverseArgs=reverseArgs
+      )
+      C = tf.shape(probes)[-1]
+      return tf.reshape(probes, (B, size, size, C))
+    # if pos is not None, then we are rendering a custom grid with arbitrary shape
     probes = self.inference(
       src=src, pos=pos,
       batchSize=batchSize,
       reverseArgs=reverseArgs
     )
-    B = tf.shape(src)[0]
-    C = tf.shape(probes)[-1]
-    return tf.reshape(probes, (B, size, size, C))
+    tf.assert_equal(tf.shape(probes), (B, tf.shape(pos)[0], tf.shape(probes)[-1]))
+    return probes
   
   def get_input_shape(self):
     return self._encoder.get_input_shape()
