@@ -14,3 +14,27 @@ def restorator_from_config(config):
     return CSingleStepRestoration(channels=config['channels'])
   
   raise ValueError(f"Unknown restorator name: {name}")
+
+def replace_diffusion_restorator_by_interpolant(config):
+  name = config['name']
+  if 'diffusion' != name: return config
+
+  origSampler = config['sampler']
+  samplerParams = {
+    'name': 'DDIM',
+    'interpolant': dict(name='diffusion'),
+    'noise provider': origSampler['noise stddev'],
+    'schedule': config['schedule'],
+
+    'stochasticity': origSampler.get('stochasticity', 1.0),
+    'clipping': origSampler.get('clipping', None),
+    'steps skip type': origSampler.get('steps skip type', dict(name='uniform', K=1)),
+    'project noise': origSampler.get('project noise', False),
+  }
+
+  return {
+    'channels': config['channels'],
+    'name': 'autoregressive',
+    'sampler': samplerParams,
+    'source distribution': config['source distribution'],
+  }
