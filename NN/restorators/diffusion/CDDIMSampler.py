@@ -51,7 +51,6 @@ class CDDIMSampler(IDiffusionSampler):
   def _reverseStep_float32(self, model, schedule, eta):
     def f(x, t, tPrev):
       predictedNoise = model(x, t)
-      isEndOfDiffusion = tf.equal(t, -1)
       # based on https://github.com/filipbasara0/simple-diffusion/blob/main/scheduler/ddim.py
       # obtain parameters for the current step and previous step
       t = schedule.parametersForT(t)
