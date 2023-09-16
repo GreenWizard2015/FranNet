@@ -1,7 +1,6 @@
 import tensorflow as tf
-from .utils import extractInterpolated, ensure4d, flatCoordsGridTF
+from .utils import extractInterpolated, ensure4d, flatCoordsGridTF, sample_halton_sequence
 from .CBaseModel import CBaseModel
-from .utils import sample_halton_sequence
 
 class CNerf2D(CBaseModel):
   def __init__(self, 
