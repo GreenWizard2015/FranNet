@@ -133,30 +133,10 @@ class CGaussianDiffusion(IRestorationProcess):
       return lambda loss, x_hat, predicted: loss * tf.clip_by_value(x_hat['SNR'], minSNR, maxSNR)
     
     raise ValueError('Unknown loss scaling')
-  
-##########################
-def adjustedTSampling(noise_steps, TShape):
-  # oversample the first few steps, as they are more important
-  index = tf.linspace(0., 1., 1 + noise_steps)[1:]
-  mu = -.1
-  sigma = 1.85
-  pdfA = tf.exp(-tf.square(tf.math.log(index) - mu) / (2. * sigma * sigma))
-  pdfB = index * (sigma * np.sqrt(2. * np.pi))
-  pdf = pdfA / pdfB
-
-  weights = tf.nn.softmax(pdf, axis=-1)[None]
-  res = tf.random.categorical(tf.math.log(weights), tf.math.reduce_prod(TShape))
-  return tf.reshape(res, )
+# End of CGaussianDiffusion
 
 def diffusion_from_config(config):
   name = config['kind'].lower()
-  # TODO: add support for time schedule via source distribution
-  # t_schedule = None
-  # TShedule = config.get('T_schedule', None)
-  # assert TShedule in [None, 'adjusted'], 'Unknown T_schedule'
-  # if 'adjusted' == TShedule:
-  #   t_schedule = adjustedTSampling
-
   if 'ddpm' == name:
     sourceDistributionConfigs = config['source distribution']
     return CGaussianDiffusion(
