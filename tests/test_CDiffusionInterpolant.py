@@ -18,7 +18,6 @@ def _fake_samplers(stochasticity, stepsConfig):
   ddim = diffusion_sampler_from_config({
     'name': 'DDIM',
     'stochasticity': stochasticity,
-    'direction scale': 1.0,
     'noise stddev': 'zero',
     'steps skip type': stepsConfig,
   })
