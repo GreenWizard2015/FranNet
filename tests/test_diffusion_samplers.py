@@ -14,13 +14,12 @@ def _fake_model(noise_steps):
     return fakeNoise + tf.cast(t + 1, tf.float32) * x
   return { 'x': x, 'fakeModel': fakeModel, 'fakeNoise': fakeNoise }
 
-def _fake_DDIM(stochasticity, K, useFloat64=False, noiseProjection=False):
+def _fake_DDIM(stochasticity, K, noiseProjection=False):
   return sampler_from_config({
     'name': 'DDIM',
     'stochasticity': stochasticity,
     'noise stddev': 'zero',
     'steps skip type': { 'name': 'uniform', 'K': K },
-    'use float64': useFloat64,
     'project noise': noiseProjection,
   })
 
@@ -99,20 +98,6 @@ def test_DDPM_eq_DDIM_sample_modelCalls():
   tf.assert_equal(fakeModelB.calls, fakeModelA.calls)
   tf.assert_equal(fakeModelA.calls, schedule.noise_steps)
   tf.assert_equal(fakeModelB.calls, schedule.noise_steps)
-  return
-
-def test_DDIM_float64():
-  schedule = CDPDiscrete( beta_schedule=get_beta_schedule('linear'), noise_steps=10 )
-  model = _fake_model(schedule.noise_steps)
-  x, fakeModel = model['x'], model['fakeModel']
-
-  ddimA = _fake_DDIM(stochasticity=1.0, K=1, useFloat64=False)
-  ddimB = _fake_DDIM(stochasticity=1.0, K=1, useFloat64=True)
-
-  A = ddimA.sample(value=x, model=fakeModel, schedule=schedule)
-  B = ddimB.sample(value=x, model=fakeModel, schedule=schedule)
-
-  tf.debugging.assert_near(A, B, atol=1e-6)
   return
 
 # test that noise projection does not change if noise is zero
