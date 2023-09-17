@@ -43,7 +43,7 @@ def test_DDPM_basic():
 
   sampler = newConfig['sampler']
   assert 1.0 == sampler['stochasticity'], 'Must set stochasticity to 1.0'
-  assert 'nstd' == sampler['noise provider'], 'Must copy the noise stddev and rename it to noise provider'
+  assert 'nstd' == sampler['noise stddev'], 'Must copy the noise stddev'
   assert 'dummy distribution' == newConfig['source distribution'], 'Must copy the source distribution'
   assert 'dummy schedule' == sampler['schedule'], 'Must copy the schedule'
   assert 'dummy clipping' == sampler['clipping'], 'Must copy the clipping'

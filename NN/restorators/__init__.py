@@ -23,7 +23,7 @@ def replace_diffusion_restorator_by_interpolant(config):
   samplerParams = {
     'name': 'DDIM',
     'interpolant': dict(name='diffusion'),
-    'noise provider': origSampler['noise stddev'],
+    'noise stddev': origSampler['noise stddev'],
     'schedule': config['schedule'],
 
     'stochasticity': origSampler.get('stochasticity', 1.0),
