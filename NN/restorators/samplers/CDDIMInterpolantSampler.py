@@ -1,14 +1,16 @@
 import tensorflow as tf
 from Utils.utils import CFakeObject
+from NN.utils import normVec
 from .CBasicInterpolantSampler import CBasicInterpolantSampler, ISamplingAlgorithm
 
 class CDDIMSamplingAlgorithm(ISamplingAlgorithm):
-  def __init__(self, stochasticity, noiseProvider, schedule, steps, clipping):
+  def __init__(self, stochasticity, noiseProvider, schedule, steps, clipping, projectNoise):
     self._stochasticity = stochasticity
     self._noiseProvider = noiseProvider
     self._schedule = schedule
     self._steps = steps
     self._clipping = clipping
+    self._projectNoise = projectNoise
     return
   
   def _makeStep(self, current_step, steps, **kwargs):
@@ -67,21 +69,28 @@ class CDDIMSamplingAlgorithm(ISamplingAlgorithm):
       t=schedule.to_continuous(step.T),
     )
   
+  def _withNoise(self, value, sigma, x0, kwargs):
+    noise_provider = kwargs.get('noiseProvider', self._noiseProvider)
+    noise = noise_provider(shape=tf.shape(value), sigma=sigma)
+    if not kwargs.get('projectNoise', self._projectNoise): return value + noise
+    
+    _, L = normVec(value - x0)
+    vec, _ = normVec(value + noise - x0)
+    return x0 + L * vec # project noise back to the spherical manifold
+  
+  def _withClipping(self, value, kwargs):
+    clipping = kwargs.get('clipping', self._clipping)
+    if clipping is None: return value
+    return tf.clip_by_value(value, clip_value_min=clipping['min'], clip_value_max=clipping['max'])
+
   def solve(self, x_hat, step, value, interpolant, **kwargs):
-    # perform DDIM step
     solved = interpolant.solve(x_hat=x_hat, xt=value, t=step.t)
     x_prev = interpolant.interpolate(
       x0=solved.x0, x1=solved.x1,
       t=step.t_prev, t2=step.t_prev_2
     )
-
-    # add noise
-    noise_provider = kwargs.get('noiseProvider', self._noiseProvider)
-    x_prev = x_prev + noise_provider(shape=tf.shape(x_prev), sigma=step.sigma)
-
-    clipping = kwargs.get('clipping', self._clipping)
-    if clipping is not None:
-      x_prev = tf.clip_by_value(x_prev, clip_value_min=clipping['min'], clip_value_max=clipping['max'])
+    x_prev = self._withNoise(x_prev, sigma=step.sigma, x0=solved.x0, kwargs=kwargs)
+    x_prev = self._withClipping(x_prev, kwargs=kwargs)
     # return solution and additional information for debugging
     return CFakeObject(
       value=x_prev,
@@ -94,7 +103,10 @@ class CDDIMSamplingAlgorithm(ISamplingAlgorithm):
 # End of CDDIMSamplingAlgorithm
 
 class CDDIMInterpolantSampler(CBasicInterpolantSampler):
-  def __init__(self, interpolant, stochasticity, noiseProvider, schedule, steps, clipping):
+  def __init__(
+    self, interpolant,
+    stochasticity, noiseProvider, schedule, steps, clipping, projectNoise
+  ):
     super().__init__(
       interpolant=interpolant,
       algorithm=CDDIMSamplingAlgorithm(
@@ -102,7 +114,8 @@ class CDDIMInterpolantSampler(CBasicInterpolantSampler):
         noiseProvider=noiseProvider,
         schedule=schedule,
         steps=steps,
-        clipping=clipping
+        clipping=clipping,
+        projectNoise=projectNoise
       )
     )
     self._schedule = schedule

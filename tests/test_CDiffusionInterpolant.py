@@ -8,7 +8,10 @@ from NN.restorators.diffusion.diffusion_schedulers import schedule_from_config
 from NN.restorators.samplers import sampler_from_config
 from NN.restorators.interpolants.CDiffusionInterpolant import CDiffusionInterpolant, CDiffusionInterpolantV
 
-def _fake_samplers(stochasticity, stepsConfig):
+def fakeNP(shape, sigma):
+  return tf.fill(shape, sigma)
+
+def _fake_samplers(stochasticity, stepsConfig, projectNoise=False, clipping=None):
   scheduleConfig = {
     'name': 'discrete',
     'beta schedule': 'linear',
@@ -20,6 +23,8 @@ def _fake_samplers(stochasticity, stepsConfig):
     'stochasticity': stochasticity,
     'noise stddev': 'zero',
     'steps skip type': stepsConfig,
+    'project noise': projectNoise,
+    'clipping': clipping,
   })
   
   x = tf.random.normal([32, 3])
@@ -33,6 +38,8 @@ def _fake_samplers(stochasticity, stepsConfig):
     'noise stddev': 'zero',
     'schedule': scheduleConfig,
     'steps skip type': stepsConfig,
+    'project noise': projectNoise,
+    'clipping': clipping,
   })
   return CFakeObject(
     ddim=ddim,
@@ -91,4 +98,45 @@ def test_inversibility():
 
 def test_inversibility_V():
   _check_inversibility(CDiffusionInterpolantV(), N=1024 * 16, atol=1e-5)
+  return
+
+def test_DDIM_eq_INTR_with_noise():
+  fake = _fake_samplers(
+    stochasticity=1.0,
+    stepsConfig={ 'name': 'uniform', 'K': 1 }
+  )
+  
+  X_ddim = fake.ddim.sample(
+    value=fake.x, model=fake.model, schedule=fake.schedule,
+    noiseProvider=fakeNP
+  )
+  X_interpolant = fake.interpolant.sample(
+    value=fake.x, model=fake.model,
+    noiseProvider=fakeNP
+  )
+  tf.debugging.assert_near(X_ddim, X_interpolant, atol=5e-6)
+  return
+
+def test_DDIM_eq_INTR_with_projected_noise():
+  fake = _fake_samplers(
+    stochasticity=1.0,
+    stepsConfig={ 'name': 'uniform', 'K': 1 },
+    projectNoise=True
+  )
+  
+  X_ddim = fake.ddim.sample(value=fake.x, model=fake.model, schedule=fake.schedule, noiseProvider=fakeNP)
+  X_interpolant = fake.interpolant.sample(value=fake.x, model=fake.model, noiseProvider=fakeNP)
+  tf.debugging.assert_near(X_ddim, X_interpolant, atol=5e-6)
+  return
+
+def test_DDIM_eq_INTR_with_clipping():
+  fake = _fake_samplers(
+    stochasticity=1.0,
+    stepsConfig={ 'name': 'uniform', 'K': 1 },
+    clipping={ 'min': -1e-3, 'max': 1e-3 }
+  )
+  
+  X_ddim = fake.ddim.sample(value=fake.x, model=fake.model, schedule=fake.schedule, noiseProvider=fakeNP)
+  X_interpolant = fake.interpolant.sample(value=fake.x, model=fake.model, noiseProvider=fakeNP)
+  tf.debugging.assert_near(X_ddim, X_interpolant, atol=5e-6)
   return

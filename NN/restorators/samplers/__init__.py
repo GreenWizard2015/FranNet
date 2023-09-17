@@ -16,6 +16,7 @@ def sampler_from_config(config):
       schedule=schedule_from_config(config['schedule']),
       steps=config['steps skip type'],
       clipping=config.get('clipping', None),
+      projectNoise=config.get('project noise', False)
     )
   
   if 'autoregressive' == kind:
