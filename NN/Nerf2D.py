@@ -28,7 +28,7 @@ class CNerf2D(CBaseModel):
       'uniform': tf.random.uniform,
       'halton': lambda shape: sample_halton_sequence(shape[:-1], shape[-1])
     }
-    assert trainingSampler in samplers, f'Unknown training sampler ({sample_halton_sequence})'
+    assert trainingSampler in samplers, f'Unknown training sampler ({trainingSampler})'
     self._trainingSampler = samplers[trainingSampler]
     return
 
