@@ -29,9 +29,10 @@ def main(args):
     config['dataset']['train']['limit'] = args.train_limit
 
   # Select dataset
-  dataset = dataset_from_config(config['dataset'])
-  train_data = dataset.make_dataset(config['dataset']['train'], split='train')
-  test_data = dataset.make_dataset(config['dataset']['test'], split='test')
+  datasetConfig = config['dataset']
+  dataset = dataset_from_config(datasetConfig)
+  train_data = dataset.make_dataset(datasetConfig['train'], split='train')
+  test_data = dataset.make_dataset(datasetConfig['test'], split='test')
 
   # Create model
   model = model_from_config(config["model"], compile=True)

@@ -22,22 +22,17 @@ class CCelebADataset:
   def unnormalizeImg(self, x):
     return self._imageProcessor.unnormalizeImg(x)
   
-  def _process(self, data):
-    return self._imageProcessor.process(data['image'])
-
-  def _dataset(self, split, batch_size=None, limit=None):
-    batch_size = batch_size or self._batchSize
+  def make_dataset(self, config, split):
     res = self._celeb_a_builder.as_dataset(split=split)
+
+    batch_size = config.get('batch_size', self._batchSize)
+    limit = config.get('limit', None)
     if limit: res = res.take(limit)
     if batch_size: res = res.batch(batch_size)
-    return res.map(self._process)
-  
-  def make_dataset(self, config, split):
-    res = self._dataset(
-      split,
-      batch_size=config.get('batch_size', self._batchSize),
-      limit=config.get('limit', None),
-    )
+
+    processF = self._imageProcessor.process(config)
+    res = res.map(lambda x: processF(x['image']))
+
     if 'masking' in config: res = res.map( masking_from_config(config['masking']) )
     if 'repeat' in config: res = res.repeat(config['repeat'])
     if 'shuffle' in config: res = res.shuffle(config['shuffle'])
