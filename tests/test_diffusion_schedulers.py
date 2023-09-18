@@ -82,3 +82,15 @@ def test_posterior_variance_HF():
   var = schedule.parametersForT(tf.range(noise_steps)).posteriorVariance
   tf.debugging.assert_near(var, extractedPosteriorVariance, atol=2e-6)
   return
+
+# test conversion with lastStep=True
+def test_last_step():
+  schedule = CDPDiscrete( beta_schedule=get_beta_schedule('linear'), noise_steps=10 )
+  N = 3
+  t = tf.linspace(0.0, 1.0, schedule.noise_steps * N)
+  tf.assert_equal(t[0], 0.0)
+  tf.assert_equal(t[-1], 1.0)
+  T = schedule.to_discrete(t, lastStep=True )
+  expected = sum([ [i] * N for i in range(schedule.noise_steps) ], [])
+  tf.assert_equal(T, expected)
+  return

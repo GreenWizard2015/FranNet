@@ -56,7 +56,7 @@ class CDiffusionParameters:
   def to_continuous(self, t):
     raise NotImplementedError("to_continuous not implemented")
   
-  def to_discrete(self, t):
+  def to_discrete(self, t, lastStep=False):
     raise NotImplementedError("to_discrete not implemented")
   
   # helper function to calculate posterior variance between two specified steps
@@ -139,18 +139,23 @@ class CDPDiscrete(CDiffusionParameters):
   def is_discrete(self): return True
 
   def to_continuous(self, t):
+    N = self.noise_steps - 1
     tf.assert_equal(t.dtype, tf.int32)
+    tf.debugging.assert_greater_equal(t, 0)
+    tf.debugging.assert_less_equal(t, N)
     t = tf.cast(t, tf.float32)
-    return t / float(self.noise_steps - 1)
+    return tf.clip_by_value(t / float(N), 0.0, 1.0)
   
-  def to_discrete(self, t):
+  def to_discrete(self, t, lastStep=False):
     tf.assert_equal(t.dtype, tf.float32)
-    tf.debugging.assert_greater_equal(t, 0.0)
+    tf.debugging.assert_less_equal(0.0, t)
     tf.debugging.assert_less_equal(t, 1.0)
     
     # convert to discrete time, with floor rounding
-    N = self.noise_steps - 1
-    return tf.cast(tf.floor(t * N), tf.int32)
+    N = self.noise_steps if lastStep else self.noise_steps - 1
+    res = tf.cast(tf.floor(t * N), tf.int32)
+    # clip to [0, noise_steps - 1] even if t == 1.0
+    return tf.clip_by_value(res, 0, self.noise_steps - 1)
   
   # helper function to create a sequence of steps
   def steps_sequence(self, startStep, endStep, config, reverse=False):

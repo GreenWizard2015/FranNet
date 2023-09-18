@@ -31,8 +31,11 @@ class CGaussianDiffusion(IRestorationProcess):
       
     if discreteT is None:
       assert continuousT is not None, 'Either T or t must be provided'
-      discreteT = self._schedule.to_discrete(continuousT)
+      discreteT = self._schedule.to_discrete(continuousT, lastStep=True)
 
+    # make sure we have the corresponding continuous time
+    continuousT = self._schedule.to_continuous(discreteT)
+    tf.assert_equal(tf.shape(discreteT), tf.shape(continuousT))
     return discreteT, continuousT
   
   def _forwardStep(self, x0, noise, **kwargs):

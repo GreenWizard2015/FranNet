@@ -10,6 +10,7 @@ class Renderer(tf.keras.Model):
     decoder, restorator,
     posEncoder, timeEncoder,
     batch_size=16 * 64 * 1024,
+    enableChecks=True,
     **kwargs
   ):
     assert posEncoder is not None, "posEncoder is not provided"
@@ -20,6 +21,7 @@ class Renderer(tf.keras.Model):
     self._restorator = restorator
     self._posEncoder = posEncoder
     self._timeEncoder = timeEncoder
+    self._enableChecks = enableChecks
     return
 
   # only for training and building, during inference use 'batched' method
@@ -36,6 +38,10 @@ class Renderer(tf.keras.Model):
     if decoderArgs.get('randomize positions', False):
       pos = tf.random.uniform(tf.shape(pos), minval=0.0, maxval=1.0)
 
+    if self._enableChecks:
+      tf.debugging.assert_less_equal(tf.reduce_max(pos), 1.0)
+      tf.debugging.assert_less_equal(0.0, tf.reduce_min(pos))
+      pass
     EPos = self._posEncoder(pos, training=training)
 
     def denoiser(x, t, mask=None):
@@ -50,10 +56,17 @@ class Renderer(tf.keras.Model):
 
       return self._decoder(*args, training=training)
     
+    def encodeTime(t):
+      if self._enableChecks:
+        tf.debugging.assert_less_equal(tf.reduce_max(t), 1.0)
+        tf.debugging.assert_less_equal(0.0, tf.reduce_min(t))
+        pass
+      return self._timeEncoder(t, training=training)
+    
     return self._restorator.reverse(
       value=(tf.shape(pos)[0], ),
       denoiser=denoiser,
-      modelT=lambda t: self._timeEncoder(t, training=training),
+      modelT=encodeTime,
       **reverseArgs
     )
 

@@ -122,12 +122,17 @@ class CDDIMInterpolantSampler(CBasicInterpolantSampler):
     return
   
   def train(self, x0, x1, T):
-    T = self._schedule.to_discrete(T)
+    B = tf.shape(x0)[0]
+    tf.assert_equal(tf.shape(T), (B, 1))
+    tf.assert_equal(tf.shape(x0), tf.shape(x1))
+    
+    T = self._schedule.to_discrete(T, lastStep=True)
     # apply training procedure from interpolant
-    alpha_hat_t = self._schedule.parametersForT(T[:, 0]).alphaHat
+    alpha_hat_t = self._schedule.parametersForT(T).alphaHat
+    tf.assert_equal(tf.shape(alpha_hat_t), (B, 1))
     trainData = self._interpolant.train(x0=x0, x1=x1, T=alpha_hat_t)
     return {
       **trainData,
-      'T': self._schedule.to_continuous(T)
+      'T': self._schedule.to_continuous(T),
     }
 # End of CDDIMInterpolantSampler
