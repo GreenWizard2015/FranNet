@@ -10,12 +10,14 @@ def shuffleBatch(batch):
   return tf.gather(batch, indices)
 
 def sample_halton_sequence(shape, dim):
-  # TODO: find way to generate halton sequences per sample (tf.map_fn?)
-  num_results = tf.math.reduce_prod(shape)
-  samples = tfp.mcmc.sample_halton_sequence(dim, num_results=num_results, randomized=True)
-  samples = shuffleBatch(samples)
-  samples = tf.reshape(samples, tf.concat([shape, (dim,)], axis=-1))
-  return samples
+  num_results = tf.math.reduce_prod(shape[1:])
+  B = shape[0]
+  samples = tf.map_fn(
+    lambda _: tfp.mcmc.sample_halton_sequence(dim, num_results=num_results, randomized=True),
+    tf.range(B), dtype=tf.float32
+  )
+  tf.assert_equal(tf.shape(samples), (B, num_results, dim))
+  return tf.reshape(samples, tf.concat([shape, (dim,)], axis=-1))
 
 def normVec(x):
   V, L = tf.linalg.normalize(x, axis=-1)

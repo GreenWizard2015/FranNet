@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 import tensorflow as tf
-from NN.utils import extractInterpolated, flatCoordsGridTF
+from NN.utils import extractInterpolated, flatCoordsGridTF, sample_halton_sequence
 
 @pytest.mark.parametrize('hw', list(range(3, 16)))
 def test_extractInterpolated(hw):
@@ -45,4 +45,10 @@ def test_extractGrid(W):
   for a, b in zip(x.reshape(-1), y):
     assert np.allclose(a, b, atol=1e-5), '%.12f != %.12f' % (a, b)
     continue
+  return
+
+def test_halton_sequence_shape():
+  targetShape = (2, 3, 4, 5)
+  x = sample_halton_sequence(targetShape[:-1], targetShape[-1])
+  tf.assert_equal(tf.shape(x), targetShape)
   return
