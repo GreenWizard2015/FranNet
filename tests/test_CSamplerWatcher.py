@@ -91,3 +91,23 @@ def test_resetIteration():
   _ = fake.interpolant.sample(value=fake.x, model=fake.model, algorithmInterceptor=watcher.interceptor())
   tf.debugging.assert_equal(watcher.iteration, 6, 'Must collect 6 steps')
   return
+
+def test_solveStep():
+  fake = _fake_sampler()
+  watcher = CSamplerWatcher(
+    steps=10,
+    tracked=dict(
+      x0=(32, 3),
+      x1=(32, 3),
+    )
+  )
+  _ = fake.interpolant.sample(value=fake.x, model=fake.model, algorithmInterceptor=watcher.interceptor())
+
+  def check(value):
+    assert value is not None, 'Must be tracked'
+    tf.debugging.assert_equal(tf.shape(value), (11, 32, 3), 'Unexpected shape')
+    tf.debugging.assert_greater(tf.reduce_sum(tf.abs(value[0] - value[1])), 0.0, 'Must be different')
+    return
+  check(watcher.tracked('x0'))
+  check(watcher.tracked('x1'))
+  return

@@ -31,6 +31,7 @@ class CSamplingInterceptor(ISamplingAlgorithm):
   
   def solve(self, **kwargs):
     res = self._algorithm.solve(**kwargs)
+    self._watcher._onSolve(res, kwargs)
     return res
 # End of CSamplingInterceptor
 
@@ -73,5 +74,15 @@ class CSamplerWatcher:
     self._updateTracked('value', value, iteration=iteration)
 
     self._iteration.assign(iteration)
+    return
+  
+  def _onSolve(self, solution, kwargs):
+    assert isinstance(solution, tuple), 'Must be a tuple'
+    assert hasattr(solution, '_fields'), 'Must be a namedtuple'
+    iteration = kwargs['iteration']
+    # iterate over all fields
+    for name in solution._fields:
+      self._updateTracked(name, getattr(solution, name), iteration=iteration)
+      continue
     return
 # End of CSamplerWatcher
