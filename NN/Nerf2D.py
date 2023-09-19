@@ -124,7 +124,7 @@ class CNerf2D(CBaseModel):
     return (pos * scale) + shift
 
   @tf.function
-  def inference(self, src, pos, batchSize=None, reverseArgs=None):
+  def inference(self, src, pos, batchSize=None, reverseArgs=None, initialValues=None):
     if reverseArgs is None: reverseArgs = {}
     encoderParams = reverseArgs.get("encoder", {})
 
@@ -135,21 +135,33 @@ class CNerf2D(CBaseModel):
     B = tf.shape(src)[0]
     encoded = self._encoder(src, training=False, params=encoderParams)
 
+    if initialValues is not None:
+      C = tf.shape(initialValues)[-1]
+      tf.assert_equal(tf.shape(initialValues)[:1], (B, ))
+      initialValues = tf.reshape(initialValues, (B, N, C))
+
     def getChunk(ind, sz):
       posC = pos[ind:ind+sz]
       sz = tf.shape(posC)[0]
+      flatB = B * sz
 
       # same coordinates for all images in the batch
       posC = tf.tile(posC, [B, 1])
-      tf.assert_equal(tf.shape(posC), (B * sz, 2))
+      tf.assert_equal(tf.shape(posC), (flatB, 2))
 
       latents = self._encoder.latentAt(
         encoded=encoded,
         pos=tf.reshape(posC, (B, sz, 2)),
         training=False, params=encoderParams
       )
-      tf.assert_equal(tf.shape(latents)[:1], (B * sz,))
-      return(latents, posC, reverseArgs)
+      tf.assert_equal(tf.shape(latents)[:1], (flatB,))
+      value = (flatB, )
+      if initialValues is not None:
+        value = initialValues[:, ind:ind+sz, :]
+        tf.assert_equal(tf.shape(value), (B, sz, C))
+        value = tf.reshape(value, (flatB, C))
+        pass
+      return dict(latents=latents, pos=posC, reverseArgs=reverseArgs, value=value)
 
     return self._renderer.batched(
       ittr=getChunk,
@@ -164,6 +176,7 @@ class CNerf2D(CBaseModel):
     size=32, scale=1.0, shift=0.0, # required be a default arguments for building the model
     pos=None,
     batchSize=None, # renderers batch size
+    initialValues=None, # initial values for the restoration process
     reverseArgs=None,
   ):
     B = tf.shape(src)[0]
@@ -174,7 +187,8 @@ class CNerf2D(CBaseModel):
       probes = self.inference(
         src=src, pos=pos,
         batchSize=batchSize,
-        reverseArgs=reverseArgs
+        reverseArgs=reverseArgs,
+        initialValues=initialValues
       )
       C = tf.shape(probes)[-1]
       return tf.reshape(probes, (B, size, size, C))
@@ -182,7 +196,8 @@ class CNerf2D(CBaseModel):
     probes = self.inference(
       src=src, pos=pos,
       batchSize=batchSize,
-      reverseArgs=reverseArgs
+      reverseArgs=reverseArgs,
+      initialValues=initialValues
     )
     tf.assert_equal(tf.shape(probes), (B, tf.shape(pos)[0], tf.shape(probes)[-1]))
     return probes

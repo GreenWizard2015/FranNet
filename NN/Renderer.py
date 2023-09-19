@@ -31,29 +31,24 @@ class Renderer(tf.keras.Model):
     res = self._decoder(latents, pos, T, V)
     return res
 
-  def _invD(self, latents, pos, reverseArgs, training):
-    reverseArgs = {} if reverseArgs is None else reverseArgs
-    decoderArgs = reverseArgs.get('decoder', {})
+  def _encodePos(self, pos, training, args):
     # for ablation study of the decoder, randomize positions BEFORE encoding
-    if decoderArgs.get('randomize positions', False):
+    if args.get('randomize positions', False):
       pos = tf.random.uniform(tf.shape(pos), minval=0.0, maxval=1.0)
 
     if self._enableChecks:
       tf.debugging.assert_less_equal(tf.reduce_max(pos), 1.0)
       tf.debugging.assert_less_equal(0.0, tf.reduce_min(pos))
       pass
-    EPos = self._posEncoder(pos, training=training)
+    return self._posEncoder(pos, training=training)
+
+  def _invD(self, latents, pos, reverseArgs, training, value):
+    EPos = self._encodePos(pos, training=training, args=reverseArgs.get('decoder', {}))
 
     def denoiser(x, t, mask=None):
       args = (latents, EPos, t, x)
       if mask is not None:
-        args = (
-          tf.boolean_mask(latents, mask),
-          tf.boolean_mask(EPos, mask),
-          tf.boolean_mask(t, mask),
-          tf.boolean_mask(x, mask)
-        )
-
+        args = (tf.boolean_mask(v, mask) for v in args)
       return self._decoder(*args, training=training)
     
     def encodeTime(t):
@@ -64,9 +59,7 @@ class Renderer(tf.keras.Model):
       return self._timeEncoder(t, training=training)
     
     return self._restorator.reverse(
-      value=(tf.shape(pos)[0], ),
-      denoiser=denoiser,
-      modelT=encodeTime,
+      value=value, denoiser=denoiser, modelT=encodeTime,
       **reverseArgs
     )
 
@@ -80,7 +73,7 @@ class Renderer(tf.keras.Model):
     for i in tf.range(NBatches):
       index = i * stepBy
       data = ittr(index, stepBy)
-      V = self._invD(*data, training=training)
+      V = self._invD(**data, training=training)
       C = tf.shape(V)[-1]
       res = res.write(i, tf.reshape(V, (B, stepBy, C)))
       continue
@@ -88,7 +81,7 @@ class Renderer(tf.keras.Model):
     index = NBatches * stepBy
 
     data = ittr(index, N - index)
-    V = self._invD(*data, training=training)
+    V = self._invD(**data, training=training)
     C = tf.shape(V)[-1]
 
     w = N - index
