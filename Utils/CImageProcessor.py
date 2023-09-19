@@ -46,13 +46,22 @@ class CImageProcessor:
   def _destImage(self, img):
     return self.normalizeImg(img)
 
-  def process(self, config):
-    args = {}
-    args['random crop'] = config.get('random crop', False)
-    if config.get('crop size', None):
-      args['crop size'] = config['crop size']
+  def process(self, config_or_image):
+    isConfig = isinstance(config_or_image, dict)
+    args = {
+      'random crop': False,
+      'crop size': None
+    }
+    if isConfig:
+      config = config_or_image
+      args['random crop'] = config.get('random crop', False)
+      if config.get('crop size', None):
+        args['crop size'] = config['crop size']
+      pass
 
     def _process(img):
       img = self._prepare(img, args)
       return( self._srcImage(img), self._destImage(img) )
-    return _process
+    
+    if isConfig: return _process
+    return _process(config_or_image) # apply to image directly
