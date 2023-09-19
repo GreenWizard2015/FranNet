@@ -18,7 +18,8 @@ class CImageProcessor:
     s = tf.shape(img)
     B, H, W, C = s[0], s[1], s[2], s[3]
     # predefined crop size or crop to the smallest dimension
-    crop_size = args.get('crop size', tf.minimum(H, W))
+    crop_size = args.get('crop size', None)
+    if crop_size is None: crop_size = tf.minimum(H, W)
     sH = dH = (H - crop_size) // 2
     sW = dW = (W - crop_size) // 2
     if args['random crop']: # same crop for all images in the batch
@@ -55,8 +56,7 @@ class CImageProcessor:
     if isConfig:
       config = config_or_image
       args['random crop'] = config.get('random crop', False)
-      if config.get('crop size', None):
-        args['crop size'] = config['crop size']
+      args['crop size'] = config.get('crop size', None)
       pass
 
     def _process(img):
