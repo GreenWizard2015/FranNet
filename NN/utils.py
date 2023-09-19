@@ -117,3 +117,10 @@ def make_quadratic_steps_sequence(startStep, endStep):
   steps = tf.unique(steps).y # i'm too lazy to write proper code for this :D
   prevSteps = tf.concat([steps[1:], [endStep]], axis=0)
   return steps, prevSteps
+
+def is_namedtuple(obj) -> bool:
+  return (
+    isinstance(obj, tuple) and
+    hasattr(obj, '_asdict') and
+    hasattr(obj, '_fields')
+  )

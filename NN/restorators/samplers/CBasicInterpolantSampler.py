@@ -1,12 +1,6 @@
 import tensorflow as tf
 from .ISamplingAlgorithm import ISamplingAlgorithm
-
-def isinstance_namedtuple(obj) -> bool:
-  return (
-    isinstance(obj, tuple) and
-    hasattr(obj, '_asdict') and
-    hasattr(obj, '_fields')
-  )
+from NN.utils import is_namedtuple
 
 class CBasicInterpolantSampler:
   def __init__(self, interpolant, algorithm):
@@ -27,7 +21,7 @@ class CBasicInterpolantSampler:
     # perform sampling
     step = algorithm.firstStep(value=value, iteration=0, **kwargs)
     # CFakeObject is a namedtuple, so we need to check for it
-    if isinstance(step, tuple) and not isinstance_namedtuple(step):
+    if isinstance(step, tuple) and not is_namedtuple(step):
       step, kwargs = step # store some data in kwargs, because TF a bit stupid
 
     iteration = tf.constant(1, dtype=tf.int32) # first step is already done
