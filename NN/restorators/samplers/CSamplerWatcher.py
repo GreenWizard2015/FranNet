@@ -71,10 +71,15 @@ class CSamplerWatcher:
       return
     
     mask = self._withIndices(mask)
-    tf.assert_equal(tf.shape(mask)[:1], tf.shape(value)[:1], 'Must have the same batch size')
+    activeCount = tf.reduce_sum(tf.cast(mask, tf.int32))
+    tf.assert_equal(
+      activeCount, tf.shape(value)[0],
+      'Number of active values must be the same as the number of values'
+    )
     prev = tracked[iteration - 1]
     # expand mask to match the value shape by copying values from the previous iteration
     indices = tf.where(mask)
+    tf.assert_equal(tf.size(indices), activeCount, 'Must be the same number of indices')
     value = tf.tensor_scatter_nd_update(prev, indices, value)
     tf.assert_equal(tf.shape(prev), tf.shape(value), 'Must be the same shape')
     tracked[iteration].assign(value)
