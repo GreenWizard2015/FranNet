@@ -82,8 +82,7 @@ class CARSamplingAlgorithm(ISamplingAlgorithm):
       **state
     )
   
-  # remove 'iteration' from the kwargs to avoid conflicts with the 'iteration' argument in other methods
-  def firstStep(self, value, iteration, **kwargs):
+  def firstStep(self, value, **kwargs):
     B = tf.shape(value)[0]
     mask = tf.fill((B, ), True)
     # update kwargs, replace/store some data/callbacks

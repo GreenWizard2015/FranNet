@@ -18,13 +18,12 @@ class CBasicInterpolantSampler:
     algorithm = kwargs.get('algorithmInterceptor', lambda x: x)( self._algorithm )
     assert isinstance(algorithm, ISamplingAlgorithm), f'Algorithm must be an instance of ISamplingAlgorithm, but got {type(algorithm)}'
 
-    # perform sampling
-    step = algorithm.firstStep(value=value, iteration=0, **kwargs)
+    step = algorithm.firstStep(value=value, **kwargs)
     # CFakeObject is a namedtuple, so we need to check for it
     if isinstance(step, tuple) and not is_namedtuple(step):
       step, kwargs = step # store some data in kwargs, because TF a bit stupid
 
-    iteration = tf.constant(1, dtype=tf.int32) # first step is already done
+    iteration = tf.constant(0, dtype=tf.int32)
     while tf.reduce_any(step.active):
       KWArgs = dict(
         value=value, step=step, iteration=iteration,
