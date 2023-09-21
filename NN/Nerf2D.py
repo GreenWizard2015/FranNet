@@ -56,28 +56,19 @@ class CNerf2D(CBaseModel):
     return srcPos
 
   def _trainingData(self, encodedSrc, dest):
-    B = tf.shape(dest)[0]
-    C = tf.shape(dest)[-1]
-    N = self.samplesN # number of points sampled from each image
-    
-    # by default, source and target positions are the same
+    B, C, N = tf.shape(dest)[0], tf.shape(dest)[-1], self.samplesN
     srcPos = self._trainingSampler((B, N, 2))
-    targetPos = self._getTrainingTargets(srcPos, B, N)
-
-    tf.assert_equal(tf.shape(targetPos), (B, N, 2))
-    tf.assert_equal(tf.shape(srcPos), (B, N, 2))
-
-    x0 = extractInterpolated(dest, targetPos)
     # obtain latent vector for each sampled position
     latents = self._encoder.latentAt(encoded=encodedSrc, pos=srcPos, training=True)
-
     tf.assert_equal(tf.shape(latents)[:1], (B * N,))
-    tf.assert_equal(tf.shape(targetPos), (B, N, 2))
-    tf.assert_equal(tf.shape(x0), (B, N, C))
-    x0 = tf.reshape(x0, (B * N, C))
-    targetPos = tf.reshape(targetPos, (B * N, 2))
-    latents = tf.reshape(latents, (B * N, -1))
-    return(x0, targetPos, latents)
+
+    targetPos = self._getTrainingTargets(srcPos, B, N)
+    x0 = extractInterpolated(dest, targetPos)
+    return(
+      tf.reshape(x0, (B * N, C)),
+      tf.reshape(targetPos, (B * N, 2)),
+      tf.reshape(latents, (B * N, -1))
+    )
   
   def train_step(self, data):
     (src, dest) = data
@@ -86,11 +77,11 @@ class CNerf2D(CBaseModel):
     
     with tf.GradientTape() as tape:
       encodedSrc = self._encoder(src=src, training=True)
-      x0, pos, latents = self._trainingData(encodedSrc, dest)
+      x0, queriedPos, latents = self._trainingData(encodedSrc, dest)
       loss = self._restorator.train_step(
         x0=x0,
         model=lambda T, V: self._renderer(
-          latents=latents, pos=pos,
+          latents=latents, pos=queriedPos,
           T=T, V=V,
           training=True
         ),
