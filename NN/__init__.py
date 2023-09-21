@@ -6,15 +6,23 @@ from .Nerf2D import CNerf2D
 import tensorflow as tf
 
 def _optimizer_from_config(config):
-  if isinstance(config, str):
-    return config
-  
+  if isinstance(config, str): return config # return optimizer name
   if isinstance(config, dict):
     if 'adam' == config['name']:
       return tf.keras.optimizers.Adam(
         learning_rate=config['learning_rate'],
       )
     
+    if 'AdamW' == config['name']:
+      optimizer = tf.keras.optimizers.AdamW(
+        learning_rate=config['learning_rate'],
+        weight_decay=config['weight_decay'],
+      )
+      optimizer.exclude_from_weight_decay(
+        var_names=config.get('exclude_from_weight_decay', [])
+      )
+      return optimizer
+    pass
   raise ValueError(f"Unknown optimizer config: {config}")
 
 def _nerf_from_config(config):
