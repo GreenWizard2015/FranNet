@@ -1,5 +1,5 @@
 import tensorflow as tf
-from .utils import extractInterpolated, ensure4d, flatCoordsGridTF, sample_halton_sequence
+from .utils import extractInterpolated, ensure4d, sample_halton_sequence, generateSquareGrid
 from .CBaseModel import CBaseModel
 
 class CNerf2D(CBaseModel):
@@ -38,18 +38,21 @@ class CNerf2D(CBaseModel):
       mainFraction = 1.0 - self._shiftedSamples['fraction']
       NMain = tf.floor(tf.cast(N, tf.float32) * tf.cast(mainFraction, tf.float32))
       NMain = tf.cast(NMain, tf.int32)
+      augmentedN = N - NMain
       # for second part of the points srcPos stays the same, but targetPos is shifted
       shifts = None
       if 'normal' == self._shiftedSamples['kind']:
-        shifts = tf.random.normal((B, N, 2), stddev=self._shiftedSamples['stddev'])
+        shifts = tf.random.normal((B, augmentedN, 2), stddev=self._shiftedSamples['stddev'])
       if 'uniform' == self._shiftedSamples['kind']:
-        shifts = tf.random.uniform((B, N, 2)) - srcPos
+        shifts = tf.random.uniform((B, augmentedN, 2)) - srcPos[:, :augmentedN]
 
-      return tf.concat([
-        srcPos[:, :NMain], # predict sampled points
-        srcPos[:, NMain:] + shifts[:, NMain:] # predict nearby points
-      ], 1)
-    # predict sampled points
+      mainPoints = srcPos[:, :NMain]
+      # use some points from the main part of the grid, so that they have the same latent vector
+      shiftedPoints = srcPos[:, :augmentedN] + shifts
+      srcPos = tf.concat([mainPoints, shiftedPoints], axis=1)
+      srcPos = tf.clip_by_value(srcPos, 0.0, 1.0)
+      pass
+    tf.assert_equal(tf.shape(srcPos), (B, N, 2))
     return srcPos
 
   def _trainingData(self, encodedSrc, dest):
@@ -106,25 +109,12 @@ class CNerf2D(CBaseModel):
     return self._testMetrics(dest, reconstructed)
 
   #####################################################
-  def _prepareGrid(self, size, scale, shift):
-    # prepare coordinates
-    scale = tf.cast(scale, tf.float32)
-    shift = tf.cast(shift, tf.float32)
-    # make sure that scale and shift 2 rank tensors 2 elements
-    # (flatten them, concatenate with themselves, take first 2 elements, reshape)
-    scale = tf.reshape(scale, (-1,))
-    scale = tf.concat([scale, scale], axis=0)[:2]
-    scale = tf.reshape(scale, (1, 2))
-
-    shift = tf.reshape(shift, (-1,))
-    shift = tf.concat([shift, shift], axis=0)[:2]
-    shift = tf.reshape(shift, (1, 2))
-    # prepare coordinates
-    pos = flatCoordsGridTF(size)
-    return (pos * scale) + shift
-
   @tf.function
-  def inference(self, src, pos, batchSize=None, reverseArgs=None, initialValues=None):
+  def inference(
+    self, src, pos, 
+    batchSize=None, reverseArgs=None, initialValues=None,
+    sampleShape=None
+  ):
     if reverseArgs is None: reverseArgs = {}
     encoderParams = reverseArgs.get("encoder", {})
 
@@ -163,12 +153,12 @@ class CNerf2D(CBaseModel):
         pass
       return dict(latents=latents, pos=posC, reverseArgs=reverseArgs, value=value)
 
-    return self._renderer.batched(
-      ittr=getChunk,
-      B=B, N=N,
-      batchSize=batchSize,
-      training=False
-    )
+    probes = self._renderer.batched(ittr=getChunk, B=B, N=N, batchSize=batchSize, training=False)
+    if sampleShape is not None:
+      C = tf.shape(probes)[-1]
+      fullShape = tf.concat([[B], sampleShape, [C]], axis=0)
+      probes = tf.reshape(probes, fullShape)
+    return probes
   
   @tf.function
   def call(self, 
@@ -179,28 +169,19 @@ class CNerf2D(CBaseModel):
     initialValues=None, # initial values for the restoration process
     reverseArgs=None,
   ):
-    B = tf.shape(src)[0]
+    sampleShape = (tf.shape(pos)[0], )
     if pos is None:
-      pos = self._prepareGrid(size, scale, shift)
-      tf.assert_equal(tf.shape(pos), (size * size, 2)) # just in case
-      
-      probes = self.inference(
-        src=src, pos=pos,
-        batchSize=batchSize,
-        reverseArgs=reverseArgs,
-        initialValues=initialValues
-      )
-      C = tf.shape(probes)[-1]
-      return tf.reshape(probes, (B, size, size, C))
-    # if pos is not None, then we are rendering a custom grid with arbitrary shape
-    probes = self.inference(
+      pos = generateSquareGrid(size, scale, shift)
+      sampleShape = (size, size)
+      pass
+
+    return self.inference(
       src=src, pos=pos,
       batchSize=batchSize,
       reverseArgs=reverseArgs,
-      initialValues=initialValues
+      initialValues=initialValues,
+      sampleShape=sampleShape
     )
-    tf.assert_equal(tf.shape(probes), (B, tf.shape(pos)[0], tf.shape(probes)[-1]))
-    return probes
   
   def get_input_shape(self):
     return self._encoder.get_input_shape()

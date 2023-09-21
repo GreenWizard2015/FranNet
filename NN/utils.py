@@ -55,6 +55,21 @@ def flatCoordsGridTF(width):
   xy = (tf.range(width, dtype=tf.float32) * d) + (d / 2.0)
   coords = tf.meshgrid(xy, xy)
   return tf.concat([tf.reshape(x, (-1, 1)) for x in coords], axis=-1)
+
+# helper function to convert any value to a (1, 2) tensor
+def ensure_12(x, dtype=tf.float32):
+  x = tf.cast(x, dtype=dtype)
+  x = tf.reshape(x, (-1,))
+  x = tf.concat([x, x], axis=0)[:2]
+  return tf.reshape(x, (1, 2))
+
+def generateSquareGrid(size, scale, shift):
+  scale = ensure_12(scale)
+  shift = ensure_12(shift)
+  pos = flatCoordsGridTF(size)
+  res = (pos * scale) + shift
+  tf.assert_equal(tf.shape(res), (size * size, 2), 'Should be a flat grid of coordinates')
+  return res
 ################
 class CFlatCoordsEncodingLayer(tf.keras.layers.Layer):
   def __init__(self, N=32, **kwargs):
