@@ -169,11 +169,12 @@ class CNerf2D(CBaseModel):
     initialValues=None, # initial values for the restoration process
     reverseArgs=None,
   ):
-    sampleShape = (tf.shape(pos)[0], )
-    if pos is not None:
+    sampleShape = None
+    if pos is None:
       pos = generateSquareGrid(size, scale, shift)
       sampleShape = (size, size)
-      pass
+    else:
+      sampleShape = (tf.shape(pos)[0], )
 
     return self.inference(
       src=src, pos=pos,
