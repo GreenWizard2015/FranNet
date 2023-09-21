@@ -170,7 +170,7 @@ class CNerf2D(CBaseModel):
     reverseArgs=None,
   ):
     sampleShape = (tf.shape(pos)[0], )
-    if pos is None:
+    if pos is not None:
       pos = generateSquareGrid(size, scale, shift)
       sampleShape = (size, size)
       pass
