@@ -1,4 +1,5 @@
 import gradio as gr
+import os
 
 def modelNameSelector(models, kind):
   models = { k: v for k, v in models.items() if kind == v.kind }
@@ -22,7 +23,8 @@ def bindClick(btn, fn, inputs, outputs):
     inputsDict = {name: value for name, value in zip(inputsNames, args)}
     res = fn(**inputsDict)
     assert isinstance(res, dict), 'function must return a dict'
-    assert set(res.keys()) == set(outputsNames), 'invalid keys in function result'
+    diff = set(res.keys()) - set(outputsNames)
+    assert 0 == len(diff), f'invalid output names: {diff}'
     # convert outputs dict to list with corresponding values
     res = [res[name] for name in outputsNames]
     if 1 == len(res): res = res[0]
@@ -36,9 +38,14 @@ def bindClick(btn, fn, inputs, outputs):
   return
 
 # read markdown file and create a markdown widget
-def markdownFrom(path):
-  with open(path, 'r') as f:
-    text = f.read()
+def markdownFrom(*path):
+  folder = os.path.dirname(__file__)
+  path = os.path.join(folder, 'markdown', *path)
+  try:
+    with open(path, 'r') as f:
+      text = f.read()
+  except FileNotFoundError:
+    text = f'File not found: {path}'
   return gr.Markdown(text)
 
 def noiseProviderStddev(value=None):

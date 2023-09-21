@@ -1,10 +1,10 @@
 import gradio as gr
-from .commonSettings import commonSettings
+from .areas.commonSettings import commonSettings
 from .singlePassModels import singlePassModels
 from .diffusionModels import diffusionModels
 from .autoregressiveModels import autoregressiveModels
 from .common import markdownFrom, bindClick
-from .ablationArea import ablationArea
+from .areas.ablationArea import ablationArea
 import os
 
 def resultsCollector():
@@ -29,8 +29,8 @@ def resultsCollector():
 def submitsCollector():
   submitsAreas = []
 
-  def onSubmit(**kwargs):
-    submit = gr.Button(value='Submit')
+  def onSubmit(btn=None, **kwargs):
+    submit = gr.Button(value='Submit') if btn is None else btn
     submitsAreas.append((submit, kwargs))
     return submit
   
@@ -51,7 +51,7 @@ def AppUI(preprocessImage, processImage, models):
   resultActions, onFinishResults = resultsCollector()
   submitAction, onFinishSubmits = submitsCollector()
   with gr.Blocks() as app:
-    markdownFrom(os.path.join(os.path.dirname(__file__), 'markdown', 'about.md'))
+    markdownFrom('about.md')
     # common settings for all models
     settings = commonSettings(preprocessImage, resultActions)
     # ablation study area

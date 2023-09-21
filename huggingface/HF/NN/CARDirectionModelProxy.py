@@ -6,7 +6,11 @@ class CARDirectionModelProxy:
     self._model = model
     return
   
-  def __call__(self, threshold, start, end, steps, decay, noiseStddev, convergeThreshold, **kwargs):
+  def __call__(self,
+    threshold, start, end, steps, decay, noiseStddev, convergeThreshold,
+    reverseArgs={},
+    **kwargs
+  ):
     assert isinstance(noiseStddev, str), f'Invalid noiseStddev: {noiseStddev}'
     # convert arguments to floats, because gradio passes them sometimes as ints
     threshold = float(threshold)
@@ -17,6 +21,7 @@ class CARDirectionModelProxy:
     convergeThreshold = float(convergeThreshold)
 
     reverseArgs = dict(
+      **reverseArgs,
       threshold=threshold,
       convergeThreshold=convergeThreshold,
       steps=CProcessStepsDecayed(start, end, steps, decay),
@@ -29,4 +34,4 @@ class CARDirectionModelProxy:
   
   @property
   def name(self): return self._model.name
-# End of CDiffusionModelProxy
+# End of CWithDDIM

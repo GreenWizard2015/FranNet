@@ -40,4 +40,4 @@ class CWithAblations:
   
   @property
   def name(self): return self._model.name
-# End of CDiffusionModelProxy
+# End of CWithDDIM

@@ -33,12 +33,12 @@ def NN_From(configs):
 
 def _autoregressive_kind(restorator):
   sampler = restorator['sampler']['name'].lower()
-  interpolant = restorator['sampler']['interpolant']['name'].lower()
+  interpolant = restorator['sampler']['interpolant'].get('name', '').lower()
 
   if 'autoregressive' == sampler:
     if 'direction' == interpolant: return 'autoregressive direction'
   
-  if 'ddim' == sampler: return 'autoregressive ddim'
+  if 'ddim' == sampler: return 'autoregressive diffusion'
   raise NotImplementedError(f'Unknown sampler: {sampler}')
 
 class CHuggingFaceBasicModel:
@@ -46,7 +46,7 @@ class CHuggingFaceBasicModel:
     self._configs = configs
     return
   
-  def __call__(self, images, targetResolution, **kwargs):
+  def __call__(self, images, targetResolution, raw=None, **kwargs):
     targetResolution = int(targetResolution)
     assert 128 <= targetResolution <= 1024, f'Invalid target resolution: {targetResolution}'
     

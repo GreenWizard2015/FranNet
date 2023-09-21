@@ -1,10 +1,9 @@
 import gradio as gr
-from .common import noiseProviderStddev, markdownFrom
-import os
+from ..common import noiseProviderStddev, markdownFrom
 
 def ARSamplerParameters():
   with gr.Box():
-    markdownFrom(os.path.join(os.path.dirname(__file__), 'markdown', 'ar-sampler.md'))
+    markdownFrom('ar-sampler.md')
 
     threshold = gr.Slider(
       minimum=0.0, maximum=0.01, step=0.0001, label='Threshold',
