@@ -61,7 +61,7 @@ Studies to be conducted:
 - [x] [Compare different parameters for DDIM sampler, compare with DDPM](diffusion-restorator.md)
 - [ ] Compare different parameters for autoregressive "direction" restorator sampler
 - [ ] Show that ordinary DDIM and autoregressive DDIM are the same, in terms of inference and training
-- [ ] Visualize the trajectories of the color values during the sampling process
+- [x] Visualize the trajectories of the color values during the sampling process
 - [ ] Compare different model sizes (**600k**, x4, x16?)
 - [ ] Compare different noise sampling methods (**normal**, halton, resampled)
 - [ ] Try to use quasi-random generator to sample points for training (**uniform**, halton)
