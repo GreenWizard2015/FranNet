@@ -11,6 +11,8 @@ def encoder_from_config(config):
       channels=config['channels'],
       downsampleSteps=headConfig['downsample steps'],
       latentDim=latentDim,
+      ConvBeforeStage=headConfig.get('conv before stage', 0),
+      ConvAfterStage=headConfig.get('conv after stage', 2), # 2 was used in the old version
       localContext=headConfig['local context'],
       globalContext=headConfig['global context'],
       name=name

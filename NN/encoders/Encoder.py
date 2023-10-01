@@ -6,7 +6,8 @@ from NN.utils import sMLP
 Simple encoder that takes image as input and returns corresponding latent vector with intermediate representations
 '''
 def createEncoderHead(
-  imgWidth, channels, downsampleSteps, latentDim,
+  imgWidth, channels, downsampleSteps, latentDim, 
+  ConvBeforeStage, ConvAfterStage, 
   localContext, globalContext,
   name
 ):
@@ -18,40 +19,51 @@ def createEncoderHead(
   intermediate = []
   for sz in downsampleSteps:
     res = L.Conv2D(sz, 3, strides=2, padding='same', activation='relu')(res)
+    for _ in range(ConvBeforeStage):
+      res = L.Conv2D(sz, 3, padding='same', activation='relu')(res)
 
     # local context
-    localCtx = res
-    KSize = localContext['kernel size']
-    for i in range(localContext['conv before']):
-      localCtx = L.Conv2D(sz, KSize, padding='same', activation='relu')(localCtx)
-      
-    intermediate.append(
-      L.Conv2D(latentDim, KSize, padding='same', activation=localContext['final activation'])(localCtx)
-    )
+    if not(localContext is None):
+      localCtx = res
+      KSize = localContext['kernel size']
+      for i in range(localContext['conv before']):
+        localCtx = L.Conv2D(sz, KSize, padding='same', activation='relu')(localCtx)
+        
+      intermediate.append(
+        L.Conv2D(
+          latentDim, KSize, padding='same', activation=localContext['final activation']
+        )(localCtx)
+      )
     ################################
-    res = L.Conv2D(sz, 3, padding='same', activation='relu')(res)
-    res = L.Conv2D(sz, 3, padding='same', activation='relu')(res)
+    for _ in range(ConvAfterStage):
+      res = L.Conv2D(sz, 3, padding='same', activation='relu')(res)
     continue
 
-  outputs = { 'intermediate': intermediate }
-
   if not(globalContext is None): # global context
-    res = L.Conv2D(globalContext['channels'], globalContext['kernel size'], padding='same', activation='relu')(res)
+    globalConvN = globalContext.get('conv before', 1)
+    for _ in range(globalConvN):
+      res = L.Conv2D(
+        globalContext['channels'], globalContext['kernel size'], padding='same',
+        activation='relu'
+      )(res)
 
     latent = L.Flatten()(res)
     context = sMLP(sizes=globalContext['mlp'], activation='relu', name=name + '/globalMixer')(latent)
-    context = L.Dense(
-      globalContext.get('latent dimension', latentDim),
-      activation=globalContext['final activation']
-    )(context)
-    outputs['context'] = context # Add context to outputs
+    context = L.Dense(latentDim, activation=globalContext['final activation'])(context)
   else: # no global context
     # return dummy context to keep the interface consistent
-    outputs['context'] = L.Lambda(
+    context = L.Lambda(
       lambda x: tf.zeros((tf.shape(x)[0], 1), dtype=res.dtype)
     )(res)
 
-  return tf.keras.Model(inputs=[data], outputs=outputs, name=name)
+  return tf.keras.Model(
+    inputs=[data],
+    outputs={
+      'intermediate': intermediate, # intermediate representations
+      'context': context, # global context
+    },
+    name=name
+  )
 
 class CEncoder(tf.keras.Model):
   def __init__(self, imgWidth, channels, head, extractor, **kwargs):
@@ -84,10 +96,14 @@ class CEncoder(tf.keras.Model):
     N = tf.shape(pos)[1]
     tf.assert_equal(tf.shape(pos), (B, N, 2))
     
-    localCtx = self._extractor(encoded['intermediate'], pos, training=training)
+    # global context is always present, even if it's a dummy one
     context = encoded['context']
     context = tf.repeat(context, N, axis=0)
     tf.assert_equal(tf.shape(context)[:-1], (B * N,))
+    if self._extractor is None: return context # local context is disabled
+    
+    # local context could be absent
+    localCtx = self._extractor(encoded['intermediate'], pos, training=training)
     tf.assert_equal(tf.shape(localCtx)[:-1], (B * N,))
 
     # ablation study

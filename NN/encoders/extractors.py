@@ -3,6 +3,9 @@ from .CInterpolateExtractor import interpolate_extractor_from_config
 from .CCombinedExtractor import combined_extractor_from_config
 
 def extractor_from_config(config, latentDim):
+  # local context is disabled
+  if config is None: return lambda _: None
+  
   name = config['name'].lower()
   if 'interpolate' == name:
     return interpolate_extractor_from_config(config, latentDim)
