@@ -2,6 +2,45 @@ import tensorflow as tf
 import tensorflow.keras.layers as L
 from NN.utils import sMLP
 
+def conv_block_params_from_config(config):
+  defaultConvParams = {
+    'kernel size': config.get('kernel size', 3),
+    'activation': config.get('activation', 'relu')
+  }
+  convBefore = config['conv before']
+  # if convBefore is an integer, then it's the same for all layers
+  if isinstance(convBefore, int):
+    convParams = { 'channels': config['channels'], **defaultConvParams }
+    convBefore = [convParams] * convBefore # repeat the same parameters
+    pass
+  assert isinstance(convBefore, list), 'convBefore must be a list'
+  # if convBefore is a list of integers, then each integer is the number of channels
+  if (0 < len(convBefore)) and isinstance(convBefore[0], int):
+    convBefore = [ {'channels': sz, **defaultConvParams} for sz in convBefore ]
+    pass
+
+  # add separately last layer
+  lastConvParams = {
+    'channels': config.get('channels last', config['channels']),
+    'kernel size': config.get('kernel size last', defaultConvParams['kernel size']),
+    'activation': config.get('final activation', defaultConvParams['activation'])
+  }
+  return convBefore + [lastConvParams]
+  
+def conv_block_from_config(data, config, defaults):
+  config = {**defaults, **config} # merge defaults and config
+  convParams = conv_block_params_from_config(config)
+  # apply convolutions to the data
+  for parameters in convParams:
+    data = L.Conv2D(
+      filters=parameters['channels'],
+      padding='same',
+      kernel_size=parameters['kernel size'],
+      activation=parameters['activation']
+    )(data)
+    continue
+  return data
+
 '''
 Simple encoder that takes image as input and returns corresponding latent vector with intermediate representations
 '''
@@ -24,15 +63,13 @@ def createEncoderHead(
 
     # local context
     if not(localContext is None):
-      localCtx = res
-      KSize = localContext['kernel size']
-      for i in range(localContext['conv before']):
-        localCtx = L.Conv2D(sz, KSize, padding='same', activation='relu')(localCtx)
-        
       intermediate.append(
-        L.Conv2D(
-          latentDim, KSize, padding='same', activation=localContext['final activation']
-        )(localCtx)
+        conv_block_from_config(
+          data=res, config=localContext, defaults={
+            'channels': sz,
+            'channels last': latentDim, # last layer should have latentDim channels
+          }
+        )
       )
     ################################
     for _ in range(ConvAfterStage):
@@ -40,13 +77,11 @@ def createEncoderHead(
     continue
 
   if not(globalContext is None): # global context
-    globalConvN = globalContext.get('conv before', 1)
-    for _ in range(globalConvN):
-      res = L.Conv2D(
-        globalContext['channels'], globalContext['kernel size'], padding='same',
-        activation='relu'
-      )(res)
-
+    res = conv_block_from_config(
+      data=res, config=globalContext, defaults={
+        'conv before': 0, # by default, no convolutions before the last layer
+      }
+    )
     latent = L.Flatten()(res)
     context = sMLP(sizes=globalContext['mlp'], activation='relu', name=name + '/globalMixer')(latent)
     context = L.Dense(latentDim, activation=globalContext['final activation'])(context)
