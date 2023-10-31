@@ -10,7 +10,6 @@ def _examplesArea():
     with gr.Row():
       for file in files:
         img = gr.Image(file, show_label=False, interactive=False)
-        img.style(width=64, height=64)
         images.append(img)
         continue
       pass
