@@ -3,7 +3,7 @@ FROM python:3.10
 # Some stuff to make it work on Hugging Face
 RUN apt-get update && apt-get install -y libsm6 libxext6 cmake libgl1-mesa-glx
 RUN --mount=target=pre-requirements.txt,source=pre-requirements.txt 	pip install --no-cache-dir -r pre-requirements.txt
-RUN pip install --no-cache-dir gradio tensorflow tensorflow-probability opencv-python wandb imageio[ffmpeg]
+RUN pip install --no-cache-dir gradio==3.40.0 tensorflow tensorflow-probability opencv-python wandb imageio[ffmpeg]
 
 # Set up environment
 COPY --link --chown=1000 ./ /home/user/app
