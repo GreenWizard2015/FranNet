@@ -18,7 +18,6 @@ def hasharr(arr):
   return hash.hexdigest()
 
 def plot2image(fig):
-  canvas = fig.canvas
   ncols, nrows = fig.canvas.get_width_height()
   with io.BytesIO() as buf:
     fig.savefig(buf, format='raw')
@@ -195,13 +194,15 @@ class CInterpolantVisualization:
       clip=(-1.0, 1.0)
     )
     # contains the trajectory of color and also distance to the original color
-    fig = plt.figure(figsize=(18, 12))
+    FIG_WIDTH = 2 * 9
+    FIG_HEIGHT = 2 * 6
+    fig = plt.figure(figsize=(FIG_WIDTH, FIG_HEIGHT))
     gs = fig.add_gridspec(2, 2)
     axs = [
-      fig.add_subplot(gs[0, 0]),
-      fig.add_subplot(gs[1, 0]),
-      fig.add_subplot(gs[0, 1], projection='3d'),
-      fig.add_subplot(gs[1, 1], projection='3d'),
+      fig.add_subplot(gs[0, 0]), # color curve
+      fig.add_subplot(gs[1, 0]), # euclidean distance curve
+      fig.add_subplot(gs[0, 1], projection='3d'), # steps trajectories
+      fig.add_subplot(gs[1, 1], projection='3d'), # estimated trajectories
     ]
     try:
       for step in range(collectedSteps.totalSteps):
