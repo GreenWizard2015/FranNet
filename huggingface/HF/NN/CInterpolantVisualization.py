@@ -66,18 +66,16 @@ def _plotColorCurve2d(collectedSteps, originalColors):
     return
   return F
 
-def _plotEuclideanDistanceCurve2d(collectedSteps, originalColors):
-  collectedSteps = collectedSteps.value
-  N = collectedSteps.shape[0]
-  pointsN = collectedSteps.shape[1]
-  targets = originalColors if originalColors is not None else collectedSteps[-1]
+def _plotEuclideanDistanceCurve2d(values, title, targets=None):
+  N, pointsN = values.shape[:2]
+  if targets is None: targets = values[-1]
   # euclidean distances
-  distances = np.sqrt(np.sum((collectedSteps - targets[None]) ** 2, axis=-1)).T
+  distances = np.sqrt(np.sum((values - targets[None]) ** 2, axis=-1)).T
   assert distances.shape == (pointsN, N), 'Unexpected shape of distances'
 
   def F(step, ax):
     ax.cla()
-    ax.set_title(f'Euclidean distance (log scale)')
+    ax.set_title(title)
     # draw the trajectory
     stepsX = np.arange(N)
     for j, distance in enumerate(distances):
@@ -183,7 +181,11 @@ class CInterpolantVisualization:
   
   def _generateVideo(self, writer, originalColors, collectedSteps):
     plotColorCurve2d = _plotColorCurve2d(collectedSteps, originalColors)
-    plotEuclideanDistanceCurve2d = _plotEuclideanDistanceCurve2d(collectedSteps, originalColors)
+    plotColorDistance2d = _plotEuclideanDistanceCurve2d(
+      values=collectedSteps.value,
+      targets=originalColors,
+      title='Distance to the original color (log scale)',
+    )
     plotStepsTrajectories = _plotRGBTrajectories(
       Values=collectedSteps.value, originalColors=originalColors, title='Color trajectories (RGB)',
       clip=(-1.0, 1.0)
@@ -193,24 +195,41 @@ class CInterpolantVisualization:
       title='Estimated values trajectories (RGB)',
       clip=(-1.0, 1.0)
     )
+    plotX0Distance = _plotEuclideanDistanceCurve2d(
+      values=collectedSteps.x0,
+      targets=originalColors,
+      title='Estimated color distance to the original color (log scale)',
+    )
+    plotX1Distance = _plotEuclideanDistanceCurve2d(
+      values=collectedSteps.x1,
+      targets=None,
+      title='Estimated noise distance to the original color (log scale)',
+    )
     # contains the trajectory of color and also distance to the original color
-    FIG_WIDTH = 2 * 9
-    FIG_HEIGHT = 2 * 6
-    fig = plt.figure(figsize=(FIG_WIDTH, FIG_HEIGHT))
-    gs = fig.add_gridspec(2, 2)
+    FIG_COLS = 3
+    FIG_ROWS = 2
+    fig = plt.figure(figsize=(FIG_COLS * 9, FIG_ROWS * 6))
+    gs = fig.add_gridspec(FIG_ROWS, FIG_COLS)
     axs = [
+      # col 1
       fig.add_subplot(gs[0, 0]), # color curve
       fig.add_subplot(gs[1, 0]), # euclidean distance curve
+      # col 2
       fig.add_subplot(gs[0, 1], projection='3d'), # steps trajectories
       fig.add_subplot(gs[1, 1], projection='3d'), # estimated trajectories
+      # col 3
+      fig.add_subplot(gs[0, 2]), # x0 trajectories
+      fig.add_subplot(gs[1, 2]), # x1 trajectories
     ]
     try:
       for step in range(collectedSteps.totalSteps):
         fig.suptitle(f'Step {step+1}/{collectedSteps.totalSteps}')
         plotColorCurve2d(step=step, ax=axs[0])
-        plotEuclideanDistanceCurve2d(step=step, ax=axs[1])
+        plotColorDistance2d(step=step, ax=axs[1])
         plotStepsTrajectories(step=step, ax=axs[2])
         plotEstimatedTrajectories(step=step, ax=axs[3])
+        plotX0Distance(step=step, ax=axs[4])
+        plotX1Distance(step=step, ax=axs[5])
 
         fig.tight_layout()
         fig.show()
