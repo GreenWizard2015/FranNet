@@ -198,12 +198,12 @@ class CInterpolantVisualization:
     plotX0Distance = _plotEuclideanDistanceCurve2d(
       values=collectedSteps.x0,
       targets=originalColors,
-      title='Estimated color distance to the original color (log scale)',
+      title='x0 distance (log scale)',
     )
     plotX1Distance = _plotEuclideanDistanceCurve2d(
       values=collectedSteps.x1,
-      targets=None,
-      title='Estimated noise distance to the original color (log scale)',
+      targets=None, # there is no target for x1
+      title='x1 distance (log scale)',
     )
     # contains the trajectory of color and also distance to the original color
     FIG_COLS = 3
