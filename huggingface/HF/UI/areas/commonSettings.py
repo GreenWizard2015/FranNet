@@ -37,7 +37,6 @@ def commonSettings(preprocessImage, resultActions):
       gr.Markdown('Actual input to the model')
       inputToModel = gr.Image(type='numpy', label='Input to the model', show_label=False, interactive=False)
       # TODO: find a way to prevent this image from being stretched
-      inputToModel.style(width=64, height=64)
 
       # button "Replace input image"
       replaceInputImage = gr.Button(value='Replace input image')
