@@ -13,7 +13,8 @@
           "name": "diffusion-V"
         },
         "stochasticity": 1.0,
-        "noise stddev": "correct",
+        "noise stddev": "squared",
+        "noise projection": true,
         "steps skip type": {
           "name": "uniform",
           "K": 1
