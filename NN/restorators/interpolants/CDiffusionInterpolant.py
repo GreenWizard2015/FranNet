@@ -35,6 +35,7 @@ class CDiffusionInterpolant(CBaseDiffusionInterpolant):
 # Diffusion Interpolant with a V objective
 class CDiffusionInterpolantV(CBaseDiffusionInterpolant):
   def solve(self, x_hat, xt, t):
+    # based on https://github.com/beresandras/clear-diffusion-keras/blob/master/model.py#L88-L90
     signal_rate, noise_rate = tf.sqrt(t), tf.sqrt(1.0 - t)
     x0 = xt * signal_rate - x_hat * noise_rate
     x1 = xt * noise_rate + x_hat * signal_rate
@@ -43,9 +44,12 @@ class CDiffusionInterpolantV(CBaseDiffusionInterpolant):
   def train(self, x0, x1, T):
     xt = self.interpolate(x0, x1, T)
     inputs = self.inference(xT=xt, T=T)
-    target = self.interpolate(x0, x1, 1.0 - T)
+    # calculate velocity
+    # based on https://github.com/beresandras/clear-diffusion-keras/blob/master/model.py#L347
+    signal_rate, noise_rate = tf.sqrt(T), tf.sqrt(1.0 - T)
+    velocity = (signal_rate * x1) - (noise_rate * x0)
     return {
-      'target': target,
+      'target': velocity, # predict velocity
       'x0': x0,
       'x1': x1,
       **inputs,
