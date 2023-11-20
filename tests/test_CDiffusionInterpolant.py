@@ -74,22 +74,22 @@ def test_DDIM_eq_INTR_sample_steps(K):
   return
 
 # Randomly sampled data go through train, and then we check if the solver is able to recover the data
-def _check_inversibility(interpolant, N=1024, atol=5e-6):
+def _check_inversibility(interpolant, N=1024, atol=5e-6, TMargin=1e-6):
   x0 = tf.zeros([N, 1])
   x1 = tf.ones([N, 1])
   T = tf.linspace(0.0, 1.0, N)
-  T = tf.clip_by_value(T, 5e-6, 1.0 - 5e-6)
+  T = tf.clip_by_value(T, TMargin, 1.0 - TMargin)
   trainData = interpolant.train(x0, x1, T[:, None])
   solved = interpolant.solve(x_hat=trainData['target'], xt=trainData['xT'], t=trainData['T'])
 
   T = T.numpy().reshape(-1)
   diff = tf.abs(solved.x0 - x0).numpy().reshape(-1)
   for i, (t, d) in enumerate(zip(T, diff)):
-    assert np.allclose(0.0, d, atol=atol), f'{i}: {t} {d}'
+    assert np.allclose(0.0, d, atol=atol), f'x0 | {i}: {t} {d}'
 
   diff = tf.abs(solved.x1 - x1).numpy().reshape(-1)
   for i, (t, d) in enumerate(zip(T, diff)):
-    assert np.allclose(0.0, d, atol=atol), f'{i}: {t} {d}'
+    assert np.allclose(0.0, d, atol=atol), f'x1 | {i}: {t} {d}'
   return
 
 def test_inversibility():
