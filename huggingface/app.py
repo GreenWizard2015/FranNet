@@ -89,8 +89,8 @@ def main(args):
   # Processor used for CelebA
   image_processor = CImageProcessor(
     image_size=64,
-    reverse_channels=False,
     to_grayscale=True,
+    reverse_channels=True,
     normalize_range=True
   )
   

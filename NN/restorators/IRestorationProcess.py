@@ -20,13 +20,13 @@ class IRestorationProcess:
     '''
     raise NotImplementedError()
   
-  def calculate_loss(self, x_hat, predicted):
+  def calculate_loss(self, x_hat, predicted, **kwargs):
     raise NotImplementedError()
   
-  def train_step(self, x0, model):
+  def train_step(self, x0, model, **kwargs):
     x_hat = self.forward(x0)
     values = model(T=x_hat['T'], V=x_hat['xT'])
-    return self.calculate_loss(x_hat, values)
+    return self.calculate_loss(x_hat, values, **kwargs)
     
   @property
   def channels(self):

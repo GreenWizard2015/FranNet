@@ -29,7 +29,8 @@ class CSingleStepRestoration(IRestorationProcess):
     T = tf.tile(T, tf.concat([shp, [1]], axis=0))
     return denoiser(value, T)
   
-  def calculate_loss(self, gt, predicted):
+  def calculate_loss(self, gt, predicted, **kwargs):
+    lossFn = kwargs.get('lossFn', tf.losses.mse) # default loss function
     x0 = gt["x0"]
     tf.assert_equal(tf.shape(x0), tf.shape(predicted))
-    return tf.losses.mse(x0, predicted)
+    return lossFn(x0, predicted)

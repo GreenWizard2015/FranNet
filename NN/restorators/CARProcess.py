@@ -24,8 +24,9 @@ class CARProcess(IRestorationProcess):
     tf.assert_equal(tf.shape(x0), tf.shape(xT))
     return self._sampler.train(x0=x0, x1=xT, T=sampled['T'])
   
-  def calculate_loss(self, x_hat, predicted):
-    return tf.losses.mae(x_hat['target'], predicted)
+  def calculate_loss(self, x_hat, predicted, **kwargs):
+    lossFn = kwargs.get('lossFn', tf.losses.mae) # default loss function
+    return lossFn(x_hat['target'], predicted)
 
   def _makeDenoiser(self, model, modelT):
     timeEncoder = make_time_encoder(modelT)

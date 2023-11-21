@@ -25,6 +25,25 @@ def _optimizer_from_config(config):
     pass
   raise ValueError(f"Unknown optimizer config: {config}")
 
+def _makeTrainingLoss(config):
+  if config is None: return None
+  if isinstance(config, str): # name of the loss
+    return tf.keras.losses.get(config)
+  
+  if isinstance(config, dict):
+    name = config['name'].lower()
+    if 'huber' == name:
+      return tf.keras.losses.Huber(delta=float(config['delta']))
+    
+    if 'pseudo huber' == name:
+      delta = float(config['delta'])
+      def _pseudo_huber_loss(y_true, y_pred):
+        err = tf.reduce_mean(tf.square(y_true - y_pred), axis=-1)
+        return tf.sqrt(err + delta**2) - delta
+      return _pseudo_huber_loss
+
+  raise ValueError(f"Unknown training loss config: {config}")
+
 def _nerf_from_config(config):
   if 'basic' == config['name']:
     return lambda encoder, renderer, restorator: CNerf2D(
@@ -33,7 +52,8 @@ def _nerf_from_config(config):
       restorator=restorator,
       samplesN=config['samplesN'],
       trainingSampler=config.get('training sampler', 'uniform'),
-      shiftedSamples=config.get('shifted samples', None)
+      shiftedSamples=config.get('shifted samples', None),
+      trainingLoss=_makeTrainingLoss(config.get('training loss', None)),
     )
   
   raise ValueError(f"Unknown nerf name: {config['name']}")
