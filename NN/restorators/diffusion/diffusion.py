@@ -107,12 +107,13 @@ class CGaussianDiffusion(IRestorationProcess):
     tf.assert_equal(tf.shape(value), initShape)
     return value
   
-  def calculate_loss(self, x_hat, predicted):
+  def calculate_loss(self, x_hat, predicted, **kwargs):
+    lossFn = kwargs.get('lossFn', tf.losses.mae) # default loss function
     target = x_hat['target']
     tf.assert_equal(tf.shape(target), tf.shape(predicted))
     B = tf.shape(predicted)[0]
     
-    loss = tf.losses.mae(target, predicted)
+    loss = lossFn(target, predicted)
     tf.assert_equal(tf.shape(loss), (B, ))
 
     loss = self._lossScaling(loss, x_hat, predicted)

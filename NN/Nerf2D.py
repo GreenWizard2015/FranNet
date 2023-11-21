@@ -7,6 +7,7 @@ class CNerf2D(CBaseModel):
     encoder, renderer, restorator,
     samplesN=256, trainingSampler='uniform',
     shiftedSamples=None,
+    trainingLoss=None,
     **kwargs
   ):
     super().__init__(**kwargs)
@@ -14,16 +15,31 @@ class CNerf2D(CBaseModel):
     self._renderer = renderer
     self._restorator = restorator
     self.samplesN = samplesN
+    self._bindShiftedSamples(shiftedSamples)
+    self._bindTrainingSampler(trainingSampler)
+    self._bindTrainingLoss(trainingLoss)
+    return
+  
+  def _bindTrainingLoss(self, trainingLoss):
+    self._lossParams = dict() # use default loss parameters
+    if trainingLoss is None: return
+    # validate training loss
+    assert callable(trainingLoss), "training loss must be callable"
+    self._lossParams = dict(lossFn=trainingLoss)
+    return
+  
+  def _bindShiftedSamples(self, shiftedSamples):
     self._shiftedSamples = shiftedSamples
+    if shiftedSamples is None: return
     # validate shifted samples config structure if it is present
-    if shiftedSamples is not None:
-      assert isinstance(shiftedSamples, dict), "shifted samples must be a dict"
-      assert 'kind' in shiftedSamples, "shifted samples must have 'kind' key"
-      assert shiftedSamples['kind'] in ['normal', 'uniform'], "shifted samples kind must be 'normal' or 'uniform'"
-      assert 'fraction' in shiftedSamples, "shifted samples must have 'fraction' key"
-      assert (0.0 <= shiftedSamples['fraction']) and (shiftedSamples['fraction'] <= 1.0), "shifted samples fraction must be in [0, 1]"
-      pass
+    assert isinstance(shiftedSamples, dict), "shifted samples must be a dict"
+    assert 'kind' in shiftedSamples, "shifted samples must have 'kind' key"
+    assert shiftedSamples['kind'] in ['normal', 'uniform'], "shifted samples kind must be 'normal' or 'uniform'"
+    assert 'fraction' in shiftedSamples, "shifted samples must have 'fraction' key"
+    assert (0.0 <= shiftedSamples['fraction']) and (shiftedSamples['fraction'] <= 1.0), "shifted samples fraction must be in [0, 1]"
+    return
 
+  def _bindTrainingSampler(self, trainingSampler):
     samplers = {
       'uniform': tf.random.uniform,
       'halton': lambda shape: sample_halton_sequence(shape[:-1], shape[-1])
@@ -85,6 +101,7 @@ class CNerf2D(CBaseModel):
           T=T, V=V,
           training=True
         ),
+        **self._lossParams
       )
       
     self.optimizer.minimize(loss, self.trainable_variables, tape=tape)
