@@ -1,0 +1,11 @@
+{
+  "model": {
+    "nerf": {
+      "training loss": {
+        "name": "pseudo huber",
+        "comment": "delta is 1.0 / 127.5",
+        "delta": 0.00784313725
+      }
+    }
+  }
+}

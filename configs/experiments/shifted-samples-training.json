@@ -1,0 +1,11 @@
+{
+  "model": {
+    "nerf": {
+      "shifted samples": {
+        "kind": "normal",
+        "fraction": 0.5,
+        "stddev": 0.01
+      }
+    }
+  }
+}
