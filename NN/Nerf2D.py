@@ -95,7 +95,7 @@ class CNerf2D(CBaseModel):
       encodedSrc = self._encoder(src=src, training=True)
       x0, queriedPos, latents = self._trainingData(encodedSrc, dest)
       loss = self._restorator.train_step(
-        x0=x0,
+        x0=self._converter.convert(x0), # convert to the target format
         model=lambda T, V: self._renderer(
           latents=latents, pos=queriedPos,
           T=T, V=V,
@@ -112,13 +112,13 @@ class CNerf2D(CBaseModel):
     (src, dest) = images
     src = ensure4d(src)
     dest = ensure4d(dest)
-    
+    # call the model itself to obtain the reconstructed image in the proper format
     reconstructed = self(src, size=tf.shape(dest)[1], training=False)
     return self._testMetrics(dest, reconstructed)
 
   #####################################################
   @tf.function
-  def inference(
+  def _inference(
     self, src, pos, 
     batchSize=None, reverseArgs=None, initialValues=None,
     sampleShape=None
@@ -166,6 +166,9 @@ class CNerf2D(CBaseModel):
       C = tf.shape(probes)[-1]
       fullShape = tf.concat([[B], sampleShape, [C]], axis=0)
       probes = tf.reshape(probes, fullShape)
+      pass
+    # convert to the proper format
+    probes = self._converter.convertBack(probes)
     return probes
   
   @tf.function
@@ -184,7 +187,7 @@ class CNerf2D(CBaseModel):
     else:
       sampleShape = (tf.shape(pos)[0], )
 
-    return self.inference(
+    return self._inference(
       src=src, pos=pos,
       batchSize=batchSize,
       reverseArgs=reverseArgs,

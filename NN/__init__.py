@@ -46,14 +46,19 @@ def _makeTrainingLoss(config):
 
 def _nerf_from_config(config):
   if 'basic' == config['name']:
-    return lambda encoder, renderer, restorator: CNerf2D(
-      encoder=encoder,
-      renderer=renderer,
-      restorator=restorator,
+    nerfParams = dict(
       samplesN=config['samplesN'],
       trainingSampler=config.get('training sampler', 'uniform'),
       shiftedSamples=config.get('shifted samples', None),
       trainingLoss=_makeTrainingLoss(config.get('training loss', None)),
+    )
+    if 'format' in config: nerfParams['format'] = config['format']
+    
+    return lambda encoder, renderer, restorator: CNerf2D(
+      encoder=encoder,
+      renderer=renderer,
+      restorator=restorator,
+      **nerfParams
     )
   
   raise ValueError(f"Unknown nerf name: {config['name']}")

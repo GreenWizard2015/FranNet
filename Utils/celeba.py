@@ -7,20 +7,18 @@ class CCelebADataset:
     self._imageProcessor = CImageProcessor(
       image_size=image_size,
       to_grayscale=toGrayscale,
-      reverse_channels=True,
-      normalize_range=True,
+      format='RGB', # in CelebA images are in RGB format
+      range='0..255' # in CelebA images are in the 0..255 range
     )
     self._batchSize = batch_size
 
     self._celeb_a_builder = tfds.builder("celeb_a")
     self._celeb_a_builder.download_and_prepare()
     return
-
-  def normalizeImg(self, x):
-    return self._imageProcessor.normalizeImg(x)
-
-  def unnormalizeImg(self, x):
-    return self._imageProcessor.unnormalizeImg(x)
+  
+  @property
+  def range(self):
+    return self._imageProcessor.range
   
   def make_dataset(self, config, split):
     res = self._celeb_a_builder.as_dataset(split=split)
@@ -55,12 +53,12 @@ if __name__ == "__main__": # test masking
   for src, img in train.take(12):
     src = src[0].numpy()
     img = img[0].numpy()
-    src = dataset.unnormalizeImg(src)
-    img = dataset.unnormalizeImg(img)
+    src = dataset.range.convertBack(src)
+    img = dataset.range.convertBack(img)
     # upscale src by 4x
     src = cv2.resize(src, (256, 256), interpolation=cv2.INTER_NEAREST)
-    cv2.imshow('src', src)
-    cv2.imshow('img', img)
+    cv2.imshow('src', src.astype('uint8'))
+    cv2.imshow('img', img.astype('uint8')[..., ::-1])
     cv2.waitKey(0)
     pass
   pass

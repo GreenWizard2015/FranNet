@@ -25,7 +25,7 @@ class COracleModel(CBaseModel):
     destShape = (tf.shape(dest)[1], tf.shape(dest)[2])
     
     # create fake reconstructed image from the ground truth
-    reconstructed = self.convertRange(dest, targetRange='0..1')
+    reconstructed = (dest + 1.0) / 2.0
     # downscale it to the size of the source image and upscale back
     reconstructed = tf.image.resize(reconstructed, srcShape, method=self._method)
     if self._grayscaled:
@@ -35,7 +35,7 @@ class COracleModel(CBaseModel):
     if self._grayscaled:
       reconstructed = tf.image.grayscale_to_rgb(reconstructed)
     # convert back to the range of the source image
-    reconstructed = self.convertRange(reconstructed, targetRange='-1..1')
+    reconstructed = (reconstructed * 2.0) - 1.0
 
     return self._testMetrics(dest, reconstructed)
   

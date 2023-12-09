@@ -1,18 +1,22 @@
 import tensorflow as tf
+import Utils.colors as colors
 
 class CImageProcessor:
-  def __init__(self, image_size, reverse_channels, to_grayscale, normalize_range):
+  def __init__(self, image_size, to_grayscale, format, range):
     self._imageSize = image_size
-    self._reverseChannels = reverse_channels
     self._toGrayscale = to_grayscale
-    self._normalizeRange = normalize_range
+    self._range = colors.convertRanges(range, '-1..1')
+    self._internalRange = colors.convertRanges(range, '0..1')
+    self._outputRange = colors.convertRanges('0..1', '-1..1')
+
+    format = format.lower()
+    assert format in ['rgb', 'bgr'], 'Invalid format: %s' % format
+    self._format = format
     return
-
-  def normalizeImg(self, x):
-    return (x * 2.0) - 1.0
-
-  def unnormalizeImg(self, x):
-    return (1.0 + x) / 2.0
+  
+  @property
+  def range(self):
+    return self._range
 
   def _squareCrop(self, img, args):
     s = tf.shape(img)
@@ -29,23 +33,30 @@ class CImageProcessor:
     res = img[:, sH:(sH + crop_size), sW:(sW + crop_size), :]
     tf.debugging.assert_equal(tf.shape(res), (B, crop_size, crop_size, C))
     return res
-               
+  
   def _prepare(self, img, args):
-    img = tf.cast(img, tf.float32)
-    if self._normalizeRange: img = img / 255.0
+    img = self._internalRange.convert(img)
     img = self._squareCrop(img, args=args)
-    # NOTE: its a bug, should be in _srcImage,
-    # but some models were trained with the channels reversed, so keep it
-    if self._reverseChannels: img = img[..., ::-1]
     return img
     
   def _srcImage(self, img):
     img = tf.image.resize(img, [self._imageSize, self._imageSize])
-    if self._toGrayscale: img = tf.image.rgb_to_grayscale(img)
-    return self.normalizeImg(img)
+    if self._toGrayscale:
+      if 'bgr' == self._format: img = img[..., ::-1] # BGR to RGB
+      img = tf.image.rgb_to_grayscale(img)
+      pass # now img is grayscale
+
+    return img
   
   def _destImage(self, img):
-    return self.normalizeImg(img)
+    return img
+
+  def _checkInput(self, img):
+    tf.assert_equal(tf.rank(img), 4)
+    tf.assert_equal(tf.shape(img)[-1], 3)
+    tf.debugging.assert_integer(img)
+    self._internalRange.check(img)
+    return
 
   def process(self, config_or_image):
     isConfig = isinstance(config_or_image, dict)
@@ -60,8 +71,16 @@ class CImageProcessor:
       pass
 
     def _process(img):
+      self._checkInput(img)
+      
       img = self._prepare(img, args)
-      return( self._srcImage(img), self._destImage(img) )
+      src = self._srcImage(img)
+      dest = self._destImage(img)
+      # NOTE: ALWAYS return images in the -1..1 range in RGB color space
+      return(
+        self._outputRange.convert(src),
+        self._outputRange.convert(dest)
+      )
     
     if isConfig: return _process
     return _process(config_or_image) # apply to image directly
