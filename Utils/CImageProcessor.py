@@ -37,15 +37,15 @@ class CImageProcessor:
   def _prepare(self, img, args):
     img = self._internalRange.convert(img)
     img = self._squareCrop(img, args=args)
+    # ensure that the image is in the RGB color space
+    if 'bgr' == self._format: img = img[..., ::-1] # BGR to RGB
     return img
     
   def _srcImage(self, img):
     img = tf.image.resize(img, [self._imageSize, self._imageSize])
     if self._toGrayscale:
-      if 'bgr' == self._format: img = img[..., ::-1] # BGR to RGB
-      img = tf.image.rgb_to_grayscale(img)
-      pass # now img is grayscale
-
+      return tf.image.rgb_to_grayscale(img)
+      
     return img
   
   def _destImage(self, img):
