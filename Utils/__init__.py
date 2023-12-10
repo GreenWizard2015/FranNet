@@ -17,7 +17,7 @@ def ImageProcessor_from_config(config):
     config = dict(name='celeba', image_size=64, toGrayscale=True)
 
   if isinstance(config, dict) and ('celeba' == config['name'].lower()):
-    from Utils.celeba import CelebaImageProcessor
+    from Utils.CelebaImageProcessor import CelebaImageProcessor
     return CelebaImageProcessor(
       image_size=config['image_size'],
       to_grayscale=config.get('toGrayscale', True),

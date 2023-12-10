@@ -29,7 +29,8 @@ def infer(models, image_processor):
     assert 3 == inputImage.shape[-1], f'Invalid image channels: {inputImage.shape[-1]}'
     # should be 64x64, because of preprocessing
     assert (64, 64) == inputImage.shape[:2], f'Invalid image shape: {inputImage.shape}'
-    input = image_processor.range.convert(inputImage[None])
+    # inputImage has 3 channels, but its grayscale
+    input = image_processor.range.convert(inputImage[None, ..., :1])
 
     model = models.get(modelName, None)
     assert model is not None, f'Invalid model name: {modelName}'

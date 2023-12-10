@@ -13,8 +13,8 @@ def _isFloatRange(a, b):
 def _isRangeUInt8(x):
   tf.debugging.assert_integer(x)
   # x is in the 0..255 range
-  tf.debugging.assert_less_equal(tf.reduce_min(x), tf.cast(0, x.dtype))
-  tf.debugging.assert_greater_equal(tf.reduce_max(x), tf.cast(255, x.dtype))
+  tf.debugging.assert_greater_equal(tf.reduce_min(x), tf.cast(0, x.dtype))
+  tf.debugging.assert_less_equal(tf.reduce_max(x), tf.cast(255, x.dtype))
   return
 
 def _from01range(to_):
@@ -38,14 +38,14 @@ def _fromUInt8Range(to_):
   if ('-1..1' == to_):
     return CFakeObject(
       convert=lambda x: (tf.cast(x, tf.float32) / 127.5) - 1.0,
-      convertBack=lambda x: (x + 1.0) * 127.5,
+      convertBack=lambda x: tf.cast((x + 1.0) * 127.5, tf.uint8),
       check=_isRangeUInt8
     )
   
   if ('0..1' == to_):
     return CFakeObject(
       convert=lambda x: tf.cast(x, tf.float32) / 255.0,
-      convertBack=lambda x: x * 255.0,
+      convertBack=lambda x: tf.cast(x * 255.0, tf.uint8),
       check=_isRangeUInt8
     )
   
