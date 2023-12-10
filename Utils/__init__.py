@@ -10,3 +10,17 @@ def dataset_from_config(config):
     )
 
   raise NotImplementedError(f"Dataset {config['name']} not implemented.")
+
+# Hacky way to create ImageProcessor without instantiating a dataset
+def ImageProcessor_from_config(config):
+  if isinstance(config, str) and ('celeba' == config.lower()): # shortcut
+    config = dict(name='celeba', image_size=64, toGrayscale=True)
+
+  if isinstance(config, dict) and ('celeba' == config['name'].lower()):
+    from Utils.celeba import CelebaImageProcessor
+    return CelebaImageProcessor(
+      image_size=config['image_size'],
+      to_grayscale=config.get('toGrayscale', True),
+    )
+  
+  raise NotImplementedError(f"ImageProcessor {config['name']} not implemented.")

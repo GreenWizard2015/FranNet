@@ -40,6 +40,7 @@ class CNerf2D(CBaseModel):
     return
 
   def _bindTrainingSampler(self, trainingSampler):
+    # TODO: add "structured" sampler, which samples points from e+0*delta, e+1*delta, ..., e+(N-1)*delta
     samplers = {
       'uniform': tf.random.uniform,
       'halton': lambda shape: sample_halton_sequence(shape[:-1], shape[-1])

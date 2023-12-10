@@ -2,7 +2,7 @@
 import os, argparse
 import numpy as np
 
-from Utils.CImageProcessor import CImageProcessor
+from Utils import ImageProcessor_from_config
 from HF.UI import AppUI
 from HF.Utils import toPILImage
 from HF.NNHelper import modelsFrom, inference_from_config
@@ -17,8 +17,8 @@ def preprocessImage(image_processor):
     assert 3 == inputImage.shape[-1], f'Invalid image channels: {inputImage.shape[-1]}'
 
     input, _ = image_processor.process(inputImage[None])
-    input = image_processor.unnormalizeImg(input).numpy()[0]
-    return toPILImage(input)
+    input = image_processor.range.convertBack(input).numpy()[0]
+    return toPILImage(input, isBGR=False)
   return _preprocessImage
 
 def infer(models, image_processor):
@@ -29,8 +29,7 @@ def infer(models, image_processor):
     assert 3 == inputImage.shape[-1], f'Invalid image channels: {inputImage.shape[-1]}'
     # should be 64x64, because of preprocessing
     assert (64, 64) == inputImage.shape[:2], f'Invalid image shape: {inputImage.shape}'
-    # but we need to preprocess it again
-    input, _ = image_processor.process(inputImage[None])
+    input = image_processor.range.convert(inputImage[None])
 
     model = models.get(modelName, None)
     assert model is not None, f'Invalid model name: {modelName}'
@@ -42,17 +41,15 @@ def infer(models, image_processor):
       extras = res
 
     if tf.is_tensor(upscaled):
-      upscaled = image_processor.unnormalizeImg(upscaled).numpy()[0]
+      upscaled = image_processor.range.convertBack(upscaled).numpy()[0]
 
     if not(upscaled is None): # validate the output
       assert isinstance(upscaled, np.ndarray), f'Invalid image type: {type(upscaled)}'
       assert 3 == upscaled.shape[-1], f'Invalid image channels: {upscaled.shape[-1]}'
       assert 3 == len(upscaled.shape), f'Invalid image shape: {upscaled.shape}'
-      upscaled = toPILImage(upscaled, isBGR=True)
-    return {
-      'upscaled': upscaled,
-      **extras,
-    }
+      upscaled = toPILImage(upscaled, isBGR=False)
+
+    return dict(upscaled=upscaled, **extras)
   return _processImage
 
 def run2inference(run, runName=None):
@@ -86,17 +83,12 @@ def main(args):
   # convert to dict
   models = {model.name: model for model in models}
 
-  # Processor used for CelebA
-  image_processor = CImageProcessor(
-    image_size=64,
-    to_grayscale=True,
-    reverse_channels=True,
-    normalize_range=True
-  )
+  # Default processor used for CelebA
+  celeba_processor = ImageProcessor_from_config('celeba')
   
   app = AppUI(
-    preprocessImage=preprocessImage(image_processor),
-    processImage=infer(models, image_processor),
+    preprocessImage=preprocessImage(celeba_processor),
+    processImage=infer(models, celeba_processor),
     models=models,
   )
   app.queue() # enable queueing of requests/events

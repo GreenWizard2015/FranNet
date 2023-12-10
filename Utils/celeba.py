@@ -2,14 +2,17 @@ import tensorflow_datasets as tfds
 from Utils.utils import masking_from_config
 from Utils.CImageProcessor import CImageProcessor
 
+def CelebaImageProcessor(image_size, to_grayscale):
+  return CImageProcessor(
+    image_size=image_size,
+    to_grayscale=to_grayscale,
+    format='RGB', # in CelebA images are in RGB format
+    range='0..255' # in CelebA images are in the 0..255 range
+  )
+
 class CCelebADataset:
   def __init__(self, batch_size=32, image_size=64, toGrayscale=True):
-    self._imageProcessor = CImageProcessor(
-      image_size=image_size,
-      to_grayscale=toGrayscale,
-      format='RGB', # in CelebA images are in RGB format
-      range='0..255' # in CelebA images are in the 0..255 range
-    )
+    self._imageProcessor = CelebaImageProcessor(image_size, toGrayscale)
     self._batchSize = batch_size
 
     self._celeb_a_builder = tfds.builder("celeb_a")
