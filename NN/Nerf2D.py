@@ -157,6 +157,7 @@ class CNerf2D(CBaseModel):
       value = (flatB, )
       if initialValues is not None:
         value = initialValues[:, ind:ind+sz, :]
+        value = self._converter.convert(value) # convert initial values to the proper format
         tf.assert_equal(tf.shape(value), (B, sz, C))
         value = tf.reshape(value, (flatB, C))
         pass
