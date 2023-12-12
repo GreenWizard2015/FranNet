@@ -52,7 +52,8 @@ def _nerf_from_config(config):
       shiftedSamples=config.get('shifted samples', None),
       trainingLoss=_makeTrainingLoss(config.get('training loss', None)),
     )
-    if 'format' in config: nerfParams['format'] = config['format']
+    # If format is not specified, use BGR, because old models were trained to predict BGR
+    nerfParams['format'] = config.get('format', 'bgr')
     
     return lambda encoder, renderer, restorator: CNerf2D(
       encoder=encoder,
