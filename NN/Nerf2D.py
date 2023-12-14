@@ -2,6 +2,24 @@ import tensorflow as tf
 from .utils import extractInterpolated, ensure4d, sample_halton_sequence, generateSquareGrid
 from .CBaseModel import CBaseModel
 
+def _structuredSample(B, N, sharedShifts):
+  # make a uniform grid of points (total N points)
+  n = tf.cast(tf.math.ceil(tf.math.sqrt(tf.cast(N, tf.float32))), tf.int32)
+  rng = tf.linspace(0.0, 1.0, n + 1)[:-1] # [0, 1) range
+  delta = rng[1] - rng[0]
+  x, y = tf.meshgrid(rng, rng)
+  grid = tf.stack([tf.reshape(x, (-1, )), tf.reshape(y, (-1, ))], axis=0)
+  grid = tf.transpose(grid)[None]
+  tf.assert_equal(tf.shape(grid), (1, N, 2))
+  # generate samples
+  shifts = tf.random.uniform((B, 1, 2) if sharedShifts else (B, N, 2)) * delta
+  res = shifts + tf.tile(grid, [B, 1, 1])
+  # some verifications
+  tf.assert_equal(tf.shape(res), (B, N, 2))
+  tf.debugging.assert_greater_equal(tf.reduce_min(res), 0.0)
+  tf.debugging.assert_less_equal(tf.reduce_max(res), 1.0)
+  return res
+
 class CNerf2D(CBaseModel):
   def __init__(self, 
     encoder, renderer, restorator,
@@ -40,10 +58,11 @@ class CNerf2D(CBaseModel):
     return
 
   def _bindTrainingSampler(self, trainingSampler):
-    # TODO: add "structured" sampler, which samples points from e+0*delta, e+1*delta, ..., e+(N-1)*delta
     samplers = {
       'uniform': tf.random.uniform,
-      'halton': lambda shape: sample_halton_sequence(shape[:-1], shape[-1])
+      'halton': lambda shape: sample_halton_sequence(shape[:-1], shape[-1]),
+      'structured': lambda shape: _structuredSample(B=shape[0], N=shape[1], sharedShifts=True),
+      'structured noisy': lambda shape: _structuredSample(B=shape[0], N=shape[1], sharedShifts=False)
     }
     assert trainingSampler in samplers, f'Unknown training sampler ({trainingSampler})'
     self._trainingSampler = samplers[trainingSampler]
