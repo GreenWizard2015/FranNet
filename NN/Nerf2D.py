@@ -26,6 +26,7 @@ class CNerf2D(CBaseModel):
     samplesN=256, trainingSampler='uniform',
     shiftedSamples=None,
     trainingLoss=None,
+    residual=False,
     **kwargs
   ):
     super().__init__(**kwargs)
@@ -36,6 +37,7 @@ class CNerf2D(CBaseModel):
     self._bindShiftedSamples(shiftedSamples)
     self._bindTrainingSampler(trainingSampler)
     self._bindTrainingLoss(trainingLoss)
+    self._residual = residual
     return
   
   def _bindTrainingLoss(self, trainingLoss):
@@ -106,6 +108,19 @@ class CNerf2D(CBaseModel):
       tf.reshape(latents, (B * N, -1))
     )
   
+  def _withResidual(self, img, points, values, add=True):
+    if not self._residual: return values
+
+    B = tf.shape(img)[0]
+    points = tf.reshape(points, (B, -1, 2))
+    # add residual
+    RV = extractInterpolated(img, points)
+    tf.assert_equal(tf.shape(RV)[-1], 1)
+    RV = tf.repeat(RV, 3, axis=-1) # grayscale to RGB
+    RV = tf.reshape(RV, tf.shape(values))
+    if add: return values + RV
+    return values - RV # for training
+  
   def train_step(self, data):
     (src, dest) = data
     src = ensure4d(src)
@@ -114,6 +129,8 @@ class CNerf2D(CBaseModel):
     with tf.GradientTape() as tape:
       encodedSrc = self._encoder(src=src, training=True)
       x0, queriedPos, latents = self._trainingData(encodedSrc, dest)
+      # train the restorator
+      x0 = self._withResidual(src, points=queriedPos, values=x0, add=False)
       loss = self._restorator.train_step(
         x0=self._converter.convert(x0), # convert to the target format
         model=lambda T, V: self._renderer(
@@ -183,13 +200,18 @@ class CNerf2D(CBaseModel):
       return dict(latents=latents, pos=posC, reverseArgs=reverseArgs, value=value)
 
     probes = self._renderer.batched(ittr=getChunk, B=B, N=N, batchSize=batchSize, training=False)
+    # convert to the proper format
+    probes = self._converter.convertBack(probes)
+    probes = self._withResidual(
+      src, values=probes,
+      points=tf.tile(pos[None], [B, 1, 1])
+    )
+    
     if sampleShape is not None:
       C = tf.shape(probes)[-1]
       fullShape = tf.concat([[B], sampleShape, [C]], axis=0)
       probes = tf.reshape(probes, fullShape)
       pass
-    # convert to the proper format
-    probes = self._converter.convertBack(probes)
     return probes
   
   @tf.function

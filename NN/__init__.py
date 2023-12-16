@@ -51,6 +51,7 @@ def _nerf_from_config(config):
       trainingSampler=config.get('training sampler', 'uniform'),
       shiftedSamples=config.get('shifted samples', None),
       trainingLoss=_makeTrainingLoss(config.get('training loss', None)),
+      residual=config.get('residual', False),
     )
     # If format is not specified, use BGR, because old models were trained to predict BGR
     nerfParams['format'] = config.get('format', 'bgr')
