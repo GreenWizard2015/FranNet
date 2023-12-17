@@ -107,16 +107,19 @@ class CNerf2D(CBaseModel):
       tf.reshape(targetPos, (B * N, 2)),
       tf.reshape(latents, (B * N, -1))
     )
+
+  def _extractGrayscaled(self, img, points):
+    B = tf.shape(img)[0]
+    points = tf.reshape(points, (B, -1, 2))
+    RV = extractInterpolated(img, points)
+    tf.assert_equal(tf.shape(RV)[-1], 1)
+    RV = tf.repeat(RV, 3, axis=-1) # grayscale to RGB
+    return RV
   
   def _withResidual(self, img, points, values, add=True):
     if not self._residual: return values
 
-    B = tf.shape(img)[0]
-    points = tf.reshape(points, (B, -1, 2))
-    # add residual
-    RV = extractInterpolated(img, points)
-    tf.assert_equal(tf.shape(RV)[-1], 1)
-    RV = tf.repeat(RV, 3, axis=-1) # grayscale to RGB
+    RV = self._extractGrayscaled(img, points)
     RV = tf.reshape(RV, tf.shape(values))
     if add: return values + RV
     return values - RV # for training
@@ -153,6 +156,23 @@ class CNerf2D(CBaseModel):
     reconstructed = self(src, size=tf.shape(dest)[1], training=False)
     return self._testMetrics(dest, reconstructed)
 
+  def _createAlgorithmInterceptor(self, interceptor, image, pos):
+    from NN.restorators.samplers.CWatcherWithExtras import CWatcherWithExtras
+    def interceptorFactory(algorithm):
+      res = interceptor(algorithm)
+      residuals = None
+      if self._residual:
+        residuals = self._extractGrayscaled(image, pos)
+        residuals = tf.reshape(residuals, (-1, tf.shape(residuals)[-1]))
+        pass
+
+      res = CWatcherWithExtras(
+        watcher=res,
+        converter=self._converter,
+        residuals=residuals
+      )
+      return res
+    return interceptorFactory
   #####################################################
   @tf.function
   def _inference(
@@ -174,6 +194,15 @@ class CNerf2D(CBaseModel):
       C = tf.shape(initialValues)[-1]
       tf.assert_equal(tf.shape(initialValues)[:1], (B, ))
       initialValues = tf.reshape(initialValues, (B, N, C))
+
+    if 'algorithmInterceptor' in reverseArgs: # update algorithm interceptor if provided
+      newParams = {k: v for k, v in encoderParams.items() if k != 'algorithmInterceptor'}
+      newParams['algorithmInterceptor'] = self._createAlgorithmInterceptor(
+        interceptor=reverseArgs['algorithmInterceptor'],
+        image=src, pos=tf.tile(pos[None], [B, 1, 1])
+      )
+      encoderParams = newParams
+      pass
 
     def getChunk(ind, sz):
       posC = pos[ind:ind+sz]

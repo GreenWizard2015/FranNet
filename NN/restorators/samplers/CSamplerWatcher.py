@@ -1,32 +1,11 @@
 import tensorflow as tf
-from .ISamplingAlgorithm import ISamplingAlgorithm
 from NN.utils import is_namedtuple
+from .CSamplingInterceptor import CSamplingInterceptor
+from .ISamplerWatcher import ISamplerWatcher
 
-class CSamplingInterceptor(ISamplingAlgorithm):
-  def __init__(self, watcher, algorithm):
-    self._watcher = watcher
-    self._algorithm = algorithm
-    return
-  
-  def firstStep(self, **kwargs):
-    res = self._algorithm.firstStep(**kwargs)
-    self._watcher._onStart(value=kwargs['value'], kwargs=kwargs)
-    return res
-  
-  def nextStep(self, **kwargs):
-    self._watcher._onNextStep(iteration=kwargs['iteration'], kwargs=kwargs)
-    res = self._algorithm.nextStep(**kwargs)
-    return res
-  
-  def inference(self, **kwargs):
-    return self._algorithm.inference(**kwargs)
-  
-  def solve(self, **kwargs):
-    return self._algorithm.solve(**kwargs)
-# End of CSamplingInterceptor
-
-class CSamplerWatcher:
+class CSamplerWatcher(ISamplerWatcher):
   def __init__(self, steps, tracked, indices=None):
+    super().__init__()
     self._indices = tf.constant(indices, dtype=tf.int32) if not(indices is None) else None
     self._tracked = {}
     prefix = [steps]
@@ -71,15 +50,9 @@ class CSamplerWatcher:
       return
     
     mask = self._withIndices(mask)
-    activeCount = tf.reduce_sum(tf.cast(mask, tf.int32))
-    tf.assert_equal(
-      activeCount, tf.shape(value)[0],
-      'Number of active values must be the same as the number of values'
-    )
     prev = tracked[iteration - 1]
     # expand mask to match the value shape by copying values from the previous iteration
     indices = tf.where(mask)
-    tf.assert_equal(tf.size(indices), activeCount, 'Must be the same number of indices')
     value = tf.tensor_scatter_nd_update(prev, indices, value)
     tf.assert_equal(tf.shape(prev), tf.shape(value), 'Must be the same shape')
     tracked[iteration].assign(value)
