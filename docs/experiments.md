@@ -36,6 +36,10 @@ In the root of the [configs/experiments](../configs/experiments) folder, there a
 
 Models to be trained:
 
+- [ ] Train with 8x8 masking grid, residual predictions, huber-10 loss
+  - [ ] Single-pass
+  - [ ] Autoregressive direction
+  - [ ] Autoregressive DDIM with V-objective
 - [ ] Single-pass restorator
   - [x] Basic
   - [x] With masking (up to 75% of patches are masked)
@@ -49,10 +53,9 @@ Models to be trained:
     - [x] Basic
     - [ ] With halton quasi-random noise
     - [ ] With loss weighting
-- [ ] Autoregressive restorator
-  - [ ] Direction
-  - [ ] DDIM extended
-  - [ ] DDIM extended with V-objective
+- [x] Autoregressive restorator
+  - [x] Direction
+  - [x] DDIM extended with V-objective
 
 Studies to be conducted:
 
@@ -60,11 +63,10 @@ Studies to be conducted:
 - [ ] Compare with and without complex encoder
 - [x] [Compare different parameters for DDIM sampler, compare with DDPM](diffusion-restorator.md)
 - [ ] Compare different parameters for autoregressive "direction" restorator sampler
-- [ ] Show that ordinary DDIM and autoregressive DDIM are the same, in terms of inference and training
 - [x] Visualize the trajectories of the color values during the sampling process
 - [ ] Compare different model sizes (**600k**, x4, x16?)
 - [ ] Compare different noise sampling methods (**normal**, halton, resampled)
-- [ ] Try to use quasi-random generator to sample points for training (**uniform**, halton)
+- [ ] Try to use different random generator to sample points for training (**uniform**, halton, structured, structured noisy)
 - [ ] Investigation of incorporating additional information into the input image, such as edge detection and adding it as an extra channel
 - [ ] Comparison of inference times for different models
 - [ ] Utilization of masks with sizes based on prime numbers
@@ -80,3 +82,4 @@ Studies to be conducted:
 - [ ] Training on CelebA-HQ dataset (input size 64x64, but the supervised loss is calculated on 1024x1024, instead of 178x178)
 - [ ] Stronger augmentations (shifts, scaling, blurring)
 - [ ] Train diffusion restorator until convergence (instead of 15 epochs) and check the influence of the `noise projection` parameter
+- [ ] Compare performance of different encoders kernels (1x1, 3x3, **5x5 (default)**, 7x7)
