@@ -26,7 +26,14 @@ class IRestorationProcess:
   def train_step(self, x0, model, **kwargs):
     x_hat = self.forward(x0)
     values = model(T=x_hat['T'], V=x_hat['xT'])
-    return self.calculate_loss(x_hat, values, **kwargs)
+    assert isinstance(values, list), "model must return a list of values"
+
+    totalLoss = sum([
+      self.calculate_loss(x_hat, value, **kwargs)
+      for value in values
+    ])
+    N = float(len(values))
+    return totalLoss / N # normalize by the number of losses
     
   @property
   def channels(self):

@@ -29,6 +29,7 @@ class Renderer(tf.keras.Model):
     pos = self._posEncoder(pos)
     T = self._timeEncoder(T)
     res = self._decoder(latents, pos, T, V)
+    assert isinstance(res, list), "decoder must return a list of values"
     return res
 
   def _encodePos(self, pos, training, args):
@@ -49,7 +50,10 @@ class Renderer(tf.keras.Model):
       args = (latents, EPos, t, x)
       if mask is not None:
         args = (tf.boolean_mask(v, mask) for v in args)
-      return self._decoder(*args, training=training)
+
+      res = self._decoder(*args, training=training)
+      assert isinstance(res, list), "decoder must return a list of values"
+      return res[-1] # return the last value as the denoised one
     
     def encodeTime(t):
       if self._enableChecks:
