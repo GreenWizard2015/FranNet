@@ -20,6 +20,7 @@ def _structuredSample(B, N, sharedShifts):
   tf.debugging.assert_less_equal(tf.reduce_max(res), 1.0)
   return res
 
+# TODO: conditional residual predictions on grayscale values
 class CNerf2D(CBaseModel):
   def __init__(self, 
     encoder, renderer, restorator,

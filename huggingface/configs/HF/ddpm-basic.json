@@ -7,6 +7,9 @@
     "kind": "diffusion"
   },
   "model": {
+    "nerf": {
+      "format": "BGR"
+    },
     "restorator": {
       "inherit": "configs/models/restorator/ddpm.json",
       "sampler": {

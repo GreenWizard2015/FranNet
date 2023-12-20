@@ -80,6 +80,12 @@ def main(args):
   bestGroups = WBProject.groups(onlyBest=True)
   models.extend( run2inference(bestGroups['AR | direction']) )
   models.extend( run2inference(bestGroups['DDPM v2 | Basic']) )
+  # some of "DDPM-V, encoder v2, masking-8, residual"
+  models.extend( run2inference(bestGroups['DDPM-V, encoder v2, masking-8, residual, RGB']) )
+  models.extend( run2inference(bestGroups['DDPM-V, encoder v2, masking-8, residual, LAB']) )
+  models.extend( run2inference(bestGroups['DDPM-V, encoder v2, masking-8, residual, LAB, structured']) )
+
+  models.extend( run2inference(bestGroups['AR direction, encoder v2, masking-8, residual, LAB, structured']) )
 
   # convert to dict
   models = {model.name: model for model in models}
