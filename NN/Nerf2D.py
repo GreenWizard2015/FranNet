@@ -20,7 +20,6 @@ def _structuredSample(B, N, sharedShifts):
   tf.debugging.assert_less_equal(tf.reduce_max(res), 1.0)
   return res
 
-# TODO: conditional residual predictions on grayscale values
 class CNerf2D(CBaseModel):
   def __init__(self, 
     encoder, renderer, restorator,
@@ -28,6 +27,7 @@ class CNerf2D(CBaseModel):
     shiftedSamples=None,
     trainingLoss=None,
     residual=False,
+    extraLatents=None,
     **kwargs
   ):
     super().__init__(**kwargs)
@@ -38,6 +38,7 @@ class CNerf2D(CBaseModel):
     self._bindShiftedSamples(shiftedSamples)
     self._bindTrainingSampler(trainingSampler)
     self._bindTrainingLoss(trainingLoss)
+    self._bindExtraLatents(extraLatents)
     self._residual = residual
     return
   
@@ -69,6 +70,17 @@ class CNerf2D(CBaseModel):
     }
     assert trainingSampler in samplers, f'Unknown training sampler ({trainingSampler})'
     self._trainingSampler = samplers[trainingSampler]
+    return
+  
+  def _bindExtraLatents(self, extraLatents):
+    self._extraLatents = extraLatents
+    if extraLatents is None: return
+    # validate extra latents config structure if it is present
+    assert isinstance(extraLatents, list), "extra latents must be a list"
+    for latent in extraLatents:
+      assert isinstance(latent, dict), "extra latent must be a dict"
+      assert 'name' in latent, "extra latent must have 'name' key"
+      continue
     return
 
   def _getTrainingTargets(self, srcPos, B, N):
@@ -112,9 +124,11 @@ class CNerf2D(CBaseModel):
   def _extractGrayscaled(self, img, points):
     B = tf.shape(img)[0]
     points = tf.reshape(points, (B, -1, 2))
+    N = tf.shape(points)[1]
     RV = extractInterpolated(img, points)
     tf.assert_equal(tf.shape(RV)[-1], 1)
     RV = tf.repeat(RV, 3, axis=-1) # grayscale to RGB
+    RV = tf.reshape(RV, (B, N, 3)) # ensure proper shape, especially for last dimension
     return RV
   
   def _withResidual(self, img, points, values, add=True):
@@ -124,6 +138,27 @@ class CNerf2D(CBaseModel):
     RV = tf.reshape(RV, tf.shape(values))
     if add: return values + RV
     return values - RV # for training
+  
+  def _withExtraLatents(self, latents, src, points):
+    if self._extraLatents is None: return latents
+    
+    extraData = []
+    for latentConfig in self._extraLatents:
+      if latentConfig['name'] == 'grayscale':
+        data = self._extractGrayscaled(src, points)
+        data = self._converter.convert(data)
+        extraData.append(data)
+        continue
+      raise NotImplementedError(f"Unknown extra latent ({latentConfig['name']})")
+      continue
+
+    C = sum([x.shape[-1] for x in extraData])
+    extraData = tf.concat(extraData, axis=-1)
+    extraData = tf.reshape( # ensure proper shape, especially for last dimension
+      extraData,
+      tf.concat([tf.shape(latents)[:-1], [C]], axis=0)
+    )
+    return tf.concat([latents, extraData], axis=-1)
   
   def train_step(self, data):
     (src, dest) = data
@@ -135,6 +170,7 @@ class CNerf2D(CBaseModel):
       x0, queriedPos, latents = self._trainingData(encodedSrc, dest)
       # train the restorator
       x0 = self._withResidual(src, points=queriedPos, values=x0, add=False)
+      latents = self._withExtraLatents(latents, src=src, points=queriedPos)
       loss = self._restorator.train_step(
         x0=self._converter.convert(x0), # convert to the target format
         model=lambda T, V: self._renderer(
@@ -213,11 +249,11 @@ class CNerf2D(CBaseModel):
       # same coordinates for all images in the batch
       posC = tf.tile(posC, [B, 1])
       tf.assert_equal(tf.shape(posC), (flatB, 2))
+      posCB = tf.reshape(posC, (B, sz, 2))
 
       latents = self._encoder.latentAt(
-        encoded=encoded,
-        pos=tf.reshape(posC, (B, sz, 2)),
-        training=False, params=encoderParams
+        encoded=encoded, pos=posCB, params=encoderParams,
+        training=False
       )
       tf.assert_equal(tf.shape(latents)[:1], (flatB,))
       value = (flatB, )
@@ -227,6 +263,9 @@ class CNerf2D(CBaseModel):
         tf.assert_equal(tf.shape(value), (B, sz, C))
         value = tf.reshape(value, (flatB, C))
         pass
+
+      # add extra latents if needed
+      latents = self._withExtraLatents(latents=latents, src=src, points=posC)
       return dict(latents=latents, pos=posC, reverseArgs=reverseArgs, value=value)
 
     probes = self._renderer.batched(ittr=getChunk, B=B, N=N, batchSize=batchSize, training=False)
