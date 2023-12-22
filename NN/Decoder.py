@@ -35,7 +35,7 @@ class MLPDecoder(tf.keras.Model):
       continue
     
     tf.assert_equal(tf.shape(res)[1:], (self._channels, ))
-    return res
+    return [res] # return as a list to be compatible with other decoders
   
 def _mlp_from_config(config, channels):
   def _createMlp(name):

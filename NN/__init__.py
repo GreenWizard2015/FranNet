@@ -46,14 +46,22 @@ def _makeTrainingLoss(config):
 
 def _nerf_from_config(config):
   if 'basic' == config['name']:
-    return lambda encoder, renderer, restorator: CNerf2D(
-      encoder=encoder,
-      renderer=renderer,
-      restorator=restorator,
+    nerfParams = dict(
       samplesN=config['samplesN'],
       trainingSampler=config.get('training sampler', 'uniform'),
       shiftedSamples=config.get('shifted samples', None),
       trainingLoss=_makeTrainingLoss(config.get('training loss', None)),
+      residual=config.get('residual', False),
+      extraLatents=config.get('extra latents', None),
+    )
+    # If format is not specified, use BGR, because old models were trained to predict BGR
+    nerfParams['format'] = config.get('format', 'bgr')
+    
+    return lambda encoder, renderer, restorator: CNerf2D(
+      encoder=encoder,
+      renderer=renderer,
+      restorator=restorator,
+      **nerfParams
     )
   
   raise ValueError(f"Unknown nerf name: {config['name']}")

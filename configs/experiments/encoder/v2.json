@@ -1,0 +1,32 @@
+{
+  "model": {
+    "encoder": {
+      "latent dimension": 64,
+      "head": {
+        "downsample steps": [32, 32, 32],
+        "global context": {
+          "name": "v2",
+          "downsample steps": [
+            {"channels": 32, "kernel size": 3, "layers": 2},
+            {"channels": 64, "kernel size": 3, "layers": 2},
+            {"channels": 128, "kernel size": 3, "layers": 2}
+          ],
+          "mlp": [256, 256],
+          "final activation": "relu"
+        },
+        "local context": {
+          "kernel size": 3,
+          "conv before": 1,
+          "final activation": "relu"
+        }
+      },
+      "contexts mixer": {
+        "extractor": {
+          "name": "interpolate",
+          "mlp": [256, 256],
+          "final activation": "relu"
+        }
+      }
+    }
+  }
+}

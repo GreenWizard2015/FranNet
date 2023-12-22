@@ -1,0 +1,11 @@
+{
+  "model": {
+    "restorator": {
+      "source distribution": {
+        "name": "normal",
+        "mean": 0.0,
+        "stddev": 0.0
+      }
+    }
+  }
+}

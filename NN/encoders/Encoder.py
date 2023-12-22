@@ -27,19 +27,74 @@ def conv_block_params_from_config(config):
   }
   return convBefore + [lastConvParams]
   
-def conv_block_from_config(data, config, defaults):
+def conv_block_from_config(data, config, defaults, name='CB'):
   config = {**defaults, **config} # merge defaults and config
   convParams = conv_block_params_from_config(config)
   # apply convolutions to the data
-  for parameters in convParams:
+  for i, parameters in enumerate(convParams):
     data = L.Conv2D(
       filters=parameters['channels'],
       padding='same',
       kernel_size=parameters['kernel size'],
-      activation=parameters['activation']
+      activation=parameters['activation'],
+      name='%s/conv-%d' % (name, i)
     )(data)
     continue
   return data
+
+def _createGCMv2(dataShape, config, latentDim, name):
+  data = L.Input(shape=dataShape)
+
+  res = data
+  for i, blockConfig in enumerate(config['downsample steps']):
+    # downsample
+    res = L.Conv2D(
+      filters=blockConfig['channels'],
+      kernel_size=blockConfig['kernel size'],
+      strides=2,
+      padding='same',
+      activation='relu',
+      name=name + '/downsample-%d' % (i + 1,)
+    )(res)
+    # convolutions
+    for layerId in range(blockConfig['layers']):
+      res = L.Conv2D(
+        filters=blockConfig['channels'],
+        kernel_size=blockConfig['kernel size'],
+        padding='same',
+        activation='relu',
+        name=name + '/downsample-%d/layer-%d' % (i + 1, layerId + 1)
+      )(res)
+      continue
+    continue
+
+  return tf.keras.Model(inputs=[data], outputs=res, name=name)
+
+def _createGlobalContextModel(X, config, latentDim, name):
+  model = config.get('name', 'v1')
+  if 'v1' == model: # simple convolutional model
+    res = conv_block_from_config(
+      data=X, config=config, defaults={
+        'conv before': 0, # by default, no convolutions before the last layer
+      }
+    )
+    # calculate global context
+    latent = L.Flatten()(res)
+    context = sMLP(sizes=config['mlp'], activation='relu', name=name + '/globalMixer')(latent)
+    context = L.Dense(latentDim, activation=config['final activation'])(context)
+    return context # end of 'v1' model
+  
+  if 'v2' == model:
+    res = data = L.Input(shape=X.shape[1:])
+    res = _createGCMv2(res.shape[1:], config, latentDim, name)(res)
+    # calculate global context
+    latent = L.Flatten()(res)
+    context = sMLP(sizes=config['mlp'], activation='relu', name=name + '/globalMixer')(latent)
+    context = L.Dense(latentDim, activation=config['final activation'])(context)
+    model = tf.keras.Model(inputs=[data], outputs=context, name=name)
+    return model(X) # end of 'v2' model
+  
+  raise NotImplementedError('Unknown global context model: {}'.format(model))
 
 '''
 Simple encoder that takes image as input and returns corresponding latent vector with intermediate representations
@@ -56,7 +111,7 @@ def createEncoderHead(
   res = data
   res = L.BatchNormalization()(res)
   intermediate = []
-  for sz in downsampleSteps:
+  for i, sz in enumerate(downsampleSteps):
     res = L.Conv2D(sz, 3, strides=2, padding='same', activation='relu')(res)
     for _ in range(ConvBeforeStage):
       res = L.Conv2D(sz, 3, padding='same', activation='relu')(res)
@@ -68,7 +123,8 @@ def createEncoderHead(
           data=res, config=localContext, defaults={
             'channels': sz,
             'channels last': latentDim, # last layer should have latentDim channels
-          }
+          },
+          name='%s/intermediate-%d' % (name, i)
         )
       )
     ################################
@@ -77,14 +133,9 @@ def createEncoderHead(
     continue
 
   if not(globalContext is None): # global context
-    res = conv_block_from_config(
-      data=res, config=globalContext, defaults={
-        'conv before': 0, # by default, no convolutions before the last layer
-      }
+    context = _createGlobalContextModel(
+      res, config=globalContext, latentDim=latentDim, name=name + '/globalContext'
     )
-    latent = L.Flatten()(res)
-    context = sMLP(sizes=globalContext['mlp'], activation='relu', name=name + '/globalMixer')(latent)
-    context = L.Dense(latentDim, activation=globalContext['final activation'])(context)
   else: # no global context
     # return dummy context to keep the interface consistent
     context = L.Lambda(
