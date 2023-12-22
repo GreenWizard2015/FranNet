@@ -138,24 +138,27 @@ class CNerf2D(CBaseModel):
     RV = tf.reshape(RV, tf.shape(values))
     if add: return values + RV
     return values - RV # for training
+
+  def _extractExtraLatents(self, config, src, points, latents):
+    name = config['name'].lower()
+    if 'grayscale' == name:
+      return self._converter.convert(
+        self._extractGrayscaled(src, points)
+      )
+    
+    raise NotImplementedError(f"Unknown extra latent ({name})")
   
   def _withExtraLatents(self, latents, src, points):
     if self._extraLatents is None: return latents
     
-    extraData = []
-    for latentConfig in self._extraLatents:
-      if latentConfig['name'] == 'grayscale':
-        data = self._extractGrayscaled(src, points)
-        data = self._converter.convert(data)
-        extraData.append(data)
-        continue
-      raise NotImplementedError(f"Unknown extra latent ({latentConfig['name']})")
-      continue
+    extraData = [
+      self._extractExtraLatents(latentConfig, src, points, latents)
+      for latentConfig in self._extraLatents
+    ]
 
     C = sum([x.shape[-1] for x in extraData])
-    extraData = tf.concat(extraData, axis=-1)
     extraData = tf.reshape( # ensure proper shape, especially for last dimension
-      extraData,
+      tf.concat(extraData, axis=-1),
       tf.concat([tf.shape(latents)[:-1], [C]], axis=0)
     )
     return tf.concat([latents, extraData], axis=-1)

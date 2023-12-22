@@ -1,0 +1,9 @@
+{
+  "model": {
+    "nerf": {
+      "extra latents": [
+        { "name": "grayscale" }
+      ]
+    }
+  }
+}
