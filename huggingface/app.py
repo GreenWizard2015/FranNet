@@ -78,15 +78,20 @@ def main(args):
   # add some models from W&B
   models.extend( list(SPModels(WBProject)) )
   bestGroups = WBProject.groups(onlyBest=True)
-  models.extend( run2inference(bestGroups['AR | direction']) )
-  models.extend( run2inference(bestGroups['DDPM v2 | Basic']) )
-  # some of "DDPM-V, encoder v2, masking-8, residual"
-  models.extend( run2inference(bestGroups['DDPM-V, encoder v2, masking-8, residual, RGB']) )
-  models.extend( run2inference(bestGroups['DDPM-V, encoder v2, masking-8, residual, LAB']) )
-  models.extend( run2inference(bestGroups['DDPM-V, encoder v2, masking-8, residual, LAB, structured']) )
-
-  models.extend( run2inference(bestGroups['AR direction, encoder v2, masking-8, residual, LAB, structured']) )
-
+  customRuns = [
+    'DDPM v2 | Basic',
+    # some of "DDPM-V, encoder v2, masking-8, residual"
+    'DDPM-V, encoder v2, masking-8, residual, RGB',
+    'DDPM-V, encoder v2, masking-8, residual, LAB',
+    'DDPM-V, encoder v2, masking-8, residual, LAB, structured',
+    # autorregressive direction
+    'AR | direction',
+    'AR direction, encoder v2, masking-8, residual, LAB, structured',
+    'AR direction, masking-8, RGB, extra(grayscale), structured',
+  ]
+  for runName in customRuns:
+    models.extend( run2inference(bestGroups[runName]) )
+    continue
   # convert to dict
   models = {model.name: model for model in models}
 
