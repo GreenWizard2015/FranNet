@@ -36,20 +36,16 @@ if __name__ == "__main__": # test masking
   dataset = CCelebADataset(image_size=64, batch_size=1)
   train = dataset.make_dataset(
     {
-      'batch_size': 1, 'limit': 16,
-      'masking': {
-        'name': 'grid',
-        'size': [5, 7, 11, 13, 17, 19, 23, 29, 31],
-        'min': 0, 'max': 0.75, # min and max number of masked squares
-        'mask value': -1.0, # normalized value of masked squares
-      }
+      'batch_size': 16, 'limit': 16,
+      'random crop': True,
+      'shared crops': False,
+      'ultra grid': True,
     }, 'train'
   )
-  for src, img in train.take(12):
-    src = src[0].numpy()
-    img = img[0].numpy()
-    src = dataset.range.convertBack(src)
-    img = dataset.range.convertBack(img)
+  srcB, imgB = next(iter(train))
+  for src, img in zip(srcB, imgB):
+    src = dataset.range.convertBack(src).numpy()
+    img = dataset.range.convertBack(img).numpy()
     # upscale src by 4x
     src = cv2.resize(src, (256, 256), interpolation=cv2.INTER_NEAREST)
     cv2.imshow('src', src.astype('uint8'))

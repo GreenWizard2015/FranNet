@@ -1,5 +1,6 @@
 import tensorflow as tf
 import Utils.colors as colors
+import Utils.CroppingAugm as CroppingAugm
 
 class CImageProcessor:
   def __init__(self, image_size, to_grayscale, format, range):
@@ -15,28 +16,10 @@ class CImageProcessor:
     return
   
   @property
-  def range(self):
-    return self._range
+  def range(self): return self._range
 
-  def _squareCrop(self, img, args):
-    s = tf.shape(img)
-    B, H, W, C = s[0], s[1], s[2], s[3]
-    # predefined crop size or crop to the smallest dimension
-    crop_size = args.get('crop size', None)
-    if crop_size is None: crop_size = tf.minimum(H, W)
-    sH = dH = (H - crop_size) // 2
-    sW = dW = (W - crop_size) // 2
-    if args['random crop']: # same crop for all images in the batch
-      sH = tf.random.uniform((), minval=0, maxval=2*dH + 1, dtype=tf.int32)
-      sW = tf.random.uniform((), minval=0, maxval=2*dW + 1, dtype=tf.int32)
-      pass
-    res = img[:, sH:(sH + crop_size), sW:(sW + crop_size), :]
-    tf.debugging.assert_equal(tf.shape(res), (B, crop_size, crop_size, C))
-    return res
-  
-  def _prepare(self, img, args):
+  def _prepare(self, img):
     img = self._internalRange.convert(img)
-    img = self._squareCrop(img, args=args)
     # ensure that the image is in the RGB color space
     if 'bgr' == self._format: img = img[..., ::-1] # BGR to RGB
     return img
@@ -48,8 +31,7 @@ class CImageProcessor:
       
     return img
   
-  def _destImage(self, img):
-    return img
+  def _destImage(self, img): return img
 
   def _checkInput(self, img):
     tf.assert_equal(tf.rank(img), 4)
@@ -60,20 +42,20 @@ class CImageProcessor:
 
   def process(self, config_or_image):
     isConfig = isinstance(config_or_image, dict)
-    args = {
+    args = { # default arguments
       'random crop': False,
+      'shared crops': True,
       'crop size': None
     }
     if isConfig:
-      config = config_or_image
-      args['random crop'] = config.get('random crop', False)
-      args['crop size'] = config.get('crop size', None)
-      pass
+      args = dict(args, **config_or_image)
 
+    cropper = CroppingAugm.configToCropper(args)
     def _process(img):
       self._checkInput(img)
       
-      img = self._prepare(img, args)
+      img = cropper(img) # crop BEFORE preprocessing
+      img = self._prepare(img)
       src = self._srcImage(img)
       dest = self._destImage(img)
       # NOTE: ALWAYS return images in the -1..1 range in RGB color space

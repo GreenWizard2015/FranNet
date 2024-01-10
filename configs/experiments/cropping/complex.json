@@ -1,0 +1,10 @@
+{
+  "dataset": {
+    "train": {
+      "random crop": true,
+      "shared crops": false,
+      "min crop size": 32,
+      "crop size": null
+    }
+  }
+}

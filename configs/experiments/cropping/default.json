@@ -1,0 +1,8 @@
+{
+  "dataset": {
+    "train": {
+      "random crop": false,
+      "crop size": null
+    }
+  }
+}
