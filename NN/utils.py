@@ -105,7 +105,6 @@ def make_steps_sequence(startStep, endStep, config):
   tf.debugging.assert_greater_equal(startStep, endStep, message='startStep must be >= endStep')
   name = config['name'].lower() if isinstance(config, dict) else config.lower()
   if 'uniform' == name:
-    # TODO: add support for specifying the number of steps, instead of the step size
     return make_uniform_steps_sequence(startStep, endStep, config['K'])
   
   if 'quadratic' == name:
