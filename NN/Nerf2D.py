@@ -1,30 +1,10 @@
 import tensorflow as tf
-from .utils import extractInterpolated, ensure4d, sample_halton_sequence, generateSquareGrid
+from .utils import extractInterpolated, ensure4d, generateSquareGrid
 from .CBaseModel import CBaseModel
-
-def _structuredSample(B, N, sharedShifts):
-  # make a uniform grid of points (total N points)
-  n = tf.cast(tf.math.ceil(tf.math.sqrt(tf.cast(N, tf.float32))), tf.int32)
-  rng = tf.linspace(0.0, 1.0, n + 1)[:-1] # [0, 1) range
-  delta = rng[1] - rng[0]
-  x, y = tf.meshgrid(rng, rng)
-  grid = tf.stack([tf.reshape(x, (-1, )), tf.reshape(y, (-1, ))], axis=0)
-  grid = tf.transpose(grid)[None]
-  tf.assert_equal(tf.shape(grid), (1, N, 2))
-  # generate samples
-  shifts = tf.random.uniform((B, 1, 2) if sharedShifts else (B, N, 2)) * delta
-  res = shifts + tf.tile(grid, [B, 1, 1])
-  # some verifications
-  tf.assert_equal(tf.shape(res), (B, N, 2))
-  tf.debugging.assert_greater_equal(tf.reduce_min(res), 0.0)
-  tf.debugging.assert_less_equal(tf.reduce_max(res), 1.0)
-  return res
 
 class CNerf2D(CBaseModel):
   def __init__(self, 
     encoder, renderer, restorator,
-    samplesN=256, trainingSampler='uniform',
-    shiftedSamples=None,
     trainingLoss=None,
     residual=False,
     extraLatents=None,
@@ -34,9 +14,6 @@ class CNerf2D(CBaseModel):
     self._encoder = encoder
     self._renderer = renderer
     self._restorator = restorator
-    self.samplesN = samplesN
-    self._bindShiftedSamples(shiftedSamples)
-    self._bindTrainingSampler(trainingSampler)
     self._bindTrainingLoss(trainingLoss)
     self._bindExtraLatents(extraLatents)
     self._residual = residual
@@ -50,28 +27,6 @@ class CNerf2D(CBaseModel):
     self._lossParams = dict(lossFn=trainingLoss)
     return
   
-  def _bindShiftedSamples(self, shiftedSamples):
-    self._shiftedSamples = shiftedSamples
-    if shiftedSamples is None: return
-    # validate shifted samples config structure if it is present
-    assert isinstance(shiftedSamples, dict), "shifted samples must be a dict"
-    assert 'kind' in shiftedSamples, "shifted samples must have 'kind' key"
-    assert shiftedSamples['kind'] in ['normal', 'uniform'], "shifted samples kind must be 'normal' or 'uniform'"
-    assert 'fraction' in shiftedSamples, "shifted samples must have 'fraction' key"
-    assert (0.0 <= shiftedSamples['fraction']) and (shiftedSamples['fraction'] <= 1.0), "shifted samples fraction must be in [0, 1]"
-    return
-
-  def _bindTrainingSampler(self, trainingSampler):
-    samplers = {
-      'uniform': tf.random.uniform,
-      'halton': lambda shape: sample_halton_sequence(shape[:-1], shape[-1]),
-      'structured': lambda shape: _structuredSample(B=shape[0], N=shape[1], sharedShifts=True),
-      'structured noisy': lambda shape: _structuredSample(B=shape[0], N=shape[1], sharedShifts=False)
-    }
-    assert trainingSampler in samplers, f'Unknown training sampler ({trainingSampler})'
-    self._trainingSampler = samplers[trainingSampler]
-    return
-  
   def _bindExtraLatents(self, extraLatents):
     self._extraLatents = extraLatents
     if extraLatents is None: return
@@ -83,43 +38,13 @@ class CNerf2D(CBaseModel):
       continue
     return
 
-  def _getTrainingTargets(self, srcPos, B, N):
-    # TODO: clarify this, make investigation
-    if self._shiftedSamples:
-      mainFraction = 1.0 - self._shiftedSamples['fraction']
-      NMain = tf.floor(tf.cast(N, tf.float32) * tf.cast(mainFraction, tf.float32))
-      NMain = tf.cast(NMain, tf.int32)
-      augmentedN = N - NMain
-      # for second part of the points srcPos stays the same, but targetPos is shifted
-      shifts = None
-      if 'normal' == self._shiftedSamples['kind']:
-        shifts = tf.random.normal((B, augmentedN, 2), stddev=self._shiftedSamples['stddev'])
-      if 'uniform' == self._shiftedSamples['kind']:
-        shifts = tf.random.uniform((B, augmentedN, 2)) - srcPos[:, :augmentedN]
-
-      mainPoints = srcPos[:, :NMain]
-      # use some points from the main part of the grid, so that they have the same latent vector
-      shiftedPoints = srcPos[:, :augmentedN] + shifts
-      srcPos = tf.concat([mainPoints, shiftedPoints], axis=1)
-      srcPos = tf.clip_by_value(srcPos, 0.0, 1.0)
-      pass
-    tf.assert_equal(tf.shape(srcPos), (B, N, 2))
-    return srcPos
-
-  def _trainingData(self, encodedSrc, dest):
-    B, C, N = tf.shape(dest)[0], tf.shape(dest)[-1], self.samplesN
-    srcPos = self._trainingSampler((B, N, 2))
+  def _extractLatents(self, encodedSrc, positions, training=True):
+    B, N = tf.shape(positions)[0], tf.shape(positions)[1]
+    tf.assert_equal(tf.shape(positions), (B, N, 2))
     # obtain latent vector for each sampled position
-    latents = self._encoder.latentAt(encoded=encodedSrc, pos=srcPos, training=True)
+    latents = self._encoder.latentAt(encoded=encodedSrc, pos=positions, training=training)
     tf.assert_equal(tf.shape(latents)[:1], (B * N,))
-
-    targetPos = self._getTrainingTargets(srcPos, B, N)
-    x0 = extractInterpolated(dest, targetPos)
-    return(
-      tf.reshape(x0, (B * N, C)),
-      tf.reshape(targetPos, (B * N, 2)),
-      tf.reshape(latents, (B * N, -1))
-    )
+    return latents
 
   def _extractGrayscaled(self, img, points):
     B = tf.shape(img)[0]
@@ -164,20 +89,27 @@ class CNerf2D(CBaseModel):
     return tf.concat([latents, extraData], axis=-1)
   
   def train_step(self, data):
-    (src, dest) = data
+    (src, YData) = data
     src = ensure4d(src)
-    dest = ensure4d(dest)
+    x0 = YData['sampled']
+    positions = YData['positions']
     
     with tf.GradientTape() as tape:
       encodedSrc = self._encoder(src=src, training=True)
-      x0, queriedPos, latents = self._trainingData(encodedSrc, dest)
+      latents = self._extractLatents(encodedSrc=encodedSrc, positions=positions, training=True)
       # train the restorator
-      x0 = self._withResidual(src, points=queriedPos, values=x0, add=False)
-      latents = self._withExtraLatents(latents, src=src, points=queriedPos)
+      x0 = self._withResidual(src, points=positions, values=x0, add=False)
+      latents = self._withExtraLatents(latents, src=src, points=positions)
+      # flatten latents and positions
+      BN = tf.shape(positions)[0] * tf.shape(positions)[1]
+      latents = tf.reshape(latents, (BN, tf.shape(latents)[-1]))
+      positions = tf.reshape(positions, (BN, 2))
+      x0 = tf.reshape(x0, (BN, tf.shape(x0)[-1]))
+      # actual training step
       loss = self._restorator.train_step(
         x0=self._converter.convert(x0), # convert to the target format
         model=lambda T, V: self._renderer(
-          latents=latents, pos=queriedPos,
+          latents=latents, pos=positions,
           T=T, V=V,
           training=True
         ),

@@ -15,7 +15,6 @@
   "renderer": "from:renderer.json",
   "nerf": {
     "name": "basic",
-    "format": "rgb",
-    "samplesN": 256
+    "format": "rgb"
   }
 }

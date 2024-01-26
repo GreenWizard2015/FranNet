@@ -1,7 +1,9 @@
 {
-  "model": {
-    "nerf": {
-      "training sampler": "structured"
+  "dataset": {
+    "train": {
+      "subsample": {
+        "sampling": "structured"
+      }
     }
   }
 }

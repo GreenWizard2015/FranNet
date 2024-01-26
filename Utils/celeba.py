@@ -33,6 +33,7 @@ class CCelebADataset:
   
 if __name__ == "__main__": # test masking
   import cv2
+  import numpy as np
   dataset = CCelebADataset(image_size=64, batch_size=1)
   train = dataset.make_dataset(
     {
@@ -40,12 +41,32 @@ if __name__ == "__main__": # test masking
       'random crop': True,
       'shared crops': False,
       'ultra grid': True,
+      'subsample': {
+        'N': 256,#**2,
+        'sampling': 'structured noisy',
+      },
+      'masking': {
+        "name": "grid",
+        "size": 32,
+        "min": 20, "max": 0.75
+      }
     }, 'train'
   )
   srcB, imgB = next(iter(train))
-  for src, img in zip(srcB, imgB):
+  N = srcB.shape[0]
+  for i in range(N):
+    src = srcB[i].numpy()
     src = dataset.range.convertBack(src).numpy()
-    img = dataset.range.convertBack(img).numpy()
+    #########################
+    colors = dataset.range.convertBack(imgB['sampled'][i]).numpy()
+    positions = imgB['positions'][i].numpy()
+    HW = 512//4
+    img = np.zeros((HW, HW, 3), dtype=np.float32)
+    positions = (positions * (HW - 1)).astype(np.int32)
+    # assign colors to the image
+    img[positions[:, 1], positions[:, 0]] = colors
+    #########################
+    # img = dataset.range.convertBack(img).numpy()
     # upscale src by 4x
     src = cv2.resize(src, (256, 256), interpolation=cv2.INTER_NEAREST)
     cv2.imshow('src', src.astype('uint8'))

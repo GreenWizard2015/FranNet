@@ -47,9 +47,6 @@ def _makeTrainingLoss(config):
 def _nerf_from_config(config):
   if 'basic' == config['name']:
     nerfParams = dict(
-      samplesN=config['samplesN'],
-      trainingSampler=config.get('training sampler', 'uniform'),
-      shiftedSamples=config.get('shifted samples', None),
       trainingLoss=_makeTrainingLoss(config.get('training loss', None)),
       residual=config.get('residual', False),
       extraLatents=config.get('extra latents', None),

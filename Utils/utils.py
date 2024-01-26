@@ -91,12 +91,47 @@ def _load_single_config(path, folder=None):
   iterate(config)
   return config
 
-def load_config(pathOrList, folder):
+def withMoveField(config):
+  def moveField(oldPath, newPath):
+    # get old path value
+    old = config
+    for key in oldPath[:-1]:
+      if key not in old: return
+      old = old[key]
+      continue
+    if oldPath[-1] not in old: return
+    value = old.pop(oldPath[-1])
+    # create new path
+    new = config
+    for key in newPath[:-1]:
+      if key not in new: new[key] = {}
+      new = new[key]
+      continue
+    new[newPath[-1]] = value # set new value
+    return
+  return moveField
+
+def upgrade_configs_structure(config):
+  moveField = withMoveField(config)
+  # convert old configs to new formats
+  moveField(
+    ['model', 'nerf', 'samplesN'],
+    ['dataset', 'train', 'subsample', 'N'],
+  )
+  moveField(
+    ['model', 'nerf', 'training sampler'],
+    ['dataset', 'train', 'subsample', 'sampling'],
+  )
+  return config
+
+def load_config(pathOrList, folder, upgrade=True):
   if isinstance(pathOrList, str): return _load_single_config(pathOrList, folder)
   config = {}
   for path in pathOrList:
     config = merge_configs(config, _load_single_config(path, folder))
     continue
+
+  if upgrade: config = upgrade_configs_structure(config)
   return config
 
 # helper function to create a masking function from config for the dataset
@@ -155,7 +190,7 @@ def masking_from_config(config):
   if 'grid' == name:
     params = _grid_from_config(config)
     maskValue = config.get('mask value', 0.0)
-    def _applyMasking(src, img):
+    def _applyMasking(src, YData):
       idx = tf.random.uniform((), 0, tf.shape(params)[0], dtype=tf.int32)
       P = tf.gather(params, idx)
       src = _applyMasking_helper(
@@ -164,7 +199,7 @@ def masking_from_config(config):
         minC=P[1], maxC=P[2],
         size=P[0]
       )
-      return (src, img)
+      return (src, YData)
     return _applyMasking
   
   raise ValueError('Unknown masking name: %s' % name)

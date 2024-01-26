@@ -39,8 +39,9 @@ def test_flatCoordsGridTF():
 
 @pytest.mark.parametrize('W', [3, 5, 7, 11, 13, 17, 19, 23, 29, 31])
 def test_extractGrid(W):
-  x = np.random.uniform(size=(1, W, W, 1)).astype(np.float32)
-  grid = flatCoordsGridTF(W)
+  x = np.random.uniform(size=(1, W, W, 1)).astype(np.float32) * 1e2
+  d = (1.0 / W) / 2.0
+  grid = flatCoordsGridTF(W) - d
   y = extractInterpolated(x, grid[None]).numpy().reshape(-1)
   for a, b in zip(x.reshape(-1), y):
     assert np.allclose(a, b, atol=1e-5), '%.12f != %.12f' % (a, b)

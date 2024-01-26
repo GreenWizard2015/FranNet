@@ -2,7 +2,7 @@
   "dataset": {
     "train": {
       "subsample": {
-        "sampling": "halton"
+        "N": 1024
       }
     }
   }
