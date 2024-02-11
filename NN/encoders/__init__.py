@@ -15,6 +15,7 @@ def encoder_from_config(config):
       ConvAfterStage=headConfig.get('conv after stage', 2), # 2 was used in the old version
       localContext=headConfig['local context'],
       globalContext=headConfig['global context'],
+      positionsConfigs=headConfig.get('positions', None),
       name=name
     )
 

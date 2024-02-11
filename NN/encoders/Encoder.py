@@ -1,6 +1,8 @@
 import tensorflow as tf
 import tensorflow.keras.layers as L
 from NN.utils import sMLP
+from NN.CCoordsGridLayer import CCoordsGridLayer
+from NN.CCoordsEncodingLayer import CCoordsEncodingLayer
 
 def conv_block_params_from_config(config):
   defaultConvParams = {
@@ -96,6 +98,21 @@ def _createGlobalContextModel(X, config, latentDim, name):
   
   raise NotImplementedError('Unknown global context model: {}'.format(model))
 
+def _withPositionConfig(config, name):
+  if config is None: return lambda x, _: x
+  if isinstance(config, bool): config = { 'N': 32 }
+  assert isinstance(config, dict), 'config must be a dictionary'
+
+  def withPosition(x, i):
+    if not config.get('stage-%d' % i, True): return x
+
+    N = config.get('stage-%d N' % i, config.get('N', 32))
+    return CCoordsGridLayer(
+      CCoordsEncodingLayer(N, name='%s/coordsGrid-%d' % (name, i)),
+      name='%s/coordsGrid-%d' % (name, i)
+    )(x)
+  return withPosition
+
 '''
 Simple encoder that takes image as input and returns corresponding latent vector with intermediate representations
 '''
@@ -103,16 +120,19 @@ def createEncoderHead(
   imgWidth, channels, downsampleSteps, latentDim, 
   ConvBeforeStage, ConvAfterStage, 
   localContext, globalContext,
+  positionsConfigs,
   name
 ):
   assert isinstance(downsampleSteps, list) and (0 < len(downsampleSteps)), 'downsampleSteps must be a list of integers'
   data = L.Input(shape=(imgWidth, imgWidth, channels))
   
+  withPosition = _withPositionConfig(positionsConfigs, name)
   res = data
   res = L.BatchNormalization()(res)
   intermediate = []
   for i, sz in enumerate(downsampleSteps):
     res = L.Conv2D(sz, 3, strides=2, padding='same', activation='relu')(res)
+    res = withPosition(res, i) # add position encoding if needed
     for _ in range(ConvBeforeStage):
       res = L.Conv2D(sz, 3, padding='same', activation='relu')(res)
 
