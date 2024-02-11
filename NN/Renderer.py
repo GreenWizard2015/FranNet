@@ -25,12 +25,24 @@ class Renderer(tf.keras.Model):
     return
 
   # only for training and building, during inference use 'batched' method
-  def call(self, latents, pos, T, V):
+  def call(self, latents, pos, T, V, training=None):
     pos = self._posEncoder(pos)
     T = self._timeEncoder(T)
-    res = self._decoder(latents, pos, T, V)
+    res = self._decoder(latents, pos, T, V, training=training)
     assert isinstance(res, list), "decoder must return a list of values"
     return res
+
+  def train_step(self, x0, latents, positions, **params):
+    # defer training to the restorator
+    return self._restorator.train_step(
+      x0=x0,
+      model=lambda T, V: self(
+        latents=latents, pos=positions,
+        T=T, V=V,
+        training=True
+      ),
+      **params
+    )
 
   def _encodePos(self, pos, training, args):
     # for ablation study of the decoder, randomize positions BEFORE encoding
@@ -101,6 +113,7 @@ class Renderer(tf.keras.Model):
     res = tf.reshape(res, (-1, (NBatches + 1) * stepBy, C))[:, :N]
     tf.assert_equal(tf.shape(res), (B, N, C))
     return res
+# End of Renderer class
 
 def _encoding_from_config(config):
   if isinstance(config, str):

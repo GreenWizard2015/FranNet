@@ -4,7 +4,7 @@ from .CBaseModel import CBaseModel
 
 class CNerf2D(CBaseModel):
   def __init__(self, 
-    encoder, renderer, restorator,
+    encoder, renderer,
     trainingLoss=None,
     residual=False,
     extraLatents=None,
@@ -13,7 +13,6 @@ class CNerf2D(CBaseModel):
     super().__init__(**kwargs)
     self._encoder = encoder
     self._renderer = renderer
-    self._restorator = restorator
     self._bindTrainingLoss(trainingLoss)
     self._bindExtraLatents(extraLatents)
     self._residual = residual
@@ -106,14 +105,11 @@ class CNerf2D(CBaseModel):
       positions = tf.reshape(positions, (BN, 2))
       x0 = tf.reshape(x0, (BN, tf.shape(x0)[-1]))
       # actual training step
-      loss = self._restorator.train_step(
+      loss = self._renderer.train_step(
         x0=self._converter.convert(x0), # convert to the target format
-        model=lambda T, V: self._renderer(
-          latents=latents, pos=positions,
-          T=T, V=V,
-          training=True
-        ),
-        **self._lossParams
+        latents=latents,
+        positions=positions,
+        params=self._lossParams
       )
       
     self.optimizer.minimize(loss, self.trainable_variables, tape=tape)
@@ -212,9 +208,9 @@ class CNerf2D(CBaseModel):
     sampleShape = None
     if pos is None:
       pos = generateSquareGrid(size, scale, shift)
-      sampleShape = (size, size)
+      sampleShape = [B, size, size]
     else:
-      sampleShape = (tf.shape(pos)[0], )
+      sampleShape = [B, tf.shape(pos)[0]]
       pass
     # prepare the reverseArgs and encoderParams
     if reverseArgs is None: reverseArgs = {}
@@ -242,9 +238,7 @@ class CNerf2D(CBaseModel):
       initialValues=initialValues
     )
     
-    C = tf.shape(probes)[-1]
-    fullShape = tf.concat([[B], sampleShape, [C]], axis=0)
-    probes = tf.reshape(probes, fullShape)
+    probes = tf.reshape(probes, sampleShape + tf.shape(probes)[-1:])
     return probes
   
   def get_input_shape(self):

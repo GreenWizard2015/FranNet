@@ -54,10 +54,9 @@ def _nerf_from_config(config):
     # If format is not specified, use BGR, because old models were trained to predict BGR
     nerfParams['format'] = config.get('format', 'bgr')
     
-    return lambda encoder, renderer, restorator: CNerf2D(
+    return lambda encoder, renderer: CNerf2D(
       encoder=encoder,
       renderer=renderer,
-      restorator=restorator,
       **nerfParams
     )
   
@@ -65,13 +64,13 @@ def _nerf_from_config(config):
 
 def model_from_config(config, compile=True):
   encoder = encoder_from_config(config['encoder'])
-  decoder = decoder_from_config(config['decoder'])
-  restorator = restorator_from_config(config['restorator'])
-  renderer = renderer_from_config(config['renderer'], decoder, restorator)
-  
-  nerf = _nerf_from_config(config['nerf'])(
-    encoder, renderer, restorator
+  renderer = renderer_from_config(
+    config['renderer'],
+    decoder=decoder_from_config(config['decoder']),
+    restorator=restorator_from_config(config['restorator'])
   )
+  
+  nerf = _nerf_from_config(config['nerf'])( encoder, renderer )
   nerf.build(nerf.get_input_shape())
 
   if compile:
