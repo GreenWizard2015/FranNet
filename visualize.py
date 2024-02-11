@@ -22,7 +22,7 @@ def _processData(data, model, processImage):
       yield {
         'original': processImage(dstB[i]),
         'input': processImage(srcB[i]),
-        'upscaled': processImage(upscaledB[i])[..., ::-1] # RGB -> BGR
+        'upscaled': processImage(upscaledB[i])
       }
     continue
   return

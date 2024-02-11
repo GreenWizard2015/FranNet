@@ -149,33 +149,18 @@ class CNerf2D(CBaseModel):
   @tf.function
   def _inference(
     self, src, pos, 
-    batchSize=None, reverseArgs=None, initialValues=None,
-    sampleShape=None
+    batchSize, reverseArgs, initialValues, encoderParams,
   ):
-    if reverseArgs is None: reverseArgs = {}
-    encoderParams = reverseArgs.get("encoder", {})
-
+    B = tf.shape(src)[0]
     N = tf.shape(pos)[0]
     tf.assert_equal(tf.shape(pos), (N, 2), "pos must be a 2D tensor of shape (N, 2)")
-
-    src = ensure4d(src)
-    B = tf.shape(src)[0]
-    encoded = self._encoder(src, training=False, params=encoderParams)
 
     if initialValues is not None:
       C = tf.shape(initialValues)[-1]
       tf.assert_equal(tf.shape(initialValues)[:1], (B, ))
       initialValues = tf.reshape(initialValues, (B, N, C))
 
-    if 'algorithmInterceptor' in reverseArgs: # update algorithm interceptor if provided
-      newParams = {k: v for k, v in encoderParams.items() if k != 'algorithmInterceptor'}
-      newParams['algorithmInterceptor'] = self._createAlgorithmInterceptor(
-        interceptor=reverseArgs['algorithmInterceptor'],
-        image=src, pos=tf.tile(pos[None], [B, 1, 1])
-      )
-      encoderParams = newParams
-      pass
-
+    encoded = self._encoder(src, training=False, params=encoderParams)
     def getChunk(ind, sz):
       posC = pos[ind:ind+sz]
       sz = tf.shape(posC)[0]
@@ -210,12 +195,6 @@ class CNerf2D(CBaseModel):
       src, values=probes,
       points=tf.tile(pos[None], [B, 1, 1])
     )
-    
-    if sampleShape is not None:
-      C = tf.shape(probes)[-1]
-      fullShape = tf.concat([[B], sampleShape, [C]], axis=0)
-      probes = tf.reshape(probes, fullShape)
-      pass
     return probes
   
   @tf.function
@@ -227,20 +206,46 @@ class CNerf2D(CBaseModel):
     initialValues=None, # initial values for the restoration process
     reverseArgs=None,
   ):
+    src = ensure4d(src)
+    B = tf.shape(src)[0]
+    # precompute the output shape
     sampleShape = None
     if pos is None:
       pos = generateSquareGrid(size, scale, shift)
       sampleShape = (size, size)
     else:
       sampleShape = (tf.shape(pos)[0], )
-
-    return self._inference(
+      pass
+    # prepare the reverseArgs and encoderParams
+    if reverseArgs is None: reverseArgs = {}
+    assert isinstance(reverseArgs, dict), "reverseArgs must be a dict"
+    # extract encoder parameters from reverseArgs
+    encoderParams = reverseArgs.get("encoder", {})
+    reverseArgs = {k: v for k, v in reverseArgs.items() if k != 'encoder'}
+    # add interceptors if needed
+    if 'algorithmInterceptor' in reverseArgs:
+      newParams = {k: v for k, v in encoderParams.items()}
+      newParams['algorithmInterceptor'] = self._createAlgorithmInterceptor(
+        interceptor=reverseArgs['algorithmInterceptor'],
+        image=src, pos=tf.tile(pos[None], [B, 1, 1])
+      )
+      encoderParams = newParams
+      # remove the interceptor from the reverseArgs
+      reverseArgs = {k: v for k, v in reverseArgs.items() if k != 'algorithmInterceptor'}
+      pass
+    
+    probes = self._inference(
       src=src, pos=pos,
       batchSize=batchSize,
       reverseArgs=reverseArgs,
-      initialValues=initialValues,
-      sampleShape=sampleShape
+      encoderParams=encoderParams,
+      initialValues=initialValues
     )
+    
+    C = tf.shape(probes)[-1]
+    fullShape = tf.concat([[B], sampleShape, [C]], axis=0)
+    probes = tf.reshape(probes, fullShape)
+    return probes
   
   def get_input_shape(self):
     return self._encoder.get_input_shape()
