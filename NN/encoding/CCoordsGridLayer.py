@@ -14,15 +14,17 @@ class CCoordsGridLayer(tf.keras.layers.Layer):
   
   def call(self, x):
     shp = tf.shape(x)
-    B, H, W, C = shp[0], shp[1], shp[2], shp[3]
+    B, H, W = shp[0], shp[1], shp[2]
+    C = x.shape[3]
     tf.assert_equal(H, W)
+    tf.assert_equal(shp, (B, H, W, C))
 
     grid = generateSquareGrid(H, scale=1.0, shift=0.0)
-    grid = tf.reshape(grid, (-1, 2))
+    grid = tf.reshape(grid, (-1, 1, 2))
     encoded = self._positionEncoder(grid)
-    encC = tf.shape(encoded)[-1]
+    encC = encoded.shape[-1]
     encoded = tf.reshape(encoded, (1, H, W, encC))
     encoded = tf.tile(encoded, (B, 1, 1, 1))
     res = tf.concat([x, encoded], axis=-1)
-    res = tf.ensure_shape(res, (B, H, W, C + encC))
+    # res = tf.ensure_shape(res, (B, H, W, C + encC))
     return res

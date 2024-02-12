@@ -1,6 +1,5 @@
 import tensorflow as tf
-from NN.utils import CFlatCoordsEncodingLayer
-from .CFixedSinCosEncoding import CFixedSinCosEncoding
+from NN.encoding import encoding_from_config
 
 '''
 Performs batched inverse restorator process to generate V from latents and coords
@@ -72,6 +71,7 @@ class Renderer(tf.keras.Model):
         tf.debugging.assert_less_equal(tf.reduce_max(t), 1.0)
         tf.debugging.assert_less_equal(0.0, tf.reduce_min(t))
         pass
+      t = tf.cast(t, tf.float32) # ensure that t is a tensor, not a nested structure
       return self._timeEncoder(t, training=training)
     
     return self._restorator.reverse(
@@ -115,25 +115,11 @@ class Renderer(tf.keras.Model):
     return res
 # End of Renderer class
 
-def _encoding_from_config(config):
-  if isinstance(config, str):
-    if 'learned' == config: return CFlatCoordsEncodingLayer(N=32)
-    if 'fixed' == config: return CFixedSinCosEncoding(N=32)
-    raise ValueError(f"Unknown encoding name: {config}")
-
-  if isinstance(config, dict):
-    name = config['name']
-    if 'learned' == name: return CFlatCoordsEncodingLayer(N=config['N'])
-    if 'fixed' == name: return CFixedSinCosEncoding(N=config['N'])
-    raise ValueError(f"Unknown encoding name: {name}")
-
-  raise ValueError(f"Unknown encoding config: {config}")
-  
 def renderer_from_config(config, decoder, restorator):
   return Renderer(
     decoder=decoder,
     restorator=restorator,
     batch_size=config.get('batch_size', 16 * 64 * 1024),
-    posEncoder=_encoding_from_config(config['position encoding']),
-    timeEncoder=_encoding_from_config(config['time encoding']),
+    posEncoder=encoding_from_config(config['position encoding']),
+    timeEncoder=encoding_from_config(config['time encoding']),
   )

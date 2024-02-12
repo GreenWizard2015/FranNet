@@ -1,5 +1,29 @@
 {
-  "position encoding": "learned",
-  "time encoding": "learned",
+  "position encoding": {
+    "name": "learned v2",
+    "N": 32,
+    "raw": true,
+    "useShifts": false,
+    "scaling": "pow",
+    "maxFrequency": 10000,
+    "useLowBands": true,
+    "useHighBands": true,
+    "finalDropout": 0.0,
+    "bandsDropout": false,
+    "sharedTransformation": false
+  },
+  "time encoding": {
+    "name": "learned v2",
+    "N": 32,
+    "raw": true,
+    "useShifts": false,
+    "scaling": "pow",
+    "maxFrequency": 10000,
+    "useLowBands": true,
+    "useHighBands": true,
+    "finalDropout": 0.0,
+    "bandsDropout": false,
+    "sharedTransformation": false
+  },
   "batch_size": 262144
 }

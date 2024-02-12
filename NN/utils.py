@@ -2,7 +2,6 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 import tensorflow_probability as tfp
 import tensorflow.keras.layers as L
-from NN.CCoordsEncodingLayer import CCoordsEncodingLayer
 
 def shuffleBatch(batch):
   indices = tf.range(tf.shape(batch)[0])
@@ -70,18 +69,6 @@ def generateSquareGrid(size, scale, shift):
   res = (pos * scale) + shift
   tf.assert_equal(tf.shape(res), (size * size, 2), 'Should be a flat grid of coordinates')
   return res
-################
-class CFlatCoordsEncodingLayer(tf.keras.layers.Layer):
-  def __init__(self, N=32, **kwargs):
-    super().__init__(**kwargs)
-    self._enc = CCoordsEncodingLayer(N)
-    return
-
-  def call(self, x):
-    B = tf.shape(x)[0]
-    tf.assert_equal(tf.shape(x)[:-1], (B, ))
-    x = tf.cast(x, tf.float32)[..., None]
-    return self._enc(x)[:, 0]
 #######################################
 class sMLP(tf.keras.layers.Layer):
   def __init__(self, sizes, activation='linear', dropout=0.05, **kwargs):

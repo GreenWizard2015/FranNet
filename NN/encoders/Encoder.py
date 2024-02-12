@@ -1,8 +1,7 @@
 import tensorflow as tf
 import tensorflow.keras.layers as L
 from NN.utils import sMLP
-from NN.CCoordsGridLayer import CCoordsGridLayer
-from NN.CCoordsEncodingLayer import CCoordsEncodingLayer
+from NN.encoding import CCoordsGridLayer, CCoordsEncodingLayer
 
 def conv_block_params_from_config(config):
   defaultConvParams = {
@@ -100,15 +99,18 @@ def _createGlobalContextModel(X, config, latentDim, name):
 
 def _withPositionConfig(config, name):
   if config is None: return lambda x, _: x
+  
   if isinstance(config, bool): config = { 'N': 32 }
   assert isinstance(config, dict), 'config must be a dictionary'
 
   def withPosition(x, i):
     if not config.get('stage-%d' % i, True): return x
 
-    N = config.get('stage-%d N' % i, config.get('N', 32))
+    encoding = config.get('encoding', {})
+    encoding = dict(**encoding)
+    encoding['N'] = config.get('stage-%d N' % i, config.get('N', 32))
     return CCoordsGridLayer(
-      CCoordsEncodingLayer(N, name='%s/coordsGrid-%d' % (name, i)),
+      CCoordsEncodingLayer(**encoding, name='%s/coordsGrid-%d/encoding' % (name, i)),
       name='%s/coordsGrid-%d' % (name, i)
     )(x)
   return withPosition

@@ -185,6 +185,8 @@ class CNerf2D(CBaseModel):
       return dict(latents=latents, pos=posC, reverseArgs=reverseArgs, value=value)
 
     probes = self._renderer.batched(ittr=getChunk, B=B, N=N, batchSize=batchSize, training=False)
+    C = tf.shape(probes)[-1]
+    tf.assert_equal(C, 3, "Expected 3 channels in the output")
     # convert to the proper format
     probes = self._converter.convertBack(probes)
     probes = self._withResidual(
@@ -208,9 +210,9 @@ class CNerf2D(CBaseModel):
     sampleShape = None
     if pos is None:
       pos = generateSquareGrid(size, scale, shift)
-      sampleShape = [B, size, size]
+      sampleShape = [B, size, size, 3]
     else:
-      sampleShape = [B, tf.shape(pos)[0]]
+      sampleShape = [B, tf.shape(pos)[0], 3]
       pass
     # prepare the reverseArgs and encoderParams
     if reverseArgs is None: reverseArgs = {}
@@ -237,8 +239,7 @@ class CNerf2D(CBaseModel):
       encoderParams=encoderParams,
       initialValues=initialValues
     )
-    
-    probes = tf.reshape(probes, sampleShape + tf.shape(probes)[-1:])
+    probes = tf.reshape(probes, sampleShape)
     return probes
   
   def get_input_shape(self):

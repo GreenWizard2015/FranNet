@@ -94,6 +94,7 @@ class CCoordsEncodingLayer(tf.keras.layers.Layer):
     return tf.reshape(res, (B, M, N, res.shape[-1] * P))
   
   def call(self, x, training=None):
+    tf.assert_rank(x, 3, "Input must be (B, M, P)")
     # x is (B, M, P)
     # output is (B, M, N)
     B, M, P, N = tf.shape(x)[0], x.shape[1], x.shape[2], self._N
