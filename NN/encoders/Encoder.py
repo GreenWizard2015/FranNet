@@ -181,6 +181,8 @@ class CEncoder(tf.keras.Model):
 
     self._encoderHead = head(self.name + '/EncoderHead')
     self._extractor = extractor(self.name + '/Extractor')
+    # spatial 2d dropout for the local context
+    self._dropoutRate = 0.25
     return
 
   def call(self, src, training=None, params=None):
@@ -200,6 +202,8 @@ class CEncoder(tf.keras.Model):
     encoded, pos, training=None,
     params=None # parameters for ablation study
   ):
+    if training is None:
+      training = tf.keras.backend.learning_phase()
     B = tf.shape(pos)[0]
     N = tf.shape(pos)[1]
     tf.assert_equal(tf.shape(pos), (B, N, 2))
@@ -225,7 +229,10 @@ class CEncoder(tf.keras.Model):
       pass
 
     tf.assert_equal(tf.shape(context)[:-1], tf.shape(localCtx)[:-1])
-
+    if training and (0.0 < self._dropoutRate):
+      msk = tf.random.uniform(tf.concat([[B * N], [1]], axis=0), dtype=context.dtype)
+      localCtx = tf.where(msk < self._dropoutRate, tf.zeros_like(localCtx), localCtx)
+      pass
     res = tf.concat([context, localCtx], axis=-1)
     tf.assert_equal(tf.shape(res)[:-1], (B * N,))
     # just to make sure that the shape is correctly inferred
