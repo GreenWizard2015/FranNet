@@ -2,6 +2,7 @@
   "model": {
     "encoder": {
       "latent dimension": 64,
+      "use downsampling": false,
       "head": {
         "downsample steps": [32, 32, 32],
         "global context": {
@@ -15,17 +16,17 @@
           "final activation": "relu"
         },
         "local context": {
-          "kernel size": 3,
-          "conv before": 1,
-          "final activation": "relu"
+          "layers": [
+            {"name": "CoordsGrid" },
+            {"name": "MLP Mixer", "token mixing": 256, "channel mixing": 256}
+          ]
         }
       },
       "contexts mixer": {
         "extractor": {
           "name": "interpolate",
           "mlp": [256, 256],
-          "final activation": "relu",
-          "dropout": 0.0
+          "final activation": "relu"
         }
       }
     }

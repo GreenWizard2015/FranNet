@@ -2,11 +2,16 @@ import tensorflow as tf
 import tensorflow.keras.layers as L
 from NN.utils import sMLP
 from NN.encoding import CCoordsGridLayer, CCoordsEncodingLayer
+from NN.layers import MixerConvLayer, Patches, TransformerBlock
 
-def conv_block_params_from_config(config):
+def block_params_from_config(config):
+  layers = config.get('layers', None)
+  if not(layers is None): return layers
+
   defaultConvParams = {
     'kernel size': config.get('kernel size', 3),
-    'activation': config.get('activation', 'relu')
+    'activation': config.get('activation', 'relu'),
+    'name': config.get('name', 'Conv2D'),
   }
   convBefore = config['conv before']
   # if convBefore is an integer, then it's the same for all layers
@@ -24,23 +29,83 @@ def conv_block_params_from_config(config):
   lastConvParams = {
     'channels': config.get('channels last', config['channels']),
     'kernel size': config.get('kernel size last', defaultConvParams['kernel size']),
-    'activation': config.get('final activation', defaultConvParams['activation'])
+    'activation': config.get('final activation', defaultConvParams['activation']),
+    'name': config.get('last name', 'Conv2D'),
   }
   return convBefore + [lastConvParams]
   
 def conv_block_from_config(data, config, defaults, name='CB'):
   config = {**defaults, **config} # merge defaults and config
-  convParams = conv_block_params_from_config(config)
+  convParams = block_params_from_config(config)
   # apply convolutions to the data
   for i, parameters in enumerate(convParams):
-    data = L.Conv2D(
-      filters=parameters['channels'],
-      padding='same',
-      kernel_size=parameters['kernel size'],
-      activation=parameters['activation'],
-      name='%s/conv-%d' % (name, i)
-    )(data)
-    continue
+    Name = parameters.get('name', 'Conv2D')
+    if 'Conv2D' == Name:
+      data = L.Conv2D(
+        filters=parameters['channels'],
+        padding='same',
+        kernel_size=parameters['kernel size'],
+        activation=parameters['activation'],
+        name='%s/conv-%d' % (name, i)
+      )(data)
+      continue
+
+    if 'MLP Mixer' == Name:
+      data = MixerConvLayer(
+        token_mixing=parameters.get('token mixing', 512),
+        channel_mixing=parameters.get('channel mixing', 512),
+        name='%s/conv-mixer-%d' % (name, i)
+      )(data)
+      continue
+
+    if 'Patches' == Name:
+      data = Patches(
+        patch_size=parameters['patch size'],
+        name='%s/patches-%d' % (name, i)
+      )(data)
+      continue
+
+    if 'CoordsGrid' == Name:
+      parameters = {k: v for k, v in parameters.items() if k not in ['name']}
+      data = CCoordsGridLayer(
+        CCoordsEncodingLayer(
+          name='%s/coordsGrid-%d/encoding' % (name, i),
+          N=parameters.get('N', 32),
+          **parameters
+        ),
+        name='%s/coordsGrid-%d' % (name, i)
+      )(data)
+      continue
+
+    if 'Transformer' == Name:
+      parameters = {k: v for k, v in parameters.items()}      
+      parameters['name'] = '%s/transformer-%d' % (name, i)
+      parameters['intermediate_dim'] = parameters.pop('intermediate dim', 512)
+      parameters['num_heads'] = parameters.pop('num heads', 8)
+      data = TransformerBlock(**parameters)(data)
+      continue
+
+    if 'Reshape' == Name:
+      shape = list(parameters['shape'])
+      for j, sz in enumerate(shape):
+        if sz <= -2:
+          sz = data.shape[sz + 1]
+        shape[j] = sz
+        continue
+      data = L.Reshape(
+        shape,
+        name='%s/reshape-%d' % (name, i)
+      )(data)
+      continue
+
+    if 'MLP' == Name:
+      data = sMLP(
+        **parameters,
+        name='%s/mlp-%d' % (name, i)
+      )(data)
+      continue
+    
+    raise NotImplementedError('Unknown layer: {}'.format(Name))
   return data
 
 def _createGCMv2(dataShape, config, latentDim, name):
@@ -119,12 +184,15 @@ def _withPositionConfig(config, name):
 Simple encoder that takes image as input and returns corresponding latent vector with intermediate representations
 '''
 def createEncoderHead(
-  imgWidth, channels, downsampleSteps, latentDim, 
+  imgWidth,
+  config,
+  channels, downsampleSteps, latentDim, 
   ConvBeforeStage, ConvAfterStage, 
   localContext, globalContext,
   positionsConfigs,
   name
 ):
+  assert config is not None, 'config must be a dictionary'
   assert isinstance(downsampleSteps, list) and (0 < len(downsampleSteps)), 'downsampleSteps must be a list of integers'
   data = L.Input(shape=(imgWidth, imgWidth, channels))
   
@@ -133,7 +201,8 @@ def createEncoderHead(
   res = L.BatchNormalization()(res)
   intermediate = []
   for i, sz in enumerate(downsampleSteps):
-    res = L.Conv2D(sz, 3, strides=2, padding='same', activation='relu')(res)
+    if config.get('use downsampling', True):
+      res = L.Conv2D(sz, 3, strides=2, padding='same', activation='relu')(res)
     res = withPosition(res, i) # add position encoding if needed
     for _ in range(ConvBeforeStage):
       res = L.Conv2D(sz, 3, padding='same', activation='relu')(res)
@@ -155,9 +224,17 @@ def createEncoderHead(
     continue
 
   if not(globalContext is None): # global context
-    context = _createGlobalContextModel(
-      res, config=globalContext, latentDim=latentDim, name=name + '/globalContext'
+    res = withPosition(res, len(downsampleSteps))
+    # context = Patches(patch_size=16)(context)
+    context = conv_block_from_config(
+        data=res, config=localContext, defaults={
+        'channels': sz,
+        'channels last': latentDim, # last layer should have latentDim channels
+        },
+        name='%s/intermediate-final' % (name, )
     )
+    # extract center of the context
+    context = L.Lambda(lambda x: x[:, x.shape[1] // 2, x.shape[2] // 2])(context)
   else: # no global context
     # return dummy context to keep the interface consistent
     context = L.Lambda(
@@ -174,7 +251,7 @@ def createEncoderHead(
   )
 
 class CEncoder(tf.keras.Model):
-  def __init__(self, imgWidth, channels, head, extractor, **kwargs):
+  def __init__(self, imgWidth, channels, head, extractor, dropoutRate=0.25, **kwargs):
     super().__init__(**kwargs)
     self._imgWidth = imgWidth
     self._channels = channels
@@ -182,7 +259,7 @@ class CEncoder(tf.keras.Model):
     self._encoderHead = head(self.name + '/EncoderHead')
     self._extractor = extractor(self.name + '/Extractor')
     # spatial 2d dropout for the local context
-    self._dropoutRate = 0.25
+    self._dropoutRate = dropoutRate
     return
 
   def call(self, src, training=None, params=None):
@@ -228,9 +305,10 @@ class CEncoder(tf.keras.Model):
       if noGlobalCtx: context = tf.zeros_like(context)
       pass
 
-    tf.assert_equal(tf.shape(context)[:-1], tf.shape(localCtx)[:-1])
+    tf.assert_equal(tf.shape(context)[:-1], (B * N,))
+    tf.assert_equal(tf.shape(localCtx)[:-1], (B * N,))
     if training and (0.0 < self._dropoutRate):
-      msk = tf.random.uniform(tf.concat([[B * N], [1]], axis=0), dtype=context.dtype)
+      msk = tf.random.uniform([B * N, 1], dtype=context.dtype)
       localCtx = tf.where(msk < self._dropoutRate, tf.zeros_like(localCtx), localCtx)
       pass
     res = tf.concat([context, localCtx], axis=-1)

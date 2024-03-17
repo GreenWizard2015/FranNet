@@ -8,6 +8,7 @@ def encoder_from_config(config):
     headConfig = config['head']
     head = lambda name: createEncoderHead(
       imgWidth=imgWidth,
+      config=config,
       channels=config['channels'],
       downsampleSteps=headConfig['downsample steps'],
       latentDim=latentDim,
@@ -24,7 +25,8 @@ def encoder_from_config(config):
       imgWidth=imgWidth,
       channels=config['channels'],
       head=head,
-      extractor=extractor_from_config(mixer['extractor'], latentDim)
+      extractor=extractor_from_config(mixer['extractor'], latentDim),
+      dropoutRate=mixer.get('dropout', 0.0),
     )
   
   raise ValueError(f"Unknown encoder name: {config['name']}")

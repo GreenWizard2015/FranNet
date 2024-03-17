@@ -37,6 +37,17 @@ def main(args):
   # Create model
   model = model_from_config(config["model"], compile=True)
   model.summary(expand_nested=True)
+  # check if model is contain only unique layers names
+  not_unique_layers = []
+  layers_names = set()
+  for layer in model.trainable_variables:
+    if layer.name in layers_names:
+      not_unique_layers.append(layer.name)
+    layers_names.add(layer.name)
+    continue
+  for layer in not_unique_layers:
+    print(f"Layer name '{layer}' is not unique")
+  assert not not_unique_layers, "Model contains not unique layers names"
   # save to config model architecture and number of parameters
   config['architecture'] = model_to_architecture(model)
   

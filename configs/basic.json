@@ -14,6 +14,9 @@
     },
     "decoder": {
       "channels": 3
+    },
+    "global": {
+      "mlp dropout": 0.0
     }
   },
   "fit_params": {

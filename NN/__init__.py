@@ -3,6 +3,7 @@ from .Decoder import decoder_from_config
 from .Renderer import renderer_from_config
 from .restorators import restorator_from_config
 from .Nerf2D import CNerf2D
+from .utils import setMLPDefaultDropout
 import tensorflow as tf
 
 def _optimizer_from_config(config):
@@ -63,6 +64,10 @@ def _nerf_from_config(config):
   raise ValueError(f"Unknown nerf name: {config['name']}")
 
 def model_from_config(config, compile=True):
+  # set global parameters
+  globalz = config.get('global', {})
+  setMLPDefaultDropout(globalz.get('mlp dropout', 0.05)) # reset if not specified
+
   encoder = encoder_from_config(config['encoder'])
   renderer = renderer_from_config(
     config['renderer'],

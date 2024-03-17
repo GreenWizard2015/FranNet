@@ -2,6 +2,7 @@
   "model": {
     "encoder": {
       "latent dimension": 64,
+      "use downsampling": false,
       "head": {
         "downsample steps": [32, 32, 32],
         "global context": {
@@ -15,9 +16,15 @@
           "final activation": "relu"
         },
         "local context": {
-          "kernel size": 3,
-          "conv before": 1,
-          "final activation": "relu"
+          "layers": [
+            {"name": "Patches", "patch size": 8 },
+            {"name": "Reshape", "shape": [8, 8, -2] },
+            {"name": "MLP", "sizes": [64], "activation": "relu" },
+            {"name": "CoordsGrid" },
+            {"name": "Reshape", "shape": [-1, -2] },
+            {"name": "Transformer", "intermediate dim": 256, "num heads": 32, "dropout": 0.0},
+            {"name": "Reshape", "shape": [8, 8, -1]}
+          ]
         }
       },
       "contexts mixer": {

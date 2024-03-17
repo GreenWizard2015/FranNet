@@ -70,9 +70,16 @@ def generateSquareGrid(size, scale, shift):
   tf.assert_equal(tf.shape(res), (size * size, 2), 'Should be a flat grid of coordinates')
   return res
 #######################################
+MLP_DEFAULT_DROPOUT = 0.05
+def setMLPDefaultDropout(dropout):
+  global MLP_DEFAULT_DROPOUT
+  MLP_DEFAULT_DROPOUT = dropout
+  return
+
 class sMLP(tf.keras.layers.Layer):
-  def __init__(self, sizes, activation='linear', dropout=0.05, **kwargs):
+  def __init__(self, sizes, activation='linear', dropout=None, **kwargs):
     super().__init__(**kwargs)
+    if dropout is None: dropout = MLP_DEFAULT_DROPOUT
     layers = []
     for i, sz in enumerate(sizes):
       if 0.0 < dropout:

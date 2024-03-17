@@ -19,7 +19,8 @@
     "extractor": {
       "name": "interpolate",
       "mlp": [256],
-      "final activation": "relu"
+      "final activation": "relu",
+      "dropout": 0.0
     }
   }
 }

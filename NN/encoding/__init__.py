@@ -1,5 +1,6 @@
 import tensorflow as tf
-from .CCoordsEncodingLayer import CCoordsEncodingLayer
+from .CCoordsEncodingLayer import CCoordsEncodingLayerV1
+from .CCoordsEncodingLayerV2 import CCoordsEncodingLayerV2
 from .CCoordsGridLayer import CCoordsGridLayer
 from .CFixedSinCosEncoding import CFixedSinCosEncoding
 
@@ -7,7 +8,7 @@ from .CFixedSinCosEncoding import CFixedSinCosEncoding
 class CFlatCoordsEncodingLayer_OLD(tf.keras.layers.Layer):
   def __init__(self, N=32, **kwargs):
     super().__init__(**kwargs)
-    self._enc = CCoordsEncodingLayer(N)
+    self._enc = CCoordsEncodingLayerV1(N)
     return
 
   def call(self, x):
@@ -41,8 +42,11 @@ def encoding_from_config(config):
     if 'fixed' == name: return CFixedSinCosEncoding(**params)
 
     if 'learned v2' == name: return CFlatCoordsEncodingLayer(
-      encoder=CCoordsEncodingLayer(**params)
+      encoder=CCoordsEncodingLayerV1(**params)
     )
+    if 'learned v3' == name: return CFlatCoordsEncodingLayer(
+      encoder=CCoordsEncodingLayerV2(**params)
+    )    
     raise ValueError(f"Unknown encoding name: {name}")
 
   raise ValueError(f"Unknown encoding config: {config}")

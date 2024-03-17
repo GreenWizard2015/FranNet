@@ -15,9 +15,7 @@ class CCoordsGridLayer(tf.keras.layers.Layer):
   def call(self, x):
     shp = tf.shape(x)
     B, H, W = shp[0], shp[1], shp[2]
-    C = x.shape[3]
     tf.assert_equal(H, W)
-    tf.assert_equal(shp, (B, H, W, C))
 
     grid = generateSquareGrid(H, scale=1.0, shift=0.0)
     grid = tf.reshape(grid, (-1, 1, 2))
