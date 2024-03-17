@@ -144,7 +144,7 @@ class CCoordsEncodingLayerV2(tf.keras.layers.Layer):
       return tf.cond(training, lambda: apply(x), lambda: tf.identity(x))
     return F
   
-  def _createBands(self, scaling, maxFrequency, N):
+  def _createBands(self, scaling, N):
     if 'pow' == scaling:
       # 1 / 2, 1 / 4, 1 / 8, 1 / 16, 1 / 32, ... 1 / 2^N
       maxFrequency = 2.0 ** min((N, 32))

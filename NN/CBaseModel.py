@@ -1,6 +1,7 @@
 import tensorflow as tf
 from Utils.utils import CFakeObject
 import Utils.colors as colors
+from .CKIDMetric import CKIDMetric
 
 def _makeConverter(format):
   format = format.lower()
@@ -33,6 +34,7 @@ class CBaseModel(tf.keras.Model):
     self._loss = tf.keras.metrics.Mean(name="loss")
     self._lossGrayscale = tf.keras.metrics.Mean(name="loss_gr")
     self._converter = _makeConverter(format)
+    self._kidMetric = CKIDMetric(name="kid")
     return
 
   def train_step(self, data):
@@ -52,6 +54,8 @@ class CBaseModel(tf.keras.Model):
     
     loss = tf.losses.mse(dest, reconstructed)
     self._loss.update_state(loss)
+    # calculate KID metric on the images, 0..1 range
+    self._kidMetric.update_state(dest, reconstructed)
     # calculate loss for images in a grayscale color space
     lossGrayscale = tf.losses.mse(
       tf.image.rgb_to_grayscale(dest),
@@ -59,7 +63,7 @@ class CBaseModel(tf.keras.Model):
     )
     self._lossGrayscale.update_state(lossGrayscale)
     
-    return self.metrics_to_dict( self._loss, self._lossGrayscale )
+    return self.metrics_to_dict( self._loss, self._lossGrayscale, self._kidMetric )
   
   # some helper functions
   def metrics_to_dict(self, *metrics):
