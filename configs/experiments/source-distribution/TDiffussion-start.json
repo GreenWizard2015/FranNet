@@ -1,0 +1,20 @@
+{
+  "model": {
+    "restorator": {
+      "source distribution": {
+        "name": "t distribution",
+        "TFunction": {
+          "name": "log normal",
+          "mu": -1.0,
+          "sigma": 0.5,
+          "steps": 100
+        },
+        "distribution": {
+          "name": "normal",
+          "mean": 0.0,
+          "stddev": 1.0
+        }
+      }
+    }
+  }
+}

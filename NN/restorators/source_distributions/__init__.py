@@ -2,11 +2,19 @@ from .CNormalSourceDistribution import CNormalSourceDistribution
 from .CUniformSourceDistribution import CUniformSourceDistribution
 from .CSwitchSourceDistribution import CSwitchSourceDistribution
 from .CResampledNormalSourceDistribution import CResampledNormalSourceDistribution
+from .CWithTDistribution import CWithTDistribution, TFunction
 
 def source_distribution_from_config(config):
   assert isinstance(config, dict), 'config for source distribution must be a dict'
   assert 'name' in config, 'config for source distribution must have a name'
   name = config['name'].lower()
+
+  if 't distribution' == name:
+    return CWithTDistribution(
+      distribution=source_distribution_from_config(config['distribution']),
+      TFunction=TFunction(config['TFunction']),
+    )
+  
   if 'normal' == name:
     return CNormalSourceDistribution(
       mean=config['mean'],

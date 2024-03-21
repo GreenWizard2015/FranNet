@@ -29,7 +29,7 @@ def setupGPU():
     pass
   return
 
-def _dumb_deepcopy(obj):
+def dumb_deepcopy(obj):
   obj = json.dumps(obj)
   obj = json.loads(obj)
   return obj
@@ -37,7 +37,7 @@ def _dumb_deepcopy(obj):
 # function to recursively merge two configs
 def merge_configs(old, new):
   if isinstance(old, dict) and isinstance(new, dict):
-    old = _dumb_deepcopy(old)
+    old = dumb_deepcopy(old)
     keys = set(list(old.keys()) + list(new.keys()))
     for key in keys:
       value = new.get(key, old.get(key))
@@ -47,7 +47,7 @@ def merge_configs(old, new):
       old[key] = value
       continue
     return old
-  return _dumb_deepcopy(new)
+  return dumb_deepcopy(new)
 
 def _load_single_config(path, folder=None):
   if folder is None: folder = []

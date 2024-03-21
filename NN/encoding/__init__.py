@@ -1,6 +1,6 @@
 import tensorflow as tf
 from .CCoordsEncodingLayer import CCoordsEncodingLayerV1
-from .CCoordsEncodingLayerV2 import CCoordsEncodingLayerV2
+from .CCoordsEncodingLayerV2 import CCoordsEncodingLayerV2 as CCoordsEncodingLayer
 from .CCoordsGridLayer import CCoordsGridLayer
 from .CFixedSinCosEncoding import CFixedSinCosEncoding
 
@@ -45,7 +45,7 @@ def encoding_from_config(config):
       encoder=CCoordsEncodingLayerV1(**params)
     )
     if 'learned v3' == name: return CFlatCoordsEncodingLayer(
-      encoder=CCoordsEncodingLayerV2(**params)
+      encoder=CCoordsEncodingLayer(**params)
     )    
     raise ValueError(f"Unknown encoding name: {name}")
 

@@ -50,9 +50,10 @@ class CNerf2D(CBaseModel):
     points = tf.reshape(points, (B, -1, 2))
     N = tf.shape(points)[1]
     RV = extractInterpolated(img, points)
-    tf.assert_equal(tf.shape(RV)[-1], 1)
-    RV = tf.repeat(RV, 3, axis=-1) # grayscale to RGB
-    RV = tf.reshape(RV, (B, N, 3)) # ensure proper shape, especially for last dimension
+    # RV could be a RGB or grayscale image
+    RV = tf.tile(RV, [1, 1, 3]) # ensure 3 channels
+    RV = RV[..., :3] # take only the first 3 channels
+    RV = tf.reshape(RV, (B, N, 3)) # ensure proper shape
     return RV
   
   def _withResidual(self, img, points, values, add=True):

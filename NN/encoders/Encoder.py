@@ -3,6 +3,7 @@ import tensorflow.keras.layers as L
 from NN.utils import sMLP
 from NN.encoding import CCoordsGridLayer, CCoordsEncodingLayer
 from NN.layers import MixerConvLayer, Patches, TransformerBlock
+from Utils.utils import dumb_deepcopy
 
 def block_params_from_config(config):
   layers = config.get('layers', None)
@@ -39,6 +40,7 @@ def conv_block_from_config(data, config, defaults, name='CB'):
   convParams = block_params_from_config(config)
   # apply convolutions to the data
   for i, parameters in enumerate(convParams):
+    parameters = dumb_deepcopy(parameters)
     Name = parameters.get('name', 'Conv2D')
     if 'Conv2D' == Name:
       data = L.Conv2D(
@@ -67,9 +69,9 @@ def conv_block_from_config(data, config, defaults, name='CB'):
 
     if 'CoordsGrid' == Name:
       parameters = {k: v for k, v in parameters.items() if k not in ['name']}
+      parameters['name'] = '%s/coordsGrid-%d' % (name, i)
       data = CCoordsGridLayer(
         CCoordsEncodingLayer(
-          name='%s/coordsGrid-%d/encoding' % (name, i),
           N=parameters.get('N', 32),
           **parameters
         ),
@@ -99,10 +101,8 @@ def conv_block_from_config(data, config, defaults, name='CB'):
       continue
 
     if 'MLP' == Name:
-      data = sMLP(
-        **parameters,
-        name='%s/mlp-%d' % (name, i)
-      )(data)
+      parameters['name'] = '%s/mlp-%d' % (name, i)
+      data = sMLP(**parameters)(data)
       continue
     
     raise NotImplementedError('Unknown layer: {}'.format(Name))

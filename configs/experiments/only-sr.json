@@ -1,0 +1,11 @@
+{
+  "dataset": {
+    "name": "celeba",
+    "toGrayscale": false
+  },
+  "model": {
+    "encoder": {
+      "channels": 3
+    }
+  }
+}
