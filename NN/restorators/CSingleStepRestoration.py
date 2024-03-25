@@ -6,11 +6,13 @@ class CSingleStepRestoration(IRestorationProcess):
     super().__init__(channels)
     return
   
-  def forward(self, x0):
+  def forward(self, x0, xT=None):
     s = tf.shape(x0)
     T = tf.zeros(s[:-1], tf.int32)[..., None]
+    if xT is None:
+      xT = tf.zeros_like(x0)
     return {
-      "xT": tf.zeros_like(x0),
+      "xT": xT,
       "t": T, # dummy discrete time
       "T": tf.zeros_like(T, tf.float32), # dummy continuous time
       "x0": x0,

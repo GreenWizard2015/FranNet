@@ -13,16 +13,9 @@ class MLPDecoder(tf.keras.Model):
     self._blocks = blocks(self.name)
     return
   
-  def _value2initstate(self, x):
-    B, C = tf.shape(x)[0], tf.shape(x)[1]
-    tf.assert_equal(tf.shape(x), (B, C))
-
-    shp = [1, (C + self._channels) // C]
-    x = tf.tile(x, shp)[..., :self._channels]
-    return tf.reshape(x, (B, self._channels))
-
   def call(self, condition, coords, timestep, V):
-    res = self._value2initstate(V)
+    B = tf.shape(V)[0]
+    res = tf.zeros((B, self._channels), dtype=V.dtype) # initial residual by 0.0
     initState = tf.concat([condition, coords, timestep, V], axis=-1)
     for block in self._blocks:
       state = tf.concat([initState, res], axis=-1)
@@ -34,8 +27,8 @@ class MLPDecoder(tf.keras.Model):
         res = curValue
       continue
     
-    tf.assert_equal(tf.shape(res)[1:], (self._channels, ))
-    return [res] # return as a list to be compatible with other decoders
+    tf.assert_equal(tf.shape(res), (B, self._channels))
+    return res 
   
 def _mlp_from_config(config, channels):
   def _createMlp(name):

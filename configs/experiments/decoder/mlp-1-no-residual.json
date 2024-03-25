@@ -1,0 +1,15 @@
+{
+  "model": {
+    "decoder": {
+      "name": "mlp",
+      "residual": false,
+      "mlp blocks": 1,
+      "mlp": {
+        "shared": false,
+        "sizes": [64, 64, 64],
+        "activation": "relu",
+        "final activation": "linear"
+      }
+    }
+  }
+}

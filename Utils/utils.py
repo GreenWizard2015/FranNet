@@ -68,25 +68,36 @@ def _load_single_config(path, folder=None):
 
   # iterate over the config and fetch the values if 'inherit' is specified
   def iterate(config):
-    for key, value in config.items():
-      if isinstance(value, dict): iterate(value)
-      if isinstance(value, str) and value.startswith('from:'):
-        filepath = resolve_path(value[5:])
-        config[key] = _load_single_config(filepath, folder)
-        iterate(config[key])
-      continue
-    # if 'inherit' is specified, fetch the values from the inherited config
-    # should be done after the iteration to avoid overriding the values
-    if 'inherit' in config:
-      filepath = resolve_path(config['inherit'])
-      inhConfig = _load_single_config(filepath, folder)
-      config.pop('inherit')
-      # update the config with the inherited values
-      for key, value in inhConfig.items():
-        config[key] = merge_configs(value, config.get(key)) if key in config else value
+    if isinstance(config, list):
+      for idx, item in enumerate(config):
+        config[idx] = iterate(item)
+      return config
+    
+    if isinstance(config, dict):
+      for key, value in config.items():
+        if isinstance(value, dict): iterate(value)
+        if isinstance(value, list):
+          for idx, item in enumerate(value):
+            value[idx] = iterate(item)
+          continue
+        if isinstance(value, str) and value.startswith('from:'):
+          filepath = resolve_path(value[5:])
+          config[key] = _load_single_config(filepath, folder)
+          iterate(config[key])
         continue
-      return iterate(config)
-    return
+      
+      # if 'inherit' is specified, fetch the values from the inherited config
+      # should be done after the iteration to avoid overriding the values
+      if 'inherit' in config:
+        filepath = resolve_path(config['inherit'])
+        inhConfig = _load_single_config(filepath, folder)
+        config.pop('inherit')
+        # update the config with the inherited values
+        for key, value in inhConfig.items():
+          config[key] = merge_configs(value, config.get(key)) if key in config else value
+          continue
+        return iterate(config)
+    return config
   
   iterate(config)
   return config
@@ -122,6 +133,30 @@ def upgrade_configs_structure(config):
     ['model', 'nerf', 'training sampler'],
     ['dataset', 'train', 'subsample', 'sampling'],
   )
+
+  model = config.get('model', {})
+  renderer = model.get('renderer', {})
+  isOldRestorator = ('restorator' in model) or ('decoder' in model)
+  if isOldRestorator:
+    # if restorator is specified in model, move it to model/renderer
+    moveField(
+      ['model', 'restorator'],
+      ['model', 'renderer', 'restoration model', 'restorator']
+    )
+    moveField(
+      ['model', 'decoder'],
+      ['model', 'renderer', 'restoration model', 'decoder']
+    )
+    moveField(
+      ['model', 'renderer', 'position encoding'],
+      ['model', 'renderer', 'restoration model', 'position encoding']
+    )
+    moveField(
+      ['model', 'renderer', 'time encoding'],
+      ['model', 'renderer', 'restoration model', 'time encoding']
+    )
+    # set restoration model name to 'basic'
+    renderer['restoration model']['name'] = 'basic'
   return config
 
 def load_config(pathOrList, folder, upgrade=True):

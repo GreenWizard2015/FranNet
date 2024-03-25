@@ -14,8 +14,8 @@ class CDirectionInterpolant(IInterpolant):
     # x_hat is the direction towards x0
     return CFakeObject(x0=xt + x_hat, x1=xt)
   
-  def train(self, x0, x1, T):
-    xt = x1
+  def train(self, x0, x1, T, xT=None):
+    xt = x1 if xT is None else xT
     inputs = self.inference(xT=xt, T=T)
     return {
       'target': x0 - xt, # xt + x0 - xt == x0
@@ -44,7 +44,7 @@ class CConstantInterpolant(IInterpolant):
   def solve(self, x_hat, xt, t, **kwargs):
     return CFakeObject(x0=x_hat, x1=x_hat)
   
-  def train(self, x0, x1, T):
+  def train(self, x0, x1, T, xT=None):
     inputs = self.inference(xT=x1, T=T)
     return {
       'target': x0,
@@ -60,24 +60,3 @@ class CConstantInterpolant(IInterpolant):
       'T': tf.zeros((B, 1), dtype=tf.float32), # not used
     }
 # End of CConstantInterpolant
-
-class CCommonInterpolantBase(IInterpolant):
-  def __init__(self, targetT):
-    self._targetT = targetT
-    # small optimization
-    self._getTarget = self.interpolate
-    if targetT == 0.0: self._getTarget = lambda x0, x1, t: x0
-    if targetT == 1.0: self._getTarget = lambda x0, x1, t: x1
-    return
-  
-  def train(self, x0, x1, T):
-    xt = self.interpolate(x0, x1, T)
-    target = self._getTarget(x0, x1, T)
-    inputs = self.inference(xT=xt, T=T)
-    return {
-      'target': target,
-      'x0': x0,
-      'x1': x1,
-      **inputs,
-    }
-# End of CCommonInterpolantBase

@@ -21,9 +21,14 @@ class CDiffusionInterpolant(CBaseDiffusionInterpolant):
     x0 = (xt - (noise_rate * x1)) / signal_rate
     return CFakeObject(x0=x0, x1=x1)
   
-  def train(self, x0, x1, T):
-    xt = self.interpolate(x0, x1, T)
-    inputs = self.inference(xT=xt, T=T)
+  def train(self, x0, x1, T, xT=None):
+    if xT is None:
+      xT = self.interpolate(x0, x1, T)
+    else:
+      signal_rate, noise_rate = tf.sqrt(T), tf.sqrt(1.0 - T)
+      x1 = (xT - (signal_rate * x0)) / noise_rate
+
+    inputs = self.inference(xT=xT, T=T)
     return {
       'target': x1, # predict noise
       'x0': x0,
@@ -41,9 +46,15 @@ class CDiffusionInterpolantV(CBaseDiffusionInterpolant):
     x1 = xt * noise_rate + x_hat * signal_rate
     return CFakeObject(x0=x0, x1=x1)
   
-  def train(self, x0, x1, T):
-    xt = self.interpolate(x0, x1, T)
-    inputs = self.inference(xT=xt, T=T)
+  def train(self, x0, x1, T, xT=None):
+    if xT is None:
+      xT = self.interpolate(x0, x1, T)
+    else:
+      signal_rate, noise_rate = tf.sqrt(T), tf.sqrt(1.0 - T)
+      x1 = (xT - (signal_rate * x0)) / noise_rate
+      tf.debugging.assert_near(xT, self.interpolate(x0, x1, T), atol=1e-6)
+
+    inputs = self.inference(xT=xT, T=T)
     # calculate velocity
     # based on https://github.com/beresandras/clear-diffusion-keras/blob/master/model.py#L347
     signal_rate, noise_rate = tf.sqrt(T), tf.sqrt(1.0 - T)

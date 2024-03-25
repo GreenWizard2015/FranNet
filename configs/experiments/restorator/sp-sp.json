@@ -1,0 +1,52 @@
+{
+  "experiment": {
+    "title": "Autoregressive DDIM with V objective",
+    "description": "DDIM-V with autoregressive model"
+  },
+  "model": {
+    "renderer": {
+      "restoration model": {
+        "name": "sequential",
+        "restorators": [
+          {
+            "name": "basic",
+            "position encoding": "from:configs/models/encodings.json",
+            "time encoding": "from:configs/models/encodings.json",
+            "decoder": {
+              "inherit": "configs/models/decoder/mlp.json",
+              "channels": 3
+            },
+            "restorator": {
+              "inherit": "configs/models/restorator/single-pass.json",
+              "channels": 3
+            }
+          },          
+          {
+            "name": "basic",
+            "position encoding": "from:configs/models/encodings.json",
+            "time encoding": "from:configs/models/encodings.json",
+            "decoder": {
+              "inherit": "configs/models/decoder/mlp.json",
+              "channels": 3
+            },
+            "restorator": {
+              "inherit": "configs/models/restorator/autoregressive.json",
+              "sampler": {
+                "threshold": 0.001, 
+                "steps": {
+                  "start": 1.0,
+                  "end": 0.001,
+                  "steps": 100,
+                  "decay": 0.9
+                },
+                "interpolant": {
+                  "name": "direction"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

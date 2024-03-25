@@ -42,4 +42,7 @@ class CBasicInterpolantSampler:
       continue
     
     return value
+  
+  def targets(self, x_hat, values):
+    return self._algorithm.directSolve(x_hat, values, interpolant=self._interpolant)
 # End of CBasicInterpolantSampler

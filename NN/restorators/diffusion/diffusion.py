@@ -58,16 +58,24 @@ class CGaussianDiffusion(IRestorationProcess):
       'SNR': step.SNR,
     }
   
-  def forward(self, x0):
+  def forward(self, x0, xT=None):
     '''
     This function implements the forward diffusion process. It takes an initial value and applies the T steps of the diffusion process.
     '''
     # source distribution need to know the shape of the input, so we need to ensure it explicitly
     x0 = tf.ensure_shape(x0, (None, self._channels))
     sampled = self._sourceDistribution.sampleFor(x0)
-    x1 = sampled['xT']
+    T = sampled['T']
+    if xT is None:
+      x1 = sampled['xT'] # use sampled value
+    else: # calculate the noise from the T and xT
+      t = self._schedule.to_discrete(T, lastStep=True)
+      t = self._schedule.parametersForT(t).alphaHat
+      signal_rate, noise_rate = tf.sqrt(t), tf.sqrt(1.0 - t)
+      x1 = (xT - (signal_rate * x0)) / noise_rate
+
     tf.assert_equal(tf.shape(x0), tf.shape(x1))
-    return self._forwardStep(x0, x1, T=sampled['T'])
+    return self._forwardStep(x0, x1, T=T)
   
   def _makeDenoiser(self, denoiser, modelT, valueShape):
     if self._schedule.is_discrete: # discrete time diffusion
@@ -137,6 +145,18 @@ class CGaussianDiffusion(IRestorationProcess):
       return lambda loss, x_hat, predicted: loss * tf.clip_by_value(x_hat['SNR'], minSNR, maxSNR)
     
     raise ValueError('Unknown loss scaling')
+  
+  def targets(self, x_hat, values):
+    xt = x_hat['xT']
+    x1 = values
+    
+    t = x_hat['t']
+    stepT = self._schedule.parametersForT(t)
+    t = stepT.alphaHat
+    
+    signal_rate, noise_rate = tf.sqrt(t), tf.sqrt(1.0 - t)
+    x0 = (xt - (noise_rate * x1)) / signal_rate
+    return x0
 # End of CGaussianDiffusion
 
 def diffusion_from_config(config):

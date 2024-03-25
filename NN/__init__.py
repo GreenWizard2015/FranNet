@@ -1,7 +1,5 @@
 from .encoders import encoder_from_config
-from .Decoder import decoder_from_config
 from .Renderer import renderer_from_config
-from .restorators import restorator_from_config
 from .Nerf2D import CNerf2D
 from .utils import setMLPDefaultDropout
 import tensorflow as tf
@@ -69,11 +67,7 @@ def model_from_config(config, compile=True):
   setMLPDefaultDropout(globalz.get('mlp dropout', 0.05)) # reset if not specified
 
   encoder = encoder_from_config(config['encoder'])
-  renderer = renderer_from_config(
-    config['renderer'],
-    decoder=decoder_from_config(config['decoder']),
-    restorator=restorator_from_config(config['restorator'])
-  )
+  renderer = renderer_from_config(config['renderer'])
   
   nerf = _nerf_from_config(config['nerf'])( encoder, renderer )
   nerf.build(nerf.get_input_shape())

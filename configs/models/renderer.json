@@ -1,29 +1,16 @@
 {
-  "position encoding": {
-    "name": "learned v3",
-    "N": 32,
-    "raw": true,
-    "useShifts": false,
-    "scaling": "pow",
-    "maxFrequency": 10000,
-    "useLowBands": true,
-    "useHighBands": true,
-    "finalDropout": 0.25,
-    "bandsDropout": true,
-    "sharedTransformation": false
-  },
-  "time encoding": {
-    "name": "learned v3",
-    "N": 32,
-    "raw": true,
-    "useShifts": false,
-    "scaling": "pow",
-    "maxFrequency": 10000,
-    "useLowBands": true,
-    "useHighBands": true,
-    "finalDropout": 0.25,
-    "bandsDropout": true,
-    "sharedTransformation": false
+  "restoration model": {
+    "name": "basic",
+    "position encoding": "from:models/encodings.json",
+    "time encoding": "from:models/encodings.json",
+    "decoder": {
+      "inherit": "models/decoder/mlp.json",
+      "channels": 3
+    },
+    "restorator": {
+      "inherit": "models/restorator/single-pass.json",
+      "channels": 3
+    } 
   },
   "batch_size": 65536
 }

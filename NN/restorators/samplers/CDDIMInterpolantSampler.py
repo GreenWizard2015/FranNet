@@ -100,6 +100,9 @@ class CDDIMSamplingAlgorithm(ISamplingAlgorithm):
       current_step=step.current_step,
       sigma=step.sigma,
     )
+  
+  def directSolve(self, x_hat, xt, interpolant):
+    return interpolant.solve(x_hat=xt, xt=x_hat['xT'], t=x_hat['alphaHat']).x0
 # End of CDDIMSamplingAlgorithm
 
 class CDDIMInterpolantSampler(CBasicInterpolantSampler):
@@ -121,7 +124,7 @@ class CDDIMInterpolantSampler(CBasicInterpolantSampler):
     self._schedule = schedule
     return
   
-  def train(self, x0, x1, T):
+  def train(self, x0, x1, T, xT=None):
     B = tf.shape(x0)[0]
     tf.assert_equal(tf.shape(T), (B, 1))
     tf.assert_equal(tf.shape(x0), tf.shape(x1))
@@ -130,9 +133,19 @@ class CDDIMInterpolantSampler(CBasicInterpolantSampler):
     # apply training procedure from interpolant
     alpha_hat_t = self._schedule.parametersForT(T).alphaHat
     tf.assert_equal(tf.shape(alpha_hat_t), (B, 1))
-    trainData = self._interpolant.train(x0=x0, x1=x1, T=alpha_hat_t)
+    
+    if (xT is not None):
+      REPLACE_NOISE = True
+      if REPLACE_NOISE:
+        x1 = xT
+      else:
+        x1 = None
+      pass
+
+    trainData = self._interpolant.train(x0=x0, x1=x1, T=alpha_hat_t, xT=xT)
     return {
       **trainData,
+      'alphaHat': alpha_hat_t,
       'T': self._schedule.to_continuous(T),
     }
 # End of CDDIMInterpolantSampler

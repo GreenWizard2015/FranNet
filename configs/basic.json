@@ -12,9 +12,6 @@
       "name": "adam",
       "learning_rate": 1e-4
     },
-    "decoder": {
-      "channels": 3
-    },
     "global": {
       "mlp dropout": 0.0
     }

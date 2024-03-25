@@ -1,5 +1,6 @@
 from Utils.utils import upgrade_configs_structure
 import pytest
+import json
 
 def default_config():
   return {
@@ -27,4 +28,34 @@ def test_convert_sampler():
   assert 'training sampler' not in config['model']['nerf']
   train = config['dataset']['train']
   assert train['subsample']['sampling'] == 'structured'
+  return
+
+def test_upgrade_renderer():
+  config = {
+    "model": {
+      "decoder": "decoder",
+      "restorator": "restorator",
+      "renderer": {
+        "position encoding": "position encoding",
+        "time encoding": "time encoding",
+        "batch_size": 32
+      }
+    }
+  }
+  config = upgrade_configs_structure(config)
+  expected = {
+    "model": {
+      "renderer": {
+        "batch_size": 32,
+        "restoration model": {
+          "name": "basic",
+          "restorator": "restorator",
+          "decoder": "decoder",
+          "position encoding": "position encoding",
+          "time encoding": "time encoding",
+        }
+      }
+    }
+  }
+  assert json.dumps(config, indent=2, sort_keys=True) == json.dumps(expected, indent=2, sort_keys=True)
   return

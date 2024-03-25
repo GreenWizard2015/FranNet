@@ -7,10 +7,10 @@ class IInterpolant:
     raise NotImplementedError()
   
   def solve(self, x_hat, xt, t):
-    # find x0 and/or x1 such that interpolate(x0, x1, t) == xt
+    # find x0 such that interpolate(x0, x_hat, t) == xt
     raise NotImplementedError()
   
-  def train(self, x0, x1, t):
+  def train(self, x0, x1, t, xT=None):
     # return a dictionary with following keys:
     # 'x' - input to the model
     # 'target' - value, that should be predicted

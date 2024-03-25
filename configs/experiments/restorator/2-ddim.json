@@ -1,0 +1,63 @@
+{
+  "experiment": {
+    "title": "Autoregressive DDIM with V objective",
+    "description": "DDIM-V with autoregressive model"
+  },
+  "model": {
+    "renderer": {
+      "restoration model": {
+        "name": "repeated",
+        "N": 2,
+        "IDs": {
+          "name": "embeddings",
+          "dim": 256
+        },
+        "restorator": {
+          "name": "basic",
+          "position encoding": "from:configs/models/encodings.json",
+          "time encoding": "from:configs/models/encodings.json",
+          "decoder": {
+            "inherit": "configs/models/decoder/mlp.json",
+            "channels": 3
+          },
+          "restorator": {
+            "inherit": "configs/models/restorator/autoregressive.json",
+            "channels": 3,
+            "sampler": {
+              "name": "DDIM",
+              "interpolant": {
+                "name": "diffusion-V"
+              },
+              "stochasticity": 1.0,
+              "noise stddev": "squared",
+              "noise projection": true,
+              "steps skip type": {
+                "name": "uniform",
+                "K": 1
+              },
+              "schedule": {
+                "name": "discrete",
+                "beta schedule": "cosine",
+                "timesteps": 100
+              }
+            },
+            "source distribution": {
+              "name": "t distribution",
+              "TFunction": {
+                "name": "log normal",
+                "mu": -1.0,
+                "sigma": 0.5,
+                "steps": 100
+              },
+              "distribution": {
+                "name": "normal",
+                "mean": 0.0,
+                "stddev": 1.0
+              }
+            }
+          } 
+        }
+      }
+    }
+  }
+}

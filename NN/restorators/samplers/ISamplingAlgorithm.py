@@ -11,4 +11,7 @@ class ISamplingAlgorithm:
   
   def solve(self, **kwargs):
     raise NotImplementedError()
+  
+  def directSolve(self, x_hat, xt, T, interpolant):
+    return x_hat
 # End of ISamplingAlgorithm

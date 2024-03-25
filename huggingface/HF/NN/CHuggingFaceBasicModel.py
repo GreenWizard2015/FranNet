@@ -2,6 +2,7 @@ import os, shutil
 from Utils.WandBUtils import CWBRun
 from NN import model_from_config
 from HF.Utils import hashable_lru
+from Utils import upgrade_configs_structure
 
 # prevent downloading the same weights file multiple times
 @hashable_lru(maxsize=None)
@@ -43,7 +44,7 @@ def _autoregressive_kind(restorator):
 
 class CHuggingFaceBasicModel:
   def __init__(self, configs):
-    self._configs = configs
+    self._configs = upgrade_configs_structure(configs)
     return
   
   def __call__(self, images, targetResolution, raw=None, **kwargs):

@@ -45,7 +45,7 @@ class CNerf2D(CBaseModel):
     tf.assert_equal(tf.shape(latents)[:1], (B * N,))
     return latents
 
-  def _extractGrayscaled(self, img, points):
+  def _extractUpscaled(self, img, points):
     B = tf.shape(img)[0]
     points = tf.reshape(points, (B, -1, 2))
     N = tf.shape(points)[1]
@@ -54,21 +54,21 @@ class CNerf2D(CBaseModel):
     RV = tf.tile(RV, [1, 1, 3]) # ensure 3 channels
     RV = RV[..., :3] # take only the first 3 channels
     RV = tf.reshape(RV, (B, N, 3)) # ensure proper shape
+
+    RV = self._converter.convert(RV) # convert to the target format
     return RV
   
-  def _withResidual(self, img, points, values, add=True):
-    if not self._residual: return values
+  def _withResidual(self, img, points):
+    B, N = tf.shape(points)[0], tf.shape(points)[1]
+    if not self._residual: return tf.zeros((B, N, 3), dtype=img.dtype)
 
-    RV = self._extractGrayscaled(img, points)
-    RV = tf.reshape(RV, tf.shape(values))
-    if add: return values + RV
-    return values - RV # for training
+    return self._extractUpscaled(img, points)
 
   def _extractExtraLatents(self, config, src, points, latents):
     name = config['name'].lower()
-    if 'grayscale' == name:
+    if ('upscaled' == name) or ('grayscale' == name):
       return self._converter.convert(
-        self._extractGrayscaled(src, points)
+        self._extractUpscaled(src, points)
       )
     
     raise NotImplementedError(f"Unknown extra latent ({name})")
@@ -93,25 +93,28 @@ class CNerf2D(CBaseModel):
     src = ensure4d(src)
     x0 = YData['sampled']
     positions = YData['positions']
+    # remove this keys from the dictionary
+    YData = {k: v for k, v in YData.items() if k not in ['sampled', 'positions']}
     
     with tf.GradientTape() as tape:
       encodedSrc = self._encoder(src=src, training=True)
       latents = self._extractLatents(encodedSrc=encodedSrc, positions=positions, training=True)
       # train the restorator
-      x0 = self._withResidual(src, points=positions, values=x0, add=False)
+      residual = self._withResidual(src, points=positions)
       latents = self._withExtraLatents(latents, src=src, points=positions)
-      # flatten latents and positions
+      # flatten values
       BN = tf.shape(positions)[0] * tf.shape(positions)[1]
       latents = tf.reshape(latents, (BN, tf.shape(latents)[-1]))
       positions = tf.reshape(positions, (BN, 2))
       x0 = tf.reshape(x0, (BN, tf.shape(x0)[-1]))
+      residual = tf.reshape(residual, (BN, tf.shape(residual)[-1]))
       # actual training step
       loss = self._renderer.train_step(
         x0=self._converter.convert(x0), # convert to the target format
         latents=latents,
         positions=positions,
-        params=self._lossParams
-      )
+        params={**self._lossParams, **YData, 'residual': residual},
+      )['loss']
       
     self.optimizer.minimize(loss, self.trainable_variables, tape=tape)
     self._loss.update_state(loss)
@@ -129,16 +132,10 @@ class CNerf2D(CBaseModel):
     from NN.restorators.samplers.CWatcherWithExtras import CWatcherWithExtras
     def interceptorFactory(algorithm):
       res = interceptor(algorithm)
-      residuals = None
-      if self._residual:
-        residuals = self._extractGrayscaled(image, pos)
-        residuals = tf.reshape(residuals, (-1, tf.shape(residuals)[-1]))
-        pass
-
       res = CWatcherWithExtras(
         watcher=res,
         converter=self._converter,
-        residuals=residuals
+        residuals=None # residuals applied in the renderer
       )
       return res
     return interceptorFactory
@@ -183,17 +180,19 @@ class CNerf2D(CBaseModel):
 
       # add extra latents if needed
       latents = self._withExtraLatents(latents=latents, src=src, points=posC)
-      return dict(latents=latents, pos=posC, reverseArgs=reverseArgs, value=value)
+      # get residuals if needed
+      residual = self._withResidual(src, points=posCB)
+      residual = tf.reshape(residual, (flatB, -1))
+      return dict(
+        latents=latents, pos=posC, reverseArgs=reverseArgs, value=value,
+        residual=residual
+      )
 
     probes = self._renderer.batched(ittr=getChunk, B=B, N=N, batchSize=batchSize, training=False)
     C = tf.shape(probes)[-1]
     tf.assert_equal(C, 3, "Expected 3 channels in the output")
     # convert to the proper format
     probes = self._converter.convertBack(probes)
-    probes = self._withResidual(
-      src, values=probes,
-      points=tf.tile(pos[None], [B, 1, 1])
-    )
     return probes
   
   @tf.function

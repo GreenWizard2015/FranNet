@@ -1,0 +1,13 @@
+{
+  "name": "learned v3",
+  "N": 32,
+  "raw": true,
+  "useShifts": false,
+  "scaling": "pow",
+  "maxFrequency": 10000,
+  "useLowBands": true,
+  "useHighBands": true,
+  "finalDropout": 0.25,
+  "bandsDropout": true,
+  "sharedTransformation": false
+}

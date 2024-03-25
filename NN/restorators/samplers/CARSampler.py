@@ -174,6 +174,10 @@ class CARSamplingAlgorithm(ISamplingAlgorithm):
       deltaDist=deltaDist,
       goalDist=goalDist,
     )
+  
+  def directSolve(self, x_hat, values, interpolant, **kwargs):
+    solved = interpolant.solve(x_hat=x_hat['x1'], xt=values, t=1.0).x0
+    return solved
 # End of CARSamplingAlgorithm
 
 class CARSampler(CBasicInterpolantSampler):
@@ -189,8 +193,8 @@ class CARSampler(CBasicInterpolantSampler):
     )
     return
   
-  def train(self, x0, x1, T):
-    return self._interpolant.train(x0=x0, x1=x1, T=T)
+  def train(self, x0, x1, T, xT=None):
+    return self._interpolant.train(x0=x0, x1=x1, T=T, xT=xT)
 # End of CARSampler
 
 def autoregressive_sampler_from_config(config):

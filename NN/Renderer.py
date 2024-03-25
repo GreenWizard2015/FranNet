@@ -1,83 +1,22 @@
 import tensorflow as tf
-from NN.encoding import encoding_from_config
-
+from NN.RestorationModel import restorationModel_from_config
+  
 '''
 Performs batched inverse restorator process to generate V from latents and coords
 '''
 class Renderer(tf.keras.Model):
-  def __init__(self, 
-    decoder, restorator,
-    posEncoder, timeEncoder,
-    batch_size=16 * 64 * 1024,
-    enableChecks=True,
-    **kwargs
-  ):
-    assert posEncoder is not None, "posEncoder is not provided"
-    assert timeEncoder is not None, "timeEncoder is not provided"
+  def __init__(self, restorationModel, batch_size=16 * 64 * 1024, **kwargs):
     super().__init__(**kwargs)
     self._batchSize = batch_size
-    self._decoder = decoder
-    self._restorator = restorator
-    self._posEncoder = posEncoder
-    self._timeEncoder = timeEncoder
-    self._enableChecks = enableChecks
+    self._restorator = restorationModel
     return
 
-  # only for training and building, during inference use 'batched' method
-  def call(self, latents, pos, T, V, training=None):
-    pos = self._posEncoder(pos)
-    T = self._timeEncoder(T)
-    res = self._decoder(latents, pos, T, V, training=training)
-    assert isinstance(res, list), "decoder must return a list of values"
+  def call(self, **params):
+    res = self._restorator(**params)
     return res
 
-  def train_step(self, x0, latents, positions, **params):
-    # defer training to the restorator
-    return self._restorator.train_step(
-      x0=x0,
-      model=lambda T, V: self(
-        latents=latents, pos=positions,
-        T=T, V=V,
-        training=True
-      ),
-      **params
-    )
-
-  def _encodePos(self, pos, training, args):
-    # for ablation study of the decoder, randomize positions BEFORE encoding
-    if args.get('randomize positions', False):
-      pos = tf.random.uniform(tf.shape(pos), minval=0.0, maxval=1.0)
-
-    if self._enableChecks:
-      tf.debugging.assert_less_equal(tf.reduce_max(pos), 1.0)
-      tf.debugging.assert_less_equal(0.0, tf.reduce_min(pos))
-      pass
-    return self._posEncoder(pos, training=training)
-
-  def _invD(self, latents, pos, reverseArgs, training, value):
-    EPos = self._encodePos(pos, training=training, args=reverseArgs.get('decoder', {}))
-
-    def denoiser(x, t, mask=None):
-      args = (latents, EPos, t, x)
-      if mask is not None:
-        args = (tf.boolean_mask(v, mask) for v in args)
-
-      res = self._decoder(*args, training=training)
-      assert isinstance(res, list), "decoder must return a list of values"
-      return res[-1] # return the last value as the denoised one
-    
-    def encodeTime(t):
-      if self._enableChecks:
-        tf.debugging.assert_less_equal(tf.reduce_max(t), 1.0)
-        tf.debugging.assert_less_equal(0.0, tf.reduce_min(t))
-        pass
-      t = tf.cast(t, tf.float32) # ensure that t is a tensor, not a nested structure
-      return self._timeEncoder(t, training=training)
-    
-    return self._restorator.reverse(
-      value=value, denoiser=denoiser, modelT=encodeTime,
-      **reverseArgs
-    )
+  def train_step(self, **params):
+    return self._restorator.train_step(**params)
 
   def batched(self, ittr, B, N, batchSize=None, training=False):
     batchSize = self._batchSize if batchSize is None else batchSize
@@ -89,7 +28,7 @@ class Renderer(tf.keras.Model):
     for i in tf.range(NBatches):
       index = i * stepBy
       data = ittr(index, stepBy)
-      V = self._invD(**data, training=training)
+      V = self._restorator.reverse(**data, training=training)
       C = tf.shape(V)[-1]
       res = res.write(i, tf.reshape(V, (B, stepBy, C)))
       continue
@@ -97,7 +36,7 @@ class Renderer(tf.keras.Model):
     index = NBatches * stepBy
 
     data = ittr(index, N - index)
-    V = self._invD(**data, training=training)
+    V = self._restorator.reverse(**data, training=training)
     C = tf.shape(V)[-1]
 
     w = N - index
@@ -115,11 +54,8 @@ class Renderer(tf.keras.Model):
     return res
 # End of Renderer class
 
-def renderer_from_config(config, decoder, restorator):
+def renderer_from_config(config):
   return Renderer(
-    decoder=decoder,
-    restorator=restorator,
+    restorationModel=restorationModel_from_config(config['restoration model']),
     batch_size=config.get('batch_size', 16 * 64 * 1024),
-    posEncoder=encoding_from_config(config['position encoding']),
-    timeEncoder=encoding_from_config(config['time encoding']),
   )

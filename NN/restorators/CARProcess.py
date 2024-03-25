@@ -13,16 +13,15 @@ class CARProcess(IRestorationProcess):
     self._sampler = sampler
     return
   
-  def forward(self, x0):
+  def forward(self, x0, xT=None):
     B = tf.shape(x0)[0]
     # source distribution need to know the shape of the input, so we need to ensure it explicitly
     x0 = tf.ensure_shape(x0, (None, self._channels))
     sampled = self._sourceDistribution.sampleFor(x0)
-    xT = sampled['xT']
+    x1 = sampled['xT'] if xT is None else xT
     
     tf.assert_equal(tf.shape(x0), (B, self._channels))
-    tf.assert_equal(tf.shape(x0), tf.shape(xT))
-    return self._sampler.train(x0=x0, x1=xT, T=sampled['T'])
+    return self._sampler.train(x0=x0, x1=x1, T=sampled['T'], xT=xT)
   
   def calculate_loss(self, x_hat, predicted, **kwargs):
     lossFn = kwargs.get('lossFn', tf.losses.mae) # default loss function
@@ -46,6 +45,9 @@ class CARProcess(IRestorationProcess):
     res = self._sampler.sample(value=value, model=denoiser, **kwargs)
     tf.assert_equal(tf.shape(res), tf.shape(value))
     return res
+  
+  def targets(self, x_hat, values):
+    return self._sampler.targets(x_hat, values)
 # End of CARProcess
 
 def autoregressive_restoration_from_config(config):
